@@ -18,12 +18,14 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
 
 :root {
-  --primary: #396dff;
+  --purple: #396dff;
+  --orange: #ff8400;
   --primary--dim: #6987db;
   --darkgrey: #d4d4d4;
   --medgrey: #e0e0e0;
   --grey: #f7f7f7;
   --white: #fff;
+  --black: #020006;
 
   --xs: 4px;
   --s: 8px;
