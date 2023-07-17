@@ -21,9 +21,9 @@ const Homepage = (props: Props) => {
   return (
     <div className="u-flexColumn u-alignCenter">
       {/* <h1>The solution to your corporate housing needs</h1> */}
-      <ul>
+      {/* <ul>
         <li>Add a favicon to your website at the path client/dist/favicon.ico</li>
-      </ul>
+      </ul> */}
       <LoginPanel
         handleLogin={handleLogin}
         googleLogout={googleLogout}

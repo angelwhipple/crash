@@ -1,7 +1,10 @@
 .background {
   position: absolute;
   display: block;
-  background-color: white;
+  /* background-color: white; */
+  background-image: url("../../assets/background4.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
   top: 0;
   left: 0;
   z-index: 0;
