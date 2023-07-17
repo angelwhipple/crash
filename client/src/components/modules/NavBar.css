@@ -33,11 +33,16 @@ body {
   font-size: large;
   background-color: var(--black);
   padding: 1%;
-  transition-duration: 0.6s;
+  transition-duration: 1s;
 }
 
 .nav-button:hover,
-.nav-button:visited {
-  transition-duration: 0.6s;
+.nav-button:visited,
+.nav-button-selected {
+  border: none;
+  font-size: large;
+  background-color: var(--black);
+  padding: 1%;
+  transition-duration: 1s;
   -webkit-text-fill-color: var(--orange);
 }

@@ -51,20 +51,6 @@ app.use(
 app.use(auth.populateCurrentUser);
 app.use("/api", api);
 
-// LINKEDIN OAUTH STEP 2: TOKEN REQUEST
-// app.get("/linkedin", (req, res) => {
-//   assert(typeof req.query.url === "string"); // URL typecheck
-
-//   call_external_API(req.query.url)
-//     .then((response) => {
-//       res.send(response);
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//       res.send(error);
-//     });
-// });
-
 // TODO: build API router for login to different services (Linkedin, Facebook, AirBnb, etc)
 app.use("/login", login);
 

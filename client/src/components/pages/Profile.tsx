@@ -14,7 +14,7 @@ const Profile = (props) => {
   };
 
   return (
-    <div className="centered">
+    <div className="centered default-container">
       <p>No profile information to display</p>
       <button
         className="login-button u-pointer"

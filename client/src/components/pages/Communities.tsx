@@ -14,7 +14,8 @@ const Communities = (props) => {
   };
 
   return (
-    <div className="centered">
+    <div className="centered default-container">
+      <p>Join Communities</p>
       <p>Coming soon...</p>
       <button
         className="login-button u-pointer"

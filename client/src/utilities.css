@@ -116,3 +116,15 @@ form {
 .right {
   right: 0;
 }
+
+.default-container {
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  width: fit-content;
+  height: fit-content;
+  padding: 5%;
+  border-radius: var(--m);
+  -webkit-text-fill-color: var(--white);
+  row-gap: var(--l);
+}

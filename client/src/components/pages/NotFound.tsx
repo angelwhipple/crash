@@ -12,7 +12,7 @@ const NotFound = (props: NotFoundProps) => {
   };
 
   return (
-    <div className="centered">
+    <div className="centered default-container">
       <h1>Sorry, you've reached a dead end.</h1>
       <button className="login-button u-pointer" onClick={routeHome}>
         Take me back

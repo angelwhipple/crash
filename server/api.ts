@@ -32,12 +32,23 @@ const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/linkedin";
 
 /**
+ * Record type for a Linkedin access token response
+ */
+type tokenResponse = {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_token_expires_in: number;
+  scope: string;
+};
+
+/**
  * Async helper for making requests to external APIs
  * @param url URL of the desired API endpoint
  * @returns a Promise that resolves when the API call resolves,
  * otherwise the Promise rejects if the call returns an error
  */
-const callExternalAPI = (url: string) => {
+const callExternalAPI = (url: string): Promise<tokenResponse> => {
   return new Promise((resolve, reject) => {
     request(url, { json: true }, (err, res, body) => {
       if (err) reject(err);
@@ -54,11 +65,13 @@ router.get("/linkedin", (req, res) => {
   const auth_code = query.code;
   console.log(`Authorization code: ${auth_code}`);
 
+  console.log("Requesting Linkedin access token");
   // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
   const endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
   callExternalAPI(endpoint_url)
-    .then((token_response) => {
-      console.log(`Access token response: ${token_response}`);
+    .then((token_response: tokenResponse) => {
+      const access_token = token_response.access_token; // default: 60 day lifespan
+      console.log(`Access token: ${access_token}`);
     })
     .catch((error) => {
       console.log(error);
