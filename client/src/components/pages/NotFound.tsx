@@ -1,13 +1,22 @@
 import React from "react";
+import "../modules/LoginPanel.css";
 
-import { RouteComponentProps } from "@reach/router";
+import { RouteComponentProps, useNavigate } from "@reach/router";
 
 type NotFoundProps = RouteComponentProps;
 
 const NotFound = (props: NotFoundProps) => {
+  const navigate = useNavigate();
+  const routeHome = (event) => {
+    navigate("/");
+  };
+
   return (
-    <div>
-      <h1>The page you are looking for doesn't exist.</h1>
+    <div className="centered">
+      <h1>Sorry, you've reached a dead end.</h1>
+      <button className="login-button u-pointer" onClick={routeHome}>
+        Take me back
+      </button>
     </div>
   );
 };

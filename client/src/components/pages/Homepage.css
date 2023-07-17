@@ -1,1 +1,13 @@
-/* Fill me in :) */
+.background {
+  position: absolute;
+  display: block;
+  background-color: white;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+
+  mask-image: radial-gradient(white 0%, white 30%, transparent 80%, transparent);
+}

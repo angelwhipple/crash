@@ -8,6 +8,10 @@ import path from "path"; // Allows us to retrieve file paths
 import auth from "./auth"; // weblab authentication helper
 import socketManager from "./server-socket"; // websockets
 import api from "./api";
+import login from "./login";
+import assert from "assert";
+import request from "request";
+import { resolve } from "../webpack.config";
 // Loads environmental variables
 dotenv.config({});
 
@@ -46,6 +50,23 @@ app.use(
 );
 app.use(auth.populateCurrentUser);
 app.use("/api", api);
+
+// LINKEDIN OAUTH STEP 2: TOKEN REQUEST
+// app.get("/linkedin", (req, res) => {
+//   assert(typeof req.query.url === "string"); // URL typecheck
+
+//   call_external_API(req.query.url)
+//     .then((response) => {
+//       res.send(response);
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       res.send(error);
+//     });
+// });
+
+// TODO: build API router for login to different services (Linkedin, Facebook, AirBnb, etc)
+app.use("/login", login);
 
 // Serves the frontend code
 const reactPath = path.resolve(__dirname, "..", "client", "dist");

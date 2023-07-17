@@ -6,8 +6,6 @@ import {
   CredentialResponse,
 } from "@react-oauth/google";
 
-// import linkedinLogin from "../../../../server/auth"
-
 import "./Homepage.css";
 import { RouteComponentProps } from "@reach/router";
 import LoginPanel from "../modules/LoginPanel";
@@ -21,11 +19,10 @@ const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
 
   return (
-    <div className="u-flexColumn u-flex-alignCenter">
-      <h1>in progress...</h1>
+    <div className="u-flexColumn u-alignCenter">
+      {/* <h1>The solution to your corporate housing needs</h1> */}
       <ul>
         <li>Add a favicon to your website at the path client/dist/favicon.ico</li>
-        <li>Update website title in client/dist/index.html</li>
       </ul>
       <LoginPanel
         handleLogin={handleLogin}

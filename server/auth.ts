@@ -3,19 +3,17 @@ import { NextFunction, Request, Response } from "express";
 import User from "./models/User";
 import UserInterface from "../shared/User";
 
-// import fetch from 'node-fetch'
+import fetch from "node-fetch";
 
 // create a new OAuth client used to verify google sign-in
-const CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
-const client = new OAuth2Client(CLIENT_ID);
-const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
-const REDIRECT_URI = "http://localhost:5050";
+const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const verify = (token: string) => {
   return client
     .verifyIdToken({
       idToken: token,
-      audience: CLIENT_ID,
+      audience: GOOGLE_CLIENT_ID,
     })
     .then((ticket) => ticket.getPayload());
 };
@@ -52,13 +50,6 @@ const login = (req: Request, res: Response) => {
     });
 };
 
-// const linkedinLogin = ( req: Request, res: Response) => {
-//   const url = "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id="+LINKEDIN_CLIENT_ID+"&redirect_uri="+REDIRECT_URI+"&scope=r_liteprofile%20r_emailaddress%20w_member_social";
-//   fetch(url).then((response) => {
-//     res.send({response})
-//   })
-// }
-
 const logout = (req: Request, res: Response) => {
   req.session.user = undefined;
   res.send({});
@@ -83,4 +74,3 @@ export default {
   login,
   logout,
 };
-

@@ -53,11 +53,11 @@ form {
   flex-direction: column;
 }
 
-.u-flex-justifyCenter {
+.u-justifyCenter {
   justify-content: center;
 }
 
-.u-flex-alignCenter {
+.u-alignCenter {
   align-items: center;
 }
 
@@ -89,4 +89,30 @@ form {
 
 .u-link:hover {
   color: var(--primary--dim);
+}
+
+/* PRESETS */
+
+.floatRight {
+  float: right;
+}
+
+.floatLeft {
+  float: left;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
 }
