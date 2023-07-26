@@ -20,3 +20,20 @@
   flex-direction: column;
   row-gap: var(--l);
 }
+
+.floating-button {
+  animation-name: fadeIn;
+  animation-duration: 3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}

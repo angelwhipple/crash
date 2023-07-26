@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { socket } from "../../client-socket";
+import { io } from "socket.io-client";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Communities.css";
@@ -13,6 +14,15 @@ const Communities = (props) => {
     navigate(path);
   };
 
+  //   useEffect(() => {
+  //     const socket = io("http://localhost:3000");
+
+  //     // disconnect socket on dismount
+  //     return () => {
+  //       socket.disconnect();
+  //     };
+  //   }, []);
+
   return (
     <div className="centered default-container">
       <p>Join Communities</p>
@@ -21,6 +31,7 @@ const Communities = (props) => {
         className="login-button u-pointer"
         onClick={(event) => {
           route("/");
+          socket.emit("toggleAll", {});
         }}
       >
         Take me back

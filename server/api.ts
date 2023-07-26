@@ -1,8 +1,13 @@
-import express from "express";
+import express, { Request, Response } from "express";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import auth from "./auth";
 import socketManager from "./server-socket";
 import url from "url";
 import request from "request";
+import assert from "assert";
+// import fetch, { Headers, Request } from "node-fetch";
+import { UnaryExpression } from "typescript";
+import http from "http";
 const router = express.Router();
 
 router.post("/login", auth.login);
@@ -22,6 +27,7 @@ router.post("/initsocket", (req, res) => {
   }
   res.send({});
 });
+router.post("/linkedin", auth.login);
 
 // |------------------------------|
 // | write your API methods below!|
@@ -42,15 +48,24 @@ type tokenResponse = {
   scope: string;
 };
 
+type profileResponse = Response & {
+  ID: string | undefined;
+  firstName: Object;
+  lastName: Object;
+  profilePicture: Object;
+};
+
 /**
  * Async helper for making requests to external APIs
  * @param url URL of the desired API endpoint
  * @returns a Promise that resolves when the API call resolves,
  * otherwise the Promise rejects if the call returns an error
  */
-const callExternalAPI = (url: string): Promise<tokenResponse> => {
+const callExternalAPI = (
+  endpoint_url: string
+): Promise<tokenResponse & profileResponse & undefined> => {
   return new Promise((resolve, reject) => {
-    request(url, { json: true }, (err, res, body) => {
+    request(endpoint_url, { json: true }, (err, res, body) => {
       if (err) reject(err);
       resolve(body);
     });
@@ -58,7 +73,7 @@ const callExternalAPI = (url: string): Promise<tokenResponse> => {
 };
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
-router.get("/linkedin", (req, res) => {
+router.get("/linkedin", async (req, res) => {
   console.log("Linkedin API route reached successfully");
   // LINKEDIN OAUTH STEP 1: AUTHORIZATION CODE
   const query = url.parse(req.url, true).query;
@@ -67,15 +82,56 @@ router.get("/linkedin", (req, res) => {
 
   console.log("Requesting Linkedin access token");
   // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
-  const endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
-  callExternalAPI(endpoint_url)
-    .then((token_response: tokenResponse) => {
+  let endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
+  await callExternalAPI(endpoint_url)
+    .then(async (token_response: tokenResponse) => {
       const access_token = token_response.access_token; // default: 60 day lifespan
       console.log(`Access token: ${access_token}`);
+
+      // LINKEDIN OAUTH STEP 3: AUTHENTICATED REQUESTS FOR USER INFORMATION
+      console.log(`Attempting user info requests with token ${access_token}`);
+      endpoint_url = `https://api.linkedin.com/v2/me`;
+      const headers = { Authorization: `Bearer ${access_token}` };
+      const axiosConfig = { headers };
+      axios.get(endpoint_url, axiosConfig).then((response) => {
+        const liteProfile = response.data;
+        const [firstName, lastName, linkedinId] = [
+          liteProfile.localizedFirstName,
+          liteProfile.localizedLastName,
+          liteProfile.id,
+        ];
+        console.log(`Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
+        endpoint_url = `https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))`;
+        axios.get(endpoint_url, axiosConfig).then((response) => {
+          // const email = JSON.stringify(response.data); // convert Response Object back into readable JSON
+          const emailAddress = response.data.elements[0]["handle~"]["emailAddress"];
+          console.log(`Email address: ${emailAddress}`);
+          endpoint_url = `https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
+          axios.get(endpoint_url, axiosConfig).then((response) => {
+            const profilePictureUrl =
+              response.data.profilePicture["displayImage~"]["elements"][0]["identifiers"][0][
+                "identifier"
+              ];
+            console.log(`Profile picture url: ${profilePictureUrl}`);
+            const consolidateUrl = `http://localhost:5050/api/login`;
+            const consolidateBody = {
+              name: `${firstName} ${lastName}`,
+              linkedinid: linkedinId,
+              email: emailAddress,
+              pfp: profilePictureUrl,
+            };
+
+            axios.post(consolidateUrl, consolidateBody).then((response) => {
+              // const readable = JSON.stringify(response.data);
+              socketManager.getIo().emit("linkedin", { user: response.data });
+            });
+          });
+        });
+      });
     })
-    .catch((error) => {
-      console.log(error);
-      res.send(error);
+    .catch((token_error) => {
+      console.log(`Token response error: ${token_error}`);
+      res.send(token_error);
     });
   res.redirect("/"); // redirects back to homepage
 });

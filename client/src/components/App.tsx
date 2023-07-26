@@ -18,6 +18,12 @@ import Housing from "./pages/Housing";
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
 
+  socket.on("linkedin", (event) => {
+    console.log(`Received linkedin socket event: ${JSON.stringify(event)}`);
+    setUserId(event.user._id);
+    post("/api/initsocket", { socketid: socket.id });
+  });
+
   useEffect(() => {
     get("/api/whoami")
       .then((user: User) => {
@@ -35,9 +41,15 @@ const App = () => {
 
   const handleLogin = (credentialResponse: CredentialResponse) => {
     const userToken = credentialResponse.credential;
-    const decodedCredential = jwt_decode(userToken as string) as { name: string; email: string };
+    const decodedCredential = jwt_decode(userToken as string) as {
+      name: string;
+      email: string;
+    };
     console.log(`Logged in as ${decodedCredential.name}`);
-    post("/api/login", { token: userToken }).then((user) => {
+    console.log(`Email address: ${decodedCredential.email}`);
+    post("/api/login", {
+      token: userToken,
+    }).then((user) => {
       setUserId(user._id);
       post("/api/initsocket", { socketid: socket.id });
     });
@@ -47,13 +59,8 @@ const App = () => {
     setUserId(undefined);
     post("/api/logout");
   };
-
-  const handleLinkedin = (event) => {
-    console.log("Attempting Linkedin login");
-  };
-
   // NOTE:
-  // All the pages need to have the props extended via RouteComponentProps for @reach/router to work properly. Please use the Skeleton as an example.
+  // All the pages need to have the props extended via RouteComponentProps for @reach/router to work properly. Please use the Homepage as an example.
   return (
     <div className="background">
       <Router primary={false}>
@@ -61,7 +68,7 @@ const App = () => {
       </Router>
       <Router>
         <Homepage path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-        <Profile path="/profile"></Profile>
+        <Profile path="/profile" userId={userId}></Profile>
         <Communities path="/communities"></Communities>
         <Housing path="/housing"></Housing>
         <NotFound default={true} />

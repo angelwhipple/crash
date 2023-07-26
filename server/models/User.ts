@@ -3,7 +3,8 @@ import { Schema, model, Document } from "mongoose";
 const UserSchema = new Schema({
   name: String,
   googleid: String,
-  // email: String,
+  linkedinid: String,
+  email: String,
   // communities: [String], // array of community IDs/names?
   // likes: [String], // array of post/listing IDs
   // lists: [String], // array of user created list IDs
@@ -12,8 +13,9 @@ const UserSchema = new Schema({
 export interface User extends Document {
   name: string;
   googleid: string;
+  linkedinid: string;
   _id: string;
-  // email: String;
+  email: String;
   // communities: [String];
   // likes: [String];
   // lists: [String];

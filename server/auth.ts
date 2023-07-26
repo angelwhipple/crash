@@ -2,7 +2,7 @@ import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { NextFunction, Request, Response } from "express";
 import User from "./models/User";
 import UserInterface from "../shared/User";
-
+import assert from "assert";
 import fetch from "node-fetch";
 
 // create a new OAuth client used to verify google sign-in
@@ -18,36 +18,78 @@ const verify = (token: string) => {
     .then((ticket) => ticket.getPayload());
 };
 
-const getOrCreateUser = (user: TokenPayload) => {
+// TODO: DRY out getOrCreate functions
+// refactor to check for existing accounts based on input type
+const getOrCreateUser_GOOGLE = async (user: TokenPayload) => {
   return User.findOne({ googleid: user.sub }).then(
-    (existingUser: UserInterface | null | undefined) => {
+    async (existingUser: UserInterface | null | undefined) => {
       if (existingUser !== null && existingUser !== undefined) return existingUser;
       const newUser = new User({
         name: user.name,
         googleid: user.sub,
+        email: user.email,
       });
-      return newUser.save();
+      return await newUser.save();
     }
   );
 };
 
-const login = (req: Request, res: Response) => {
-  verify(req.body.token)
-    .then((user) => {
-      if (user === undefined) return;
-      return getOrCreateUser(user);
-    })
-    .then((user) => {
-      if (user === null || user === undefined) {
-        throw new Error("Unable to retrieve user.");
-      }
-      req.session.user = user;
-      res.send(user);
-    })
-    .catch((err) => {
-      console.log(`Failed to login: ${err}`);
-      res.status(401).send({ err });
-    });
+const getOrCreateUser_LINKEDIN = async (req: Request) => {
+  return await User.findOne({ email: req.body.email }).then(
+    async (existingUser: UserInterface | null | undefined) => {
+      if (existingUser !== null && existingUser !== undefined) return existingUser;
+      const newUser = new User({
+        name: req.body.name,
+        linkedinid: req.body.linkedinid,
+        email: req.body.email,
+      });
+      return await newUser.save();
+    }
+  );
+};
+
+/**
+ * TODO: implement Google-Linkedin account consolidation
+ * @param user
+ */
+const consolidateProfiles = (user: UserInterface) => {
+  User.find({ email: user.email }).then((users) => {
+    if (users.length > 1) {
+      // TODO: >1 user profile exists under the same email
+      console.log(`Profile consolidation needed`);
+    } else {
+      console.log(`No user profile consolidation necessary`);
+    }
+  });
+};
+
+const login = async (req: Request, res: Response) => {
+  console.log(`Successfully reached consolidate login`);
+  if ("linkedinid" in req.body) {
+    const linkedinUser = await getOrCreateUser_LINKEDIN(req);
+    console.log(`Found user: ${linkedinUser}`);
+    consolidateProfiles(linkedinUser);
+    res.send(linkedinUser);
+  } else {
+    verify(req.body.token)
+      .then(async (user) => {
+        if (user === undefined) return;
+        const googleUser = await getOrCreateUser_GOOGLE(user);
+        consolidateProfiles(googleUser);
+        return googleUser;
+      })
+      .then((user) => {
+        if (user === null || user === undefined) {
+          throw new Error("Unable to retrieve user.");
+        }
+        req.session.user = user;
+        res.send(user);
+      })
+      .catch((err) => {
+        console.log(`Failed to login: ${err}`);
+        res.status(401).send({ err });
+      });
+  }
 };
 
 const logout = (req: Request, res: Response) => {
