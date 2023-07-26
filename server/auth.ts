@@ -52,38 +52,52 @@ const getOrCreateUser_LINKEDIN = async (req: Request) => {
  * TODO: implement Google-Linkedin account consolidation
  * @param user
  */
-const consolidateProfiles = (user: UserInterface) => {
-  User.find({ email: user.email }).then((users) => {
-    if (users.length > 1) {
-      // TODO: >1 user profile exists under the same email
-      console.log(`Profile consolidation needed`);
-    } else {
-      console.log(`No user profile consolidation necessary`);
-    }
+const consolidateProfiles = async (req: Request, res: Response) => {
+  const fields = ["linkedinid", "googleid"];
+  const consolidatedUser = new User({
+    name: req.body.name,
+    email: req.body.email,
+  });
+  for (const field of fields) {
+    const query = { email: req.body.email, [field]: { $exists: true } };
+    console.log(query);
+    await User.findOneAndDelete(query).then((user) => {
+      if (user) consolidatedUser[field] = user[field];
+    });
+  }
+  res.send(await consolidatedUser.save());
+};
+
+/**
+ *
+ * @param user
+ * @returns
+ */
+const countProfiles = async (user: UserInterface) => {
+  return User.find({ email: user.email }).then((users) => {
+    return users.length > 1;
   });
 };
 
 const login = async (req: Request, res: Response) => {
-  console.log(`Successfully reached consolidate login`);
+  console.log(`Successfully reached profile consolidation check`);
   if ("linkedinid" in req.body) {
     const linkedinUser = await getOrCreateUser_LINKEDIN(req);
-    console.log(`Found user: ${linkedinUser}`);
-    consolidateProfiles(linkedinUser);
-    res.send(linkedinUser);
+    console.log(`Found MongoDB user: ${linkedinUser}`);
+    res.send({ user: linkedinUser, consolidate: await countProfiles(linkedinUser) });
   } else {
     verify(req.body.token)
       .then(async (user) => {
         if (user === undefined) return;
         const googleUser = await getOrCreateUser_GOOGLE(user);
-        consolidateProfiles(googleUser);
         return googleUser;
       })
-      .then((user) => {
+      .then(async (user) => {
         if (user === null || user === undefined) {
           throw new Error("Unable to retrieve user.");
         }
         req.session.user = user;
-        res.send(user);
+        res.send({ user: user, consolidate: await countProfiles(user) });
       })
       .catch((err) => {
         console.log(`Failed to login: ${err}`);
@@ -115,4 +129,5 @@ export default {
   populateCurrentUser,
   login,
   logout,
+  consolidateProfiles,
 };

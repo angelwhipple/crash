@@ -11,6 +11,7 @@ import {
 } from "@react-oauth/google";
 import "./Modal.css";
 import "./LoginPanel.css";
+import Merge from "./Merge";
 
 type Props = RouteComponentProps & {}; // TODO: define specific prop types
 
@@ -39,18 +40,21 @@ const LoginPanel = (props) => {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       {props.userId ? ( // revise
-        <div className="centered default-container">
-          <p>You are logged in.</p>
-          <button
-            className="login-button u-pointer"
-            onClick={() => {
-              props.googleLogout();
-              props.handleLogout();
-            }}
-          >
-            Logout
-          </button>
-        </div>
+        <>
+          <div className="centered default-container">
+            <p>You are logged in.</p>
+            <button
+              className="login-button u-pointer"
+              onClick={() => {
+                props.googleLogout();
+                props.handleLogout();
+              }}
+            >
+              Logout
+            </button>
+          </div>
+          {props.consolidate ? <Merge></Merge> : <></>}
+        </>
       ) : (
         <div className="modal-Container">
           <div className="modal-Content">

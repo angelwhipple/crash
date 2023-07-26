@@ -3,6 +3,7 @@
   display: block;
   /* background-color: white; */
   background-image: url("../../assets/background4.jpg");
+  /* opacity: 0.5; */
   background-repeat: no-repeat;
   background-size: cover;
   top: 0;

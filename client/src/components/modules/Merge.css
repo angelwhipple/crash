@@ -1,0 +1,82 @@
+:root {
+  --glow-1: #ff932e;
+  --glow-2: #ed7429;
+  --glow-3: #ed6111;
+  --glow-4: #d74a13;
+  --glow-5: #d71313;
+}
+
+.merge-modal {
+  align-self: center;
+  background: var(--black);
+  width: fit-content;
+  border-radius: 12px;
+  /* z-index: 1; */
+  -webkit-text-fill-color: var(--white);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  row-gap: 18px;
+  align-items: center;
+  padding: 2%;
+  height: 50%;
+  width: fit-content;
+  position: relative;
+}
+
+.merge-modal::before,
+.merge-modal::after {
+  content: "";
+  position: absolute;
+  inset: -0.2rem;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--glow-1),
+    var(--glow-2),
+    var(--glow-3),
+    var(--glow-4),
+    var(--glow-5),
+    var(--glow-4),
+    var(--glow-3),
+    var(--glow-2),
+    var(--glow-1)
+  );
+  animation: rotation 5s linear infinite;
+}
+
+.merge-modal::after {
+  filter: blur(3.5rem);
+}
+
+.merge-modal-container {
+  animation: slideUp 3.4s;
+  align-self: center;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotation {
+  0% {
+    --gradient-angle: 0deg;
+  }
+  100% {
+    --gradient-angle: 360deg;
+  }
+}

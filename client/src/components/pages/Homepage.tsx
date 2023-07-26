@@ -12,6 +12,7 @@ import LoginPanel from "../modules/LoginPanel";
 
 type Props = RouteComponentProps & {
   userId?: string;
+  consolidate: boolean;
   handleLogin: (credentialResponse: CredentialResponse) => void;
   handleLogout: () => void;
 };
@@ -29,6 +30,7 @@ const Homepage = (props: Props) => {
         googleLogout={googleLogout}
         handleLogout={handleLogout}
         userId={props.userId}
+        consolidate={props.consolidate}
       ></LoginPanel>
     </div>
   );

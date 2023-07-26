@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Router, useNavigate } from "@reach/router";
 import jwt_decode from "jwt-decode";
 import { CredentialResponse } from "@react-oauth/google";
+// import assert from "assert";
 
 import { get, post } from "../utilities";
 import NotFound from "./pages/NotFound";
@@ -17,11 +18,23 @@ import Housing from "./pages/Housing";
 
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [consolidate, setConsolidate] = useState(false);
 
   socket.on("linkedin", (event) => {
-    console.log(`Received linkedin socket event: ${JSON.stringify(event)}`);
+    console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
     post("/api/initsocket", { socketid: socket.id });
+
+    if (event.consolidate) {
+      console.log(`Attempting user profile consolidation`);
+
+      // TODO: ask permission (YES/NO) instead of auto-consolidating
+      // display "found profiles" popup component
+      setConsolidate(true);
+      // post("/api/consolidate", { email: event.user.email }).then((response) => {
+      //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
+      // });
+    }
   });
 
   useEffect(() => {
@@ -49,9 +62,18 @@ const App = () => {
     console.log(`Email address: ${decodedCredential.email}`);
     post("/api/login", {
       token: userToken,
-    }).then((user) => {
-      setUserId(user._id);
+    }).then((response) => {
+      setUserId(response.user._id);
       post("/api/initsocket", { socketid: socket.id });
+
+      if (response.consolidate) {
+        // TODO: ask permission (YES/NO) instead of auto-consolidating
+        // display "found profiles" popup component
+        setConsolidate(true);
+        // post("/api/consolidate", { email: response.user.email }).then((response) => {
+        //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
+        // });
+      }
     });
   };
 
@@ -67,7 +89,13 @@ const App = () => {
         <NavBar default userId={userId}></NavBar>
       </Router>
       <Router>
-        <Homepage path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+        <Homepage
+          path="/"
+          handleLogin={handleLogin}
+          handleLogout={handleLogout}
+          consolidate={consolidate}
+          userId={userId}
+        />
         <Profile path="/profile" userId={userId}></Profile>
         <Communities path="/communities"></Communities>
         <Housing path="/housing"></Housing>

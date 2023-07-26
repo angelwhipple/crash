@@ -27,7 +27,9 @@ router.post("/initsocket", (req, res) => {
   }
   res.send({});
 });
+
 router.post("/linkedin", auth.login);
+router.post("/consolidate", auth.consolidateProfiles);
 
 // |------------------------------|
 // | write your API methods below!|
@@ -123,7 +125,7 @@ router.get("/linkedin", async (req, res) => {
 
             axios.post(consolidateUrl, consolidateBody).then((response) => {
               // const readable = JSON.stringify(response.data);
-              socketManager.getIo().emit("linkedin", { user: response.data });
+              socketManager.getIo().emit("linkedin", response.data);
             });
           });
         });
