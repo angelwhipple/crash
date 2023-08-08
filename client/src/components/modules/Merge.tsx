@@ -14,9 +14,10 @@ const Merge = (props) => {
         <div className="merge-modal">
           <h1>Is this you?</h1>
           <p>
-            We found another profile under the same email address. Would you like to merge them?
+            We found another profile under the same email address. Would you like to connect your
+            accounts?
           </p>
-          <div className="u-flex"></div>
+          <div className="u-flexColumn">{props.extraProfiles}</div>
         </div>
       </div>
     </div>

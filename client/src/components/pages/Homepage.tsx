@@ -9,10 +9,12 @@ import {
 import "./Homepage.css";
 import { RouteComponentProps } from "@reach/router";
 import LoginPanel from "../modules/LoginPanel";
+import Merge from "../modules/Merge";
 
 type Props = RouteComponentProps & {
   userId?: string;
   consolidate: boolean;
+  extraProfiles: any[];
   handleLogin: (credentialResponse: CredentialResponse) => void;
   handleLogout: () => void;
 };
@@ -30,8 +32,8 @@ const Homepage = (props: Props) => {
         googleLogout={googleLogout}
         handleLogout={handleLogout}
         userId={props.userId}
-        consolidate={props.consolidate}
       ></LoginPanel>
+      {props.consolidate ? <Merge extraProfiles={props.extraProfiles}></Merge> : <></>}
     </div>
   );
 };

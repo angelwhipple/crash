@@ -11,7 +11,6 @@ import {
 } from "@react-oauth/google";
 import "./Modal.css";
 import "./LoginPanel.css";
-import Merge from "./Merge";
 
 type Props = RouteComponentProps & {}; // TODO: define specific prop types
 
@@ -53,7 +52,6 @@ const LoginPanel = (props) => {
               Logout
             </button>
           </div>
-          {props.consolidate ? <Merge></Merge> : <></>}
         </>
       ) : (
         <div className="modal-Container">

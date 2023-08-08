@@ -60,7 +60,6 @@ const consolidateProfiles = async (req: Request, res: Response) => {
   });
   for (const field of fields) {
     const query = { email: req.body.email, [field]: { $exists: true } };
-    console.log(query);
     await User.findOneAndDelete(query).then((user) => {
       if (user) consolidatedUser[field] = user[field];
     });
@@ -74,8 +73,14 @@ const consolidateProfiles = async (req: Request, res: Response) => {
  * @returns
  */
 const countProfiles = async (user: UserInterface) => {
-  return User.find({ email: user.email }).then((users) => {
-    return users.length > 1;
+  const fields = ["linkedinid", "googleid"];
+  const currentProfile: string = fields.filter((field) => field in user)[0];
+
+  const query = { email: user.email, [currentProfile]: { $ne: user[currentProfile] } };
+  return User.find(query).then((additionalUsers) => {
+    console.log(`Found extra profiles: ${additionalUsers}`);
+    const response = { eligible: additionalUsers.length > 0, profiles: additionalUsers };
+    return response;
   });
 };
 

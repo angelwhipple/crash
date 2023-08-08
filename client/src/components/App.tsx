@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactElement } from "react";
 import { Router, useNavigate } from "@reach/router";
 import jwt_decode from "jwt-decode";
 import { CredentialResponse } from "@react-oauth/google";
@@ -15,21 +15,31 @@ import NavBar from "../components/modules/NavBar";
 import Profile from "./pages/Profile";
 import Communities from "./pages/Communities";
 import Housing from "./pages/Housing";
+import ProfilePill from "./modules/ProfilePill";
 
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [consolidate, setConsolidate] = useState(false);
+  const [extraProfiles, setExtraProfiles]: any[] = useState([]);
+
+  const generatePills = (profiles: Array<JSON>) => {
+    const pills = profiles.map((profile, index) => (
+      <ProfilePill profile={profile} key={index}></ProfilePill>
+    ));
+    return pills;
+  };
 
   socket.on("linkedin", (event) => {
     console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
     post("/api/initsocket", { socketid: socket.id });
 
-    if (event.consolidate) {
+    if (event.consolidate.eligible) {
       console.log(`Attempting user profile consolidation`);
 
       // TODO: ask permission (YES/NO) instead of auto-consolidating
       // display "found profiles" popup component
+      setExtraProfiles(generatePills(event.consolidate.profiles));
       setConsolidate(true);
       // post("/api/consolidate", { email: event.user.email }).then((response) => {
       //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
@@ -66,9 +76,11 @@ const App = () => {
       setUserId(response.user._id);
       post("/api/initsocket", { socketid: socket.id });
 
-      if (response.consolidate) {
+      console.log(`Google login response: ${JSON.stringify(response)}`);
+      if (response.consolidate.eligible) {
         // TODO: ask permission (YES/NO) instead of auto-consolidating
         // display "found profiles" popup component
+        setExtraProfiles(generatePills(response.consolidate.profiles));
         setConsolidate(true);
         // post("/api/consolidate", { email: response.user.email }).then((response) => {
         //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
@@ -94,6 +106,7 @@ const App = () => {
           handleLogin={handleLogin}
           handleLogout={handleLogout}
           consolidate={consolidate}
+          extraProfiles={extraProfiles}
           userId={userId}
         />
         <Profile path="/profile" userId={userId}></Profile>
