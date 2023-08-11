@@ -17,11 +17,16 @@ const NavBar = (props) => {
   const [communities, setCommunities] = useState(false);
   const [housing, setHousing] = useState(false);
   const [querying, setQuerying] = useState(false);
+  const [query, setQuery] = useState("");
 
   const toggleTabs = (selectedFunc: (val: boolean) => void, all: boolean = false) => {
-    const funcOptions = [setProfile, setCommunities, setHousing];
+    const funcOptions = [setProfile, setCommunities, setHousing, setQuerying];
     for (const toggleFunc of funcOptions) toggleFunc(false);
     if (!all) selectedFunc(true);
+  };
+
+  const handleQuery = (event) => {
+    setQuery(event.target.value);
   };
 
   //   useEffect(() => {
@@ -67,14 +72,19 @@ const NavBar = (props) => {
         }}
       ></IoIosPeople>
       <BsSearch
-        className="nav-icon u-pointer"
+        className={`u-pointer ${querying ? "nav-icon-selected" : "nav-icon"}`}
         onClick={(event) => {
-          setQuerying(!querying);
+          if (querying) {
+            if (!query) toggleTabs(setQuerying, true); // no search query, de-highlight all navbar tabs
+          } else {
+            toggleTabs(setQuerying);
+          }
         }}
       ></BsSearch>
       <input
         type="search"
         className={`${querying ? "search-bar-open" : "search-bar-close"}`}
+        onChange={handleQuery}
       ></input>
       <></>
     </nav>
