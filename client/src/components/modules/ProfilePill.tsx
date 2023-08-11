@@ -3,13 +3,46 @@ import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./ProfilePill.css";
+import linkedin from "../../assets/linkedin.png";
+import google from "../../assets/google.png";
+import facebook from "../../assets/google.png";
+import assert from "assert";
 
 type Props = RouteComponentProps & {};
 
+const PROFILE_ICONS = {
+  linkedinid: linkedin,
+  googleid: google,
+  facebookid: facebook,
+};
+
 const ProfilePill = (props) => {
+  console.log(`Profile info: ${JSON.stringify(props.profile)}`);
+  const [platform, setPlatform] = useState("");
+  const [icon, setIcon] = useState("");
+
+  useEffect(() => {
+    for (const [platform, path] of Object.entries(PROFILE_ICONS)) {
+      if (platform in props.profile) {
+        setIcon(path);
+        setPlatform(platform);
+      }
+    }
+  }, []);
+
+  const handleSelect = (checkbox) => {
+    const checked = checkbox.target.checked;
+    console.log(`Checkbox status: ${checked}`);
+    if (checked) {
+      props.setChosenProfiles([...props.chosenProfiles, platform]);
+    }
+  };
+
   return (
     <div className="pill-container u-pointer">
-      <p>{props.profile._id}</p>
+      <img src={icon} className="platform-icon"></img>
+      <p>{props.profile.name}</p>
+      <input type="checkbox" className="u-pointer" onClick={handleSelect.bind(this)}></input>
     </div>
   );
 };

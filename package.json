@@ -21,6 +21,7 @@
     "css-loader": "^5.0.1",
     "eslint": "^8.32.0",
     "eslint-plugin-react": "^7.32.1",
+    "file-loader": "^6.2.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^8.0.14",
     "url-loader": "^4.1.1",

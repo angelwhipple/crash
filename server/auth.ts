@@ -49,7 +49,7 @@ const getOrCreateUser_LINKEDIN = async (req: Request) => {
 };
 
 /**
- * TODO: implement Google-Linkedin account consolidation
+ * Google-Linkedin account consolidation
  * @param user
  */
 const consolidateProfiles = async (req: Request, res: Response) => {
@@ -58,7 +58,9 @@ const consolidateProfiles = async (req: Request, res: Response) => {
     name: req.body.name,
     email: req.body.email,
   });
-  for (const field of fields) {
+  // extract user selected profiles for consolidation only
+  const chosenProfiles = fields.reduce((field) => req.body.profiles.includes(field));
+  for (const field of chosenProfiles) {
     const query = { email: req.body.email, [field]: { $exists: true } };
     await User.findOneAndDelete(query).then((user) => {
       if (user) consolidatedUser[field] = user[field];

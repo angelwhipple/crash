@@ -17,7 +17,26 @@ const Merge = (props) => {
             We found another profile under the same email address. Would you like to connect your
             accounts?
           </p>
-          <div className="u-flexColumn">{props.extraProfiles}</div>
+          <div className="profiles-container">{props.extraProfiles}</div>
+          <button
+            onClick={(event) => {
+              console.log(`Selected profiles: ${props.chosenProfiles}`);
+              if (props.chosenProfiles.length !== 0) {
+                const body = {
+                  name: props.extraProfiles[0].props.profile.name,
+                  email: props.extraProfiles[0].props.profile.email,
+                  profiles: props.chosenProfiles,
+                };
+                post("/api/consolidate", body).then((res) => {
+                  console.log(`Conslidated user: ${JSON.stringify(res)}`);
+                });
+              }
+              props.setConsolidate(false);
+            }}
+            className="confirm-button u-pointer"
+          >
+            Done
+          </button>
         </div>
       </div>
     </div>

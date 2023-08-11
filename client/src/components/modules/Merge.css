@@ -6,6 +6,23 @@
   --glow-5: #d71313;
 }
 
+.confirm-button {
+  border: solid;
+  border-color: white;
+  border-radius: var(--m);
+  background-color: black;
+  -webkit-text-fill-color: white;
+  padding: 2%;
+  transition-duration: 1s;
+}
+
+.confirm-button:hover,
+.confirm-button:visited {
+  border-color: var(--orange);
+  -webkit-text-fill-color: var(--orange);
+  transition-duration: 1s;
+}
+
 .merge-modal {
   align-self: center;
   background: var(--black);
@@ -53,6 +70,16 @@
 .merge-modal-container {
   animation: slideUp 3.4s;
   align-self: center;
+}
+
+.profiles-container {
+  display: flex;
+  column-gap: 2px;
+  overflow-x: scroll;
+}
+
+.profiles-container::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideUp {

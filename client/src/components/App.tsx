@@ -21,10 +21,16 @@ const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [consolidate, setConsolidate] = useState(false);
   const [extraProfiles, setExtraProfiles]: any[] = useState([]);
+  const [chosenProfiles, setChosenProfiles]: any[] = useState([]);
 
   const generatePills = (profiles: Array<JSON>) => {
     const pills = profiles.map((profile, index) => (
-      <ProfilePill profile={profile} key={index}></ProfilePill>
+      <ProfilePill
+        profile={profile}
+        key={index}
+        chosenProfiles={chosenProfiles}
+        setChosenProfiles={setChosenProfiles}
+      ></ProfilePill>
     ));
     return pills;
   };
@@ -107,7 +113,9 @@ const App = () => {
           handleLogout={handleLogout}
           consolidate={consolidate}
           extraProfiles={extraProfiles}
+          chosenProfiles={chosenProfiles}
           userId={userId}
+          setConsolidate={setConsolidate}
         />
         <Profile path="/profile" userId={userId}></Profile>
         <Communities path="/communities"></Communities>

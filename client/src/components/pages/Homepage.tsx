@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   GoogleOAuthProvider,
   GoogleLogin,
@@ -15,8 +15,10 @@ type Props = RouteComponentProps & {
   userId?: string;
   consolidate: boolean;
   extraProfiles: any[];
+  chosenProfiles: any[];
   handleLogin: (credentialResponse: CredentialResponse) => void;
   handleLogout: () => void;
+  setConsolidate: (consolidate: boolean) => void;
 };
 const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
@@ -33,7 +35,15 @@ const Homepage = (props: Props) => {
         handleLogout={handleLogout}
         userId={props.userId}
       ></LoginPanel>
-      {props.consolidate ? <Merge extraProfiles={props.extraProfiles}></Merge> : <></>}
+      {props.consolidate ? (
+        <Merge
+          extraProfiles={props.extraProfiles}
+          chosenProfiles={props.chosenProfiles}
+          setConsolidate={props.setConsolidate}
+        ></Merge>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
