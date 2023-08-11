@@ -5,8 +5,7 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./ProfilePill.css";
 import linkedin from "../../assets/linkedin.png";
 import google from "../../assets/google.png";
-import facebook from "../../assets/google.png";
-import assert from "assert";
+import facebook from "../../assets/fb.png";
 
 type Props = RouteComponentProps & {};
 
@@ -31,9 +30,8 @@ const ProfilePill = (props) => {
   }, []);
 
   const handleSelect = (checkbox) => {
-    const checked = checkbox.target.checked;
-    console.log(`Checkbox status: ${checked}`);
-    if (checked) {
+    console.log(`Checkbox status: ${checkbox.target.checked}`);
+    if (checkbox.target.checked) {
       props.setChosenProfiles([...props.chosenProfiles, platform]);
     }
   };
@@ -42,7 +40,12 @@ const ProfilePill = (props) => {
     <div className="pill-container u-pointer">
       <img src={icon} className="platform-icon"></img>
       <p>{props.profile.name}</p>
-      <input type="checkbox" className="u-pointer" onClick={handleSelect.bind(this)}></input>
+      <input
+        id="platformCheck"
+        type="checkbox"
+        className="u-pointer"
+        onClick={handleSelect.bind(this)}
+      ></input>
     </div>
   );
 };

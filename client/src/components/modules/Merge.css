@@ -6,6 +6,11 @@
   --glow-5: #d71313;
 }
 
+.confirm-container {
+  display: flex;
+  column-gap: 8px;
+}
+
 .confirm-button {
   border: solid;
   border-color: white;
@@ -68,7 +73,7 @@
 }
 
 .merge-modal-container {
-  animation: slideUp 3.4s;
+  animation: slideUp 3s;
   align-self: center;
 }
 

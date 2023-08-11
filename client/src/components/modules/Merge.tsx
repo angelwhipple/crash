@@ -18,10 +18,10 @@ const Merge = (props) => {
             accounts?
           </p>
           <div className="profiles-container">{props.extraProfiles}</div>
-          <button
-            onClick={(event) => {
-              console.log(`Selected profiles: ${props.chosenProfiles}`);
-              if (props.chosenProfiles.length !== 0) {
+          <div className="confirm-container">
+            <button
+              onClick={(event) => {
+                console.log(`Selected profiles: ${props.chosenProfiles}`);
                 const body = {
                   name: props.extraProfiles[0].props.profile.name,
                   email: props.extraProfiles[0].props.profile.email,
@@ -30,13 +30,21 @@ const Merge = (props) => {
                 post("/api/consolidate", body).then((res) => {
                   console.log(`Conslidated user: ${JSON.stringify(res)}`);
                 });
-              }
-              props.setConsolidate(false);
-            }}
-            className="confirm-button u-pointer"
-          >
-            Done
-          </button>
+                props.setConsolidate(false);
+              }}
+              className="confirm-button u-pointer"
+            >
+              Yes, please
+            </button>
+            <button
+              onClick={(event) => {
+                props.setConsolidate(false);
+              }}
+              className="confirm-button u-pointer"
+            >
+              No, thank you
+            </button>
+          </div>
         </div>
       </div>
     </div>
