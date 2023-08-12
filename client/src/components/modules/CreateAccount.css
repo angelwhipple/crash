@@ -1,0 +1,16 @@
+.create-container {
+  align-items: center;
+}
+
+.create-label {
+  display: flex;
+  font-size: small;
+  column-gap: 8px;
+}
+
+.create-input {
+  width: 70%;
+  height: auto;
+  -webkit-text-fill-color: var(--black);
+  padding: 2%;
+}

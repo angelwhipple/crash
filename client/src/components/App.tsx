@@ -17,6 +17,8 @@ import Communities from "./pages/Communities";
 import Housing from "./pages/Housing";
 import ProfilePill from "./modules/ProfilePill";
 
+const PLATFORMS = { linkedin: "linkedinid", google: "googleid", fb: "facebookid" };
+
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [consolidate, setConsolidate] = useState(false);
@@ -35,21 +37,19 @@ const App = () => {
     return pills;
   };
 
-  socket.on("linkedin", (event) => {
+  // useEffect(() => {
+  //   console.log(`Chosen profiles: ${chosenProfiles}`);
+  // }, [chosenProfiles]);
+
+  socket.on("linkedin", async (event) => {
     console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
+    setChosenProfiles((prev: string[]) => [...prev, PLATFORMS.linkedin]); // functional update ensures latest state
     post("/api/initsocket", { socketid: socket.id });
 
     if (event.consolidate.eligible) {
-      console.log(`Attempting user profile consolidation`);
-
-      // TODO: ask permission (YES/NO) instead of auto-consolidating
-      // display "found profiles" popup component
       setExtraProfiles(generatePills(event.consolidate.profiles));
       setConsolidate(true);
-      // post("/api/consolidate", { email: event.user.email }).then((response) => {
-      //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
-      // });
     }
   });
 
@@ -80,17 +80,14 @@ const App = () => {
       token: userToken,
     }).then((response) => {
       setUserId(response.user._id);
+      setChosenProfiles([PLATFORMS.google]);
+      console.log(`Chosen profiles: ${chosenProfiles}`);
       post("/api/initsocket", { socketid: socket.id });
 
       console.log(`Google login response: ${JSON.stringify(response)}`);
       if (response.consolidate.eligible) {
-        // TODO: ask permission (YES/NO) instead of auto-consolidating
-        // display "found profiles" popup component
         setExtraProfiles(generatePills(response.consolidate.profiles));
         setConsolidate(true);
-        // post("/api/consolidate", { email: response.user.email }).then((response) => {
-        //   console.log(`Consolidation response: ${JSON.stringify(response)}`);
-        // });
       }
     });
   };
@@ -114,6 +111,7 @@ const App = () => {
           consolidate={consolidate}
           extraProfiles={extraProfiles}
           chosenProfiles={chosenProfiles}
+          setChosenProfiles={setChosenProfiles}
           userId={userId}
           setConsolidate={setConsolidate}
         />

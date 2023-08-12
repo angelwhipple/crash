@@ -115,15 +115,15 @@ router.get("/linkedin", async (req, res) => {
                 "identifier"
               ];
             console.log(`Profile picture url: ${profilePictureUrl}`);
-            const consolidateUrl = `http://localhost:5050/api/login`;
-            const consolidateBody = {
+            const loginUrl = `http://localhost:5050/api/login`;
+            const loginBody = {
               name: `${firstName} ${lastName}`,
               linkedinid: linkedinId,
               email: emailAddress,
               pfp: profilePictureUrl,
             };
 
-            axios.post(consolidateUrl, consolidateBody).then((response) => {
+            axios.post(loginUrl, loginBody).then((response) => {
               // const readable = JSON.stringify(response.data);
               socketManager.getIo().emit("linkedin", response.data);
             });
@@ -137,6 +137,13 @@ router.get("/linkedin", async (req, res) => {
     });
   res.redirect("/"); // redirects back to homepage
 });
+
+router.post("/searchprofiles", async (req, res) => {
+  console.log(`Backend profile search query: ${req.body.query}`);
+  res.send({});
+});
+
+router.post("/createprofile", (req, res) => {});
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

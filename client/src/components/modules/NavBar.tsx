@@ -8,7 +8,6 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import { HiHome } from "react-icons/hi";
 import { BsSearch, BsPersonFill } from "react-icons/bs";
 import { IoIosPeople } from "react-icons/io";
-import { query } from "express";
 
 type Props = RouteComponentProps & {};
 
@@ -27,6 +26,14 @@ const NavBar = (props) => {
 
   const handleQuery = (event) => {
     setQuery(event.target.value);
+    console.log(`Search query: ${query}`);
+  };
+
+  const handleSearch = (event) => {
+    const body = { query: query };
+    setQuery("");
+    event.target.value = "";
+    post("/api/searchprofiles", body).then((res) => {});
   };
 
   //   useEffect(() => {
@@ -75,15 +82,22 @@ const NavBar = (props) => {
         className={`u-pointer ${querying ? "nav-icon-selected" : "nav-icon"}`}
         onClick={(event) => {
           if (querying) {
-            if (!query) toggleTabs(setQuerying, true); // no search query, de-highlight all navbar tabs
+            if (!query) toggleTabs(setQuerying, true); // no search query, close & de-highlight all navbar tabs
+            // else handleSearch()
           } else {
             toggleTabs(setQuerying);
           }
         }}
       ></BsSearch>
       <input
+        id="navSearch"
         type="search"
         className={`${querying ? "search-bar-open" : "search-bar-close"}`}
+        onKeyDown={(event) => {
+          if (event.key == "Enter") {
+            handleSearch(event);
+          }
+        }}
         onChange={handleQuery}
       ></input>
       <></>

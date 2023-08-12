@@ -7,7 +7,12 @@ import linkedin from "../../assets/linkedin.png";
 import google from "../../assets/google.png";
 import facebook from "../../assets/fb.png";
 
-type Props = RouteComponentProps & {};
+type Props = RouteComponentProps & {
+  key: number;
+  profile: any;
+  chosenProfiles: string[];
+  setChosenProfiles: (profiles: string[]) => void;
+};
 
 const PROFILE_ICONS = {
   linkedinid: linkedin,
@@ -32,7 +37,11 @@ const ProfilePill = (props) => {
   const handleSelect = (checkbox) => {
     console.log(`Checkbox status: ${checkbox.target.checked}`);
     if (checkbox.target.checked) {
-      props.setChosenProfiles([...props.chosenProfiles, platform]);
+      props.setChosenProfiles((prev: string[]) => [...prev, platform]); // functional update
+    } else {
+      props.setChosenProfiles(
+        props.chosenProfiles.filter((profile: string) => profile !== platform)
+      );
     }
   };
 

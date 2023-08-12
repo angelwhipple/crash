@@ -5,7 +5,11 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Modal.css";
 import "./Merge.css";
 
-type Props = RouteComponentProps & {};
+type Props = RouteComponentProps & {
+  chosenProfiles: string[];
+  extraProfiles: any[];
+  setConsolidate: boolean;
+};
 
 const Merge = (props) => {
   return (
@@ -22,14 +26,16 @@ const Merge = (props) => {
             <button
               onClick={(event) => {
                 console.log(`Selected profiles: ${props.chosenProfiles}`);
-                const body = {
-                  name: props.extraProfiles[0].props.profile.name,
-                  email: props.extraProfiles[0].props.profile.email,
-                  profiles: props.chosenProfiles,
-                };
-                post("/api/consolidate", body).then((res) => {
-                  console.log(`Conslidated user: ${JSON.stringify(res)}`);
-                });
+                if (props.chosenProfiles.length > 1) {
+                  const body = {
+                    name: props.extraProfiles[0].props.profile.name,
+                    email: props.extraProfiles[0].props.profile.email,
+                    profiles: props.chosenProfiles,
+                  };
+                  post("/api/consolidate", body).then((res) => {
+                    console.log(`Conslidated user: ${JSON.stringify(res)}`);
+                  });
+                }
                 props.setConsolidate(false);
               }}
               className="confirm-button u-pointer"

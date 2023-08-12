@@ -12,13 +12,14 @@ import LoginPanel from "../modules/LoginPanel";
 import Merge from "../modules/Merge";
 
 type Props = RouteComponentProps & {
-  userId?: string;
+  userId?: any;
   consolidate: boolean;
   extraProfiles: any[];
-  chosenProfiles: any[];
+  chosenProfiles: string[];
   handleLogin: (credentialResponse: CredentialResponse) => void;
   handleLogout: () => void;
   setConsolidate: (consolidate: boolean) => void;
+  setChosenProfiles: (profiles: string[]) => void;
 };
 const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
@@ -33,6 +34,7 @@ const Homepage = (props: Props) => {
         handleLogin={handleLogin}
         googleLogout={googleLogout}
         handleLogout={handleLogout}
+        setChosenProfiles={props.setChosenProfiles}
         userId={props.userId}
       ></LoginPanel>
       {props.consolidate ? (

@@ -35,7 +35,7 @@ const getOrCreateUser_GOOGLE = async (user: TokenPayload) => {
 };
 
 const getOrCreateUser_LINKEDIN = async (req: Request) => {
-  return await User.findOne({ email: req.body.email }).then(
+  return await User.findOne({ email: req.body.email, linkedinid: { $exists: true } }).then(
     async (existingUser: UserInterface | null | undefined) => {
       if (existingUser !== null && existingUser !== undefined) return existingUser;
       const newUser = new User({
@@ -59,7 +59,7 @@ const consolidateProfiles = async (req: Request, res: Response) => {
     email: req.body.email,
   });
   // extract user selected profiles for consolidation only
-  const chosenProfiles = fields.reduce((field) => req.body.profiles.includes(field));
+  const chosenProfiles = fields.filter((field) => req.body.profiles.includes(field));
   for (const field of chosenProfiles) {
     const query = { email: req.body.email, [field]: { $exists: true } };
     await User.findOneAndDelete(query).then((user) => {
@@ -91,7 +91,10 @@ const login = async (req: Request, res: Response) => {
   if ("linkedinid" in req.body) {
     const linkedinUser = await getOrCreateUser_LINKEDIN(req);
     console.log(`Found MongoDB user: ${linkedinUser}`);
-    res.send({ user: linkedinUser, consolidate: await countProfiles(linkedinUser) });
+    res.send({
+      user: linkedinUser,
+      consolidate: await countProfiles(linkedinUser),
+    });
   } else {
     verify(req.body.token)
       .then(async (user) => {
