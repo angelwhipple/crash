@@ -34,11 +34,11 @@ const CreateAccount = (props: Props) => {
     }
     return true;
   };
-
-  const validateAge = (age: string) => {};
-
+  // AGE CONSTRAINT: age >= 16
+  const validateAge = (birthYear: string) => {};
+  // USERNAME CONSTRAINTS: len >= 3, 0 special characters
   const validateUsername = (user: string) => {};
-
+  // EMAIL CONSTRAINTS:
   const validateEmail = (emailAddress: string) => {};
 
   return (

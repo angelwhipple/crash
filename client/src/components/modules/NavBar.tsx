@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./NavBar.css";
+import "./LoginPanel.css";
 import "../../utilities.css";
 import { socket } from "../../client-socket";
 import { io } from "socket.io-client";
@@ -8,6 +9,7 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import { HiHome } from "react-icons/hi";
 import { BsSearch, BsPersonFill } from "react-icons/bs";
 import { IoIosPeople } from "react-icons/io";
+import { GoFilter } from "react-icons/go";
 
 type Props = RouteComponentProps & {};
 
@@ -16,12 +18,26 @@ const NavBar = (props) => {
   const [communities, setCommunities] = useState(false);
   const [housing, setHousing] = useState(false);
   const [querying, setQuerying] = useState(false);
+  const [filtering, setFiltering] = useState(false);
   const [query, setQuery] = useState("");
 
-  const toggleTabs = (selectedFunc: (val: boolean) => void, all: boolean = false) => {
-    const funcOptions = [setProfile, setCommunities, setHousing, setQuerying];
+  /**
+   * TODO
+   * @param selectedFunc
+   * @param all
+   * @param filter
+   */
+  const toggleTabs = (
+    selectedFunc: (val: boolean) => void,
+    all: boolean = false,
+    filter: boolean = false
+  ) => {
+    const funcOptions = [setProfile, setCommunities, setHousing, setQuerying, setFiltering];
     for (const toggleFunc of funcOptions) toggleFunc(false);
-    if (!all) selectedFunc(true);
+    if (filter) {
+      setQuerying(true);
+      setFiltering(!filtering);
+    } else if (!all) selectedFunc(true);
   };
 
   const handleQuery = (event) => {
@@ -89,18 +105,44 @@ const NavBar = (props) => {
           }
         }}
       ></BsSearch>
-      <input
-        id="navSearch"
-        type="search"
-        className={`${querying ? "search-bar-open" : "search-bar-close"}`}
-        onKeyDown={(event) => {
-          if (event.key == "Enter") {
-            handleSearch(event);
-          }
-        }}
-        onChange={handleQuery}
-      ></input>
-      <></>
+      <div className={`search-bar-container ${querying ? "search-bar-open" : "search-bar-close"}`}>
+        <div className="search-filters-container">
+          <GoFilter
+            className={`u-pointer ${filtering ? "nav-icon-selected" : "nav-icon"}`}
+            onClick={(event) => {
+              toggleTabs(setFiltering, false, true);
+            }}
+          ></GoFilter>
+          <div className={`${filtering ? "search-filters-dropdown" : "dropdown-hidden"}`}>
+            <div className="search-filter">
+              <input type="checkbox"></input>
+              <label>All</label>
+            </div>
+            <div className="search-filter">
+              <input type="checkbox"></input>
+              <label>Users</label>
+            </div>
+            <div className="search-filter">
+              <input type="checkbox"></input>
+              <label>Communities</label>
+            </div>
+            <div className="search-filter">
+              <input type="checkbox"></input>
+              <label>Apartments</label>
+            </div>
+          </div>
+        </div>
+        <input
+          id="navSearch"
+          type="search"
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              handleSearch(event);
+            }
+          }}
+          onChange={handleQuery}
+        ></input>
+      </div>
     </nav>
   );
 };
