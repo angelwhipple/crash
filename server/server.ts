@@ -8,14 +8,16 @@ import path from "path"; // Allows us to retrieve file paths
 import auth from "./auth"; // weblab authentication helper
 import socketManager from "./server-socket"; // websockets
 import api from "./api";
+import login from "./login";
+import assert from "assert";
+import request from "request";
+import { resolve } from "../webpack.config";
 // Loads environmental variables
 dotenv.config({});
 
 // Server configuration below
-// TODO change connection URL after setting up your team database and creating the .env file
 const mongoConnectionURL = process.env.MONGO_SRV;
-// TODO change database name to the name you chose
-const databaseName = "IncludeYourDatabaseNameHere";
+const databaseName = "intern-io";
 
 if (mongoConnectionURL === undefined) {
   throw new Error("Please add the MongoDB connection SRV as 'MONGO_SRV'");
@@ -48,6 +50,9 @@ app.use(
 );
 app.use(auth.populateCurrentUser);
 app.use("/api", api);
+
+// TODO: build API router for login to different services (Linkedin, Facebook, AirBnb, etc)
+app.use("/login", login);
 
 // Serves the frontend code
 const reactPath = path.resolve(__dirname, "..", "client", "dist");
