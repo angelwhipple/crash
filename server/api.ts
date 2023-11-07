@@ -141,12 +141,12 @@ router.get("/linkedin", async (req, res) => {
 });
 
 router.post("/searchprofiles", async (req, res) => {
-  console.log(`[BACKEND] Profile search query: ${req.body.query}`);
+  console.log(`[BACKEND] Profile search query: ${req.body.query}`); // main search, filtered by user profiles
   res.send({});
 });
 
 router.post("/existingaccount", async (req, res) => {
-  res.send({ exists: false, message: "" });
+  res.send({ exists: false, message: "" }); // indicator type format
 });
 
 router.post("/createcommunity", async (req, res) => {

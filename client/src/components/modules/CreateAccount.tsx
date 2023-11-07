@@ -68,6 +68,78 @@ const CreateAccount = (props: Props) => {
     return valid.length !== 0;
   };
 
+  const handleDob = (event, dobInput) => {
+    event.preventDefault();
+    console.log(`Date of birth: ${dobInput.value}`);
+    if (!dobInput.value) {
+      dobInput.value = "";
+      setInvalid({ ind: true, message: "Please enter a valid date of birth" });
+    } else if (validateAge(dobInput.value)) {
+      setDob(dobInput.value);
+      setInvalid({ ind: false, message: "" });
+    } else {
+      dobInput.value = "";
+      setInvalid({ ind: true, message: "Must be atleast 16 years of age" });
+    }
+  };
+
+  const handleEmail = (event, emailInput) => {
+    event.preventDefault();
+    console.log(`Email: ${emailInput.value}`);
+    if (validateEmail(emailInput.value)) {
+      // post("/existingaccount", { email: emailInput.value }).then((res) => {
+      //   // if existing account returned, redirect to login
+      //   if (res.exists) setInvalid({ ind: true, message: res.message });
+      //   else setEmail(emailInput.value);
+      // });
+      setEmail(emailInput.value);
+      setInvalid({ ind: false, message: "" });
+    } else {
+      emailInput.value = "";
+      setInvalid({ ind: true, message: "Invalid email address" });
+    }
+  };
+
+  const handleUserPass = (event, usernameInput, passwordInput, confirmInput) => {
+    event.preventDefault();
+    console.log(`Username: ${usernameInput.value}`);
+    if (passwordInput.value !== confirmInput.value) {
+      passwordInput.value = "";
+      confirmInput.value = "";
+      setInvalid({ ind: true, message: "Passwords must match" });
+    } else {
+      console.log(`Password: ${passwordInput.value}`);
+      const validUsername = validateUsername(usernameInput.value);
+      const invalidPassword = checkInvalidPassword(passwordInput.value);
+      if (!invalidPassword.ind && validUsername) {
+        setUsername(usernameInput.value);
+        setPassword(passwordInput.value);
+        setInvalid({ ind: false, message: "" });
+        const body = {
+          username: usernameInput.value,
+          password: passwordInput.value,
+          email: email,
+          dob: dob,
+        };
+        post("/api/createuser", body).then((user) => {
+          console.log(user);
+          props.setUserId(user._id);
+          props.setCreate(false);
+          // switch to profile page for setup here
+        });
+      } else if (!validUsername) {
+        setInvalid({ ind: true, message: "Invalid username" });
+        usernameInput.value = "";
+        passwordInput.value = "";
+        confirmInput.value = "";
+      } else if (invalidPassword.ind) {
+        setInvalid({ ind: true, message: invalidPassword.message });
+        passwordInput.value = "";
+        confirmInput.value = "";
+      }
+    }
+  };
+
   return (
     <div className="centered default-container create-container">
       <h3>Create an account</h3>
@@ -75,25 +147,21 @@ const CreateAccount = (props: Props) => {
         <>
           <label className="create-label">
             Enter your email address:
-            <input id="email" className="create-input" type="email"></input>
+            <input
+              id="email"
+              className="create-input"
+              onKeyDown={(event) => {
+                const emailInput = document.getElementById("email")! as HTMLInputElement;
+                if (event.key === "Enter") handleEmail(event, emailInput);
+              }}
+              type="email"
+            ></input>
           </label>
           <TbPlayerTrackNextFilled
             className="nav-icon u-pointer"
             onClick={(event) => {
               const emailInput = document.getElementById("email")! as HTMLInputElement;
-              console.log(`Email: ${emailInput.value}`);
-              if (validateEmail(emailInput.value)) {
-                // post("/existingaccount", { email: emailInput.value }).then((res) => {
-                //   // if existing account returned, redirect to login
-                //   if (res.exists) setInvalid({ ind: true, message: res.message });
-                //   else setEmail(emailInput.value);
-                // });
-                setEmail(emailInput.value);
-                setInvalid({ ind: false, message: "" });
-              } else {
-                emailInput.value = "";
-                setInvalid({ ind: true, message: "Invalid email address" });
-              }
+              handleEmail(event, emailInput);
             }}
           ></TbPlayerTrackNextFilled>
         </>
@@ -101,23 +169,23 @@ const CreateAccount = (props: Props) => {
         <>
           <label className="create-label">
             What is your date of birth?
-            <input id="dob" className="create-input" type="date"></input>
+            <input
+              id="dob"
+              className="create-input"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  const dobInput = document.getElementById("dob")! as HTMLInputElement;
+                  handleDob(event, dobInput);
+                }
+              }}
+              type="date"
+            ></input>
           </label>
           <TbPlayerTrackNextFilled
             className="nav-icon u-pointer"
             onClick={(event) => {
               const dobInput = document.getElementById("dob")! as HTMLInputElement;
-              console.log(`Date of birth: ${dobInput.value}`);
-              if (!dobInput.value) {
-                dobInput.value = "";
-                setInvalid({ ind: true, message: "Please enter a valid date of birth" });
-              } else if (validateAge(dobInput.value)) {
-                setDob(dobInput.value);
-                setInvalid({ ind: false, message: "" });
-              } else {
-                dobInput.value = "";
-                setInvalid({ ind: true, message: "Must be atleast 16 years of age" });
-              }
+              handleDob(event, dobInput);
             }}
           ></TbPlayerTrackNextFilled>
         </>
@@ -131,7 +199,19 @@ const CreateAccount = (props: Props) => {
           </label>
           <label className="create-label">
             Re-enter your password:{" "}
-            <input id="confirm" className="create-input" type="password"></input>
+            <input
+              id="confirm"
+              className="create-input"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  const usernameInput = document.getElementById("username")! as HTMLInputElement;
+                  const passwordInput = document.getElementById("password")! as HTMLInputElement;
+                  const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
+                  handleUserPass(event, usernameInput, passwordInput, confirmInput);
+                }
+              }}
+              type="password"
+            ></input>
           </label>
           <TbPlayerTrackNextFilled
             className="nav-icon u-pointer"
@@ -139,41 +219,7 @@ const CreateAccount = (props: Props) => {
               const usernameInput = document.getElementById("username")! as HTMLInputElement;
               const passwordInput = document.getElementById("password")! as HTMLInputElement;
               const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
-              console.log(`Username: ${usernameInput.value}`);
-              if (passwordInput.value !== confirmInput.value) {
-                passwordInput.value = "";
-                confirmInput.value = "";
-                setInvalid({ ind: true, message: "Passwords must match" });
-              } else {
-                console.log(`Password: ${passwordInput.value}`);
-                const validUsername = validateUsername(usernameInput.value);
-                const invalidPassword = checkInvalidPassword(passwordInput.value);
-                if (!invalidPassword.ind && validUsername) {
-                  setUsername(usernameInput.value);
-                  setPassword(passwordInput.value);
-                  setInvalid({ ind: false, message: "" });
-                  props.setCreate(false);
-                  const body = {
-                    username: usernameInput.value,
-                    password: passwordInput.value,
-                    email: email,
-                    dob: dob,
-                  };
-                  post("/api/createuser", body).then((user) => {
-                    console.log(user);
-                    props.setUserId(user._id);
-                  });
-                } else if (!validUsername) {
-                  setInvalid({ ind: true, message: "Invalid username" });
-                  usernameInput.value = "";
-                  passwordInput.value = "";
-                  confirmInput.value = "";
-                } else if (invalidPassword.ind) {
-                  setInvalid({ ind: true, message: invalidPassword.message });
-                  passwordInput.value = "";
-                  confirmInput.value = "";
-                }
-              }
+              handleUserPass(event, usernameInput, passwordInput, confirmInput);
             }}
           ></TbPlayerTrackNextFilled>
         </>
