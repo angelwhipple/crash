@@ -24,19 +24,22 @@ const Communities = (props) => {
   //   }, []);
 
   return (
-    <div className="centered default-container">
-      <p>Join Communities</p>
-      <p>Coming soon...</p>
-      <button
-        className="login-button u-pointer"
-        onClick={(event) => {
-          route("/");
-          socket.emit("toggleAll", {});
-        }}
-      >
-        Take me back
-      </button>
-    </div>
+    <>
+      <div className="sidebar"></div>
+      <div className="centered default-container">
+        <p>Join Communities</p>
+        <p>Coming soon...</p>
+        <button
+          className="login-button u-pointer"
+          onClick={(event) => {
+            route("/");
+            socket.emit("toggleAll", {});
+          }}
+        >
+          Take me back
+        </button>
+      </div>
+    </>
   );
 };
 

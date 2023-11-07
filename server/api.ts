@@ -6,6 +6,7 @@ import url from "url";
 import request from "request";
 import assert from "assert";
 // import fetch, { Headers, Request } from "node-fetch";
+// import Community from "./models/Community";
 import { UnaryExpression } from "typescript";
 import http from "http";
 const router = express.Router();
@@ -30,6 +31,7 @@ router.post("/initsocket", (req, res) => {
 
 router.post("/linkedin", auth.login);
 router.post("/consolidate", auth.consolidateProfiles);
+router.post("/createuser", auth.createUser);
 
 // |------------------------------|
 // | write your API methods below!|
@@ -76,22 +78,22 @@ const callExternalAPI = (
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
 router.get("/linkedin", async (req, res) => {
-  console.log("Linkedin API route reached successfully");
+  console.log("[BACKEND] Initializing Linkedin OAuth flow");
   // LINKEDIN OAUTH STEP 1: AUTHORIZATION CODE
   const query = url.parse(req.url, true).query;
   const auth_code = query.code;
-  console.log(`Authorization code: ${auth_code}`);
+  console.log(`[BACKEND] Authorization code: ${auth_code}`);
 
-  console.log("Requesting Linkedin access token");
+  console.log("[BACKEND] Requesting Linkedin access token");
   // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
   let endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
   await callExternalAPI(endpoint_url)
     .then(async (token_response: tokenResponse) => {
       const access_token = token_response.access_token; // default: 60 day lifespan
-      console.log(`Access token: ${access_token}`);
+      console.log(`[BACKEND] Access token: ${access_token}`);
 
       // LINKEDIN OAUTH STEP 3: AUTHENTICATED REQUESTS FOR USER INFORMATION
-      console.log(`Attempting user info requests with token ${access_token}`);
+      console.log(`[BACKEND] Attempting user info requests with token ${access_token}`);
       endpoint_url = `https://api.linkedin.com/v2/me`;
       const headers = { Authorization: `Bearer ${access_token}` };
       const axiosConfig = { headers };
@@ -102,19 +104,19 @@ router.get("/linkedin", async (req, res) => {
           liteProfile.localizedLastName,
           liteProfile.id,
         ];
-        console.log(`Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
+        console.log(`[BACKEND] Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
         endpoint_url = `https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))`;
         axios.get(endpoint_url, axiosConfig).then((response) => {
           // const email = JSON.stringify(response.data); // convert Response Object back into readable JSON
           const emailAddress = response.data.elements[0]["handle~"]["emailAddress"];
-          console.log(`Email address: ${emailAddress}`);
+          console.log(`[BACKEND] Email address: ${emailAddress}`);
           endpoint_url = `https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
           axios.get(endpoint_url, axiosConfig).then((response) => {
             const profilePictureUrl =
               response.data.profilePicture["displayImage~"]["elements"][0]["identifiers"][0][
                 "identifier"
               ];
-            console.log(`Profile picture url: ${profilePictureUrl}`);
+            console.log(`[BACKEND] Profile picture url: ${profilePictureUrl}`);
             const loginUrl = `http://localhost:5050/api/login`;
             const loginBody = {
               name: `${firstName} ${lastName}`,
@@ -132,18 +134,29 @@ router.get("/linkedin", async (req, res) => {
       });
     })
     .catch((token_error) => {
-      console.log(`Token response error: ${token_error}`);
+      console.log(`[BACKEND] Token response error: ${token_error}`);
       res.send(token_error);
     });
   res.redirect("/"); // redirects back to homepage
 });
 
 router.post("/searchprofiles", async (req, res) => {
-  console.log(`Backend profile search query: ${req.body.query}`);
+  console.log(`[BACKEND] Profile search query: ${req.body.query}`);
   res.send({});
 });
 
-router.post("/createprofile", (req, res) => {});
+router.post("/existingaccount", async (req, res) => {
+  res.send({ exists: false, message: "" });
+});
+
+router.post("/createcommunity", async (req, res) => {
+  // const community = new Community({
+  //   name: req.body.communityName,
+  //   members: [req.body.id],
+  //   variation: req.body.communityType,
+  // });
+  // res.send(await community.save());
+});
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

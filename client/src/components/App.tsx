@@ -113,6 +113,7 @@ const App = () => {
           chosenProfiles={chosenProfiles}
           setChosenProfiles={setChosenProfiles}
           userId={userId}
+          setUserId={setUserId}
           setConsolidate={setConsolidate}
         />
         <Profile path="/profile" userId={userId}></Profile>

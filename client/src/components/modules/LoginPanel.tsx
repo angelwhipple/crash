@@ -18,6 +18,7 @@ type Props = RouteComponentProps & {
   googleLogout: any;
   handleLogout: any;
   setChosenProfiles: (profiles: string[]) => void;
+  setUserId: (newUserId: string) => void;
   userId: string;
 };
 
@@ -64,7 +65,7 @@ const LoginPanel = (props: Props) => {
           </div>
         </>
       ) : create ? (
-        <CreateAccount setCreate={setCreate}></CreateAccount>
+        <CreateAccount setCreate={setCreate} setUserId={props.setUserId}></CreateAccount>
       ) : (
         <div className="modal-Container">
           <div className="modal-Content">
@@ -96,14 +97,14 @@ const LoginPanel = (props: Props) => {
               >
                 Sign in with Facebook
               </button>
-              <button
+              {/* <button
                 className="login-button floating-button u-pointer"
                 onClick={(event) => {
                   route("/airbnb");
                 }}
               >
                 Sign in with Airbnb
-              </button>
+              </button> */}
               <button
                 className="login-button floating-button u-pointer"
                 onClick={(event) => {

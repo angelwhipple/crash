@@ -18,6 +18,17 @@ const verify = (token: string) => {
     .then((ticket) => ticket.getPayload());
 };
 
+const createUser = async (req: Request, res: Response) => {
+  // encrypt password here
+  const newUser = new User({
+    email: req.body.email,
+    dob: req.body.dob,
+    username: req.body.username,
+    password: req.body.password,
+  });
+  res.send(await newUser.save());
+};
+
 // TODO: DRY out getOrCreate functions
 // refactor to check for existing accounts based on input type
 const getOrCreateUser_GOOGLE = async (user: TokenPayload) => {
@@ -80,14 +91,14 @@ const countProfiles = async (user: UserInterface) => {
 
   const query = { email: user.email, [currentProfile]: { $ne: user[currentProfile] } };
   return User.find(query).then((additionalUsers) => {
-    console.log(`Found extra profiles: ${additionalUsers}`);
+    console.log(`[BACKEND] Found extra profiles: ${additionalUsers}`);
     const response = { eligible: additionalUsers.length > 0, profiles: additionalUsers };
     return response;
   });
 };
 
 const login = async (req: Request, res: Response) => {
-  console.log(`Successfully reached profile consolidation check`);
+  console.log(`[BACKEND] Reached user profile consolidation check`);
   if ("linkedinid" in req.body) {
     const linkedinUser = await getOrCreateUser_LINKEDIN(req);
     console.log(`Found MongoDB user: ${linkedinUser}`);
@@ -140,4 +151,5 @@ export default {
   login,
   logout,
   consolidateProfiles,
+  createUser,
 };

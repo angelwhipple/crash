@@ -22,18 +22,18 @@
 }
 
 .floating-button {
-  animation-name: fadeIn;
-  animation-duration: 3s;
+  animation-name: buttonFade;
+  animation-duration: 2.6s;
 }
 
-@keyframes fadeIn {
+@keyframes buttonFade {
   from {
     opacity: 0;
-    transform: translateY(100%);
+    transform: scale(0);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0%);
+    transform: scale(1);
   }
 }

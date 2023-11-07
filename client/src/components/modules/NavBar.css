@@ -59,9 +59,11 @@ body {
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateX(100%);
   }
   to {
     opacity: 1;
+    transform: translateX(0%);
   }
 }
 
@@ -90,21 +92,20 @@ body {
   width: fit-content;
 }
 
-.search-filters-dropdown {
+.search-filters-sidebar {
   display: flex;
   position: absolute;
-  flex-direction: column;
-  row-gap: 2px;
+  column-gap: 10px;
   align-content: baseline;
   -webkit-text-fill-color: var(--white);
   background-color: grey;
   border: solid black;
   border-radius: var(--s);
-  animation: fadeIn 1.5s;
+  animation: fadeIn 1.1s;
   padding: 10%;
 }
 
-.dropdown-hidden {
+.sidebar-hidden {
   display: none;
   animation: fadeOut 1.5s;
 }

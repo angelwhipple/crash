@@ -49,7 +49,7 @@ const NavBar = (props) => {
     const body = { query: query };
     setQuery("");
     event.target.value = "";
-    post("/api/searchprofiles", body).then((res) => {});
+    post("/api/existingaccount", body).then((res) => {});
   };
 
   //   useEffect(() => {
@@ -113,7 +113,7 @@ const NavBar = (props) => {
               toggleTabs(setFiltering, false, true);
             }}
           ></GoFilter>
-          <div className={`${filtering ? "search-filters-dropdown" : "dropdown-hidden"}`}>
+          <div className={`${filtering ? "search-filters-sidebar" : "sidebar-hidden"}`}>
             <div className="search-filter">
               <input type="checkbox"></input>
               <label>All</label>

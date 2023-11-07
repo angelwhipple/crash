@@ -20,6 +20,7 @@ type Props = RouteComponentProps & {
   handleLogout: () => void;
   setConsolidate: (consolidate: boolean) => void;
   setChosenProfiles: (profiles: string[]) => void;
+  setUserId: (newUserId: string) => void;
 };
 const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
@@ -36,6 +37,7 @@ const Homepage = (props: Props) => {
         handleLogout={handleLogout}
         setChosenProfiles={props.setChosenProfiles}
         userId={props.userId}
+        setUserId={props.setUserId}
       ></LoginPanel>
       {props.consolidate ? (
         <Merge

@@ -37,7 +37,7 @@ const ProfilePill = (props) => {
   const handleSelect = (checkbox) => {
     console.log(`Checkbox status: ${checkbox.target.checked}`);
     if (checkbox.target.checked) {
-      props.setChosenProfiles((prev: string[]) => [...prev, platform]); // functional update
+      props.setChosenProfiles((prev: string[]) => [...prev, platform]); // functional (dynamic) update
     } else {
       props.setChosenProfiles(
         props.chosenProfiles.filter((profile: string) => profile !== platform)
