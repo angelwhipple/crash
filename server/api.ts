@@ -33,7 +33,7 @@ router.post("/linkedin", auth.login);
 router.post("/consolidate", auth.consolidateProfiles);
 router.post("/createuser", auth.createUser);
 router.get("/existingaccount", auth.existingUser);
-router.get("/verifylogin", auth.loginUser);
+// router.post("/verifylogin", auth.login);
 
 // |------------------------------|
 // | write your API methods below!|

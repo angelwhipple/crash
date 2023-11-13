@@ -42,16 +42,21 @@ const App = () => {
     return pills;
   };
 
-  // useEffect(() => {
-  //   console.log(`Chosen profiles: ${chosenProfiles}`);
-  // }, [chosenProfiles]);
-
   socket.on("linkedin", async (event) => {
     console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
-    // setChosenProfiles((prev: string[]) => [...prev, PLATFORMS.linkedin]); // functional update ensures latest state
     post("/api/initsocket", { socketid: socket.id });
 
+    if (event.consolidate.eligible) {
+      setExtraProfiles(generatePills(event.consolidate.profiles));
+      setConsolidate(true);
+    }
+  });
+
+  socket.on("origin", async (event) => {
+    console.log(`Origin login socket emission: ${JSON.stringify(event)}`);
+    setUserId(event.user._id);
+    post("/api/initsocket", { socketid: socket.id });
     if (event.consolidate.eligible) {
       setExtraProfiles(generatePills(event.consolidate.profiles));
       setConsolidate(true);

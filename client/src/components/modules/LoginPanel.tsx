@@ -17,6 +17,7 @@ type Props = RouteComponentProps & {
   handleLogin: any;
   googleLogout: any;
   handleLogout: any;
+  setConsolidate: (consolidate: boolean) => void;
   setChosenProfiles: (profiles: string[]) => void;
   setUserId: (newUserId: string) => void;
   userId: string;
@@ -73,7 +74,11 @@ const LoginPanel = (props: Props) => {
           </div>
         </>
       ) : create ? (
-        <CreateAccount setCreate={setCreate} setUserId={props.setUserId}></CreateAccount>
+        <CreateAccount
+          setCreate={setCreate}
+          setUserId={props.setUserId}
+          setConsolidate={props.setConsolidate}
+        ></CreateAccount>
       ) : (
         <div className="modal-Container">
           <div className="modal-Content">

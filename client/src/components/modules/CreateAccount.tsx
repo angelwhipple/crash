@@ -106,18 +106,19 @@ const CreateAccount = (props: Props) => {
 
   const handleLogin = (event, emailInput, passwordInput) => {
     event.preventDefault();
-    get("/api/verifylogin", { email: emailInput.value, password: passwordInput.value }).then(
-      (res) => {
-        if (res.valid) {
-          props.setUserId(res.account._id);
-          setInvalid({ ind: false, message: "" });
-          props.setCreate(false);
-        } else {
-          passwordInput.value = "";
-          setInvalid({ ind: true, message: res.message });
-        }
+    post("/api/login", {
+      originid: "originid",
+      email: emailInput.value,
+      password: passwordInput.value,
+    }).then((res) => {
+      if (res.valid) {
+        setInvalid({ ind: false, message: "" });
+        props.setCreate(false);
+      } else {
+        passwordInput.value = "";
+        setInvalid({ ind: true, message: res.message });
       }
-    );
+    });
   };
 
   const handleUserPass = (event, usernameInput, passwordInput, confirmInput) => {

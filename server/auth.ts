@@ -2,6 +2,7 @@ import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { NextFunction, Request, Response } from "express";
 import User from "./models/User";
 import UserInterface from "../shared/User";
+import socketManager from "./server-socket";
 import assert from "assert";
 import fetch from "node-fetch";
 
@@ -9,7 +10,7 @@ import fetch from "node-fetch";
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-// for assigning account IDs to newly created acounts (through the origin platform)
+// holds next new account ID, revise to avoid resetting to 0 on server restart
 const ID_MAP = { nextID: 0 };
 
 const verify = (token: string) => {
@@ -31,25 +32,9 @@ const existingUser = async (req: Request, res: Response) => {
   });
 };
 
-const loginUser = async (req: Request, res: Response) => {
-  User.findOne({
-    email: req.query.email?.toString(),
-    originid: { $exists: true },
-    password: req.query.password?.toString(),
-  }).then((user) => {
-    // if login credentials match, returns a valid user
-    if (user !== null) res.send({ valid: true, account: user, message: "" });
-    else
-      res.send({
-        valid: false,
-        account: undefined,
-        message: "Incorrect password, please try again",
-      });
-  });
-};
-
 const createUser = async (req: Request, res: Response) => {
-  // encrypt password here
+  // ENCRYPT
+
   const newUser = new User({
     email: req.body.email,
     dob: req.body.dob,
@@ -94,14 +79,24 @@ const getOrCreateUser_LINKEDIN = async (req: Request) => {
   );
 };
 
-const getUser_ORIGIN = async (req: Request) => {
-  // search by user provided email and password from request
-  return await User.findOne({ email: req.body.email, originid: { $exists: true } }).then(
-    async (existingUser: UserInterface | null | undefined) => {
-      if (existingUser !== null && existingUser !== undefined) return existingUser;
-      // return nil if existing user w/ matching login credentials not found, handle
-    }
-  );
+const loginUser_ORIGIN = async (req: Request) => {
+  return await User.findOne({
+    email: req.body.email?.toString(),
+    originid: { $exists: true },
+    password: req.body.password?.toString(),
+  }).then(async (user) => {
+    // if login credentials match, returns a valid user & status
+    if (user !== null) return { user: user, status: { valid: true, account: user, message: "" } };
+    else
+      return {
+        user: undefined,
+        status: {
+          valid: false,
+          account: undefined,
+          message: "Incorrect password, please try again",
+        },
+      };
+  });
 };
 
 /**
@@ -142,7 +137,6 @@ const consolidateProfiles = async (req: Request, res: Response) => {
 const countProfiles = async (user: UserInterface) => {
   const fields = ["linkedinid", "googleid", "originid"];
   const currentProfile: string = fields.filter((field) => user.get(field) !== undefined)[0];
-
   const query = { email: user.email, [currentProfile]: { $ne: user[currentProfile] } };
   return User.find(query).then((additionalUsers) => {
     console.log(`[BACKEND] Found extra profiles: ${additionalUsers}`);
@@ -161,8 +155,17 @@ const login = async (req: Request, res: Response) => {
       consolidate: await countProfiles(linkedinUser),
     });
   } else if ("originid" in req.body) {
-    const originUser = await getUser_ORIGIN(req);
-    // check for originUser not nil, handle & send appropriate response
+    const { user, status } = await loginUser_ORIGIN(req);
+    if (status.valid && user !== undefined) {
+      console.log(`Logged in user: ${user.username}`);
+      socketManager.getIo().emit("origin", { user: user, consolidate: await countProfiles(user) });
+      res.send({
+        valid: status.valid,
+        account: status.account,
+      });
+    } else {
+      res.send({ valid: status.valid, message: status.message });
+    }
   } else {
     verify(req.body.token)
       .then(async (user) => {
@@ -210,5 +213,4 @@ export default {
   consolidateProfiles,
   createUser,
   existingUser,
-  loginUser,
 };
