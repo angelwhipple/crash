@@ -9,6 +9,9 @@ import fetch from "node-fetch";
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
+// for assigning account IDs to newly created acounts (through the origin platform)
+const ID_MAP = { nextID: 0 };
+
 const verify = (token: string) => {
   return client
     .verifyIdToken({
@@ -16,6 +19,33 @@ const verify = (token: string) => {
       audience: GOOGLE_CLIENT_ID,
     })
     .then((ticket) => ticket.getPayload());
+};
+
+const existingUser = async (req: Request, res: Response) => {
+  User.findOne({ email: req.query.email?.toString(), originid: { $exists: true } }).then((user) => {
+    if (user !== null) {
+      res.send({ exists: true });
+    } else {
+      res.send({ exists: false });
+    }
+  });
+};
+
+const loginUser = async (req: Request, res: Response) => {
+  User.findOne({
+    email: req.query.email?.toString(),
+    originid: { $exists: true },
+    password: req.query.password?.toString(),
+  }).then((user) => {
+    // if login credentials match, returns a valid user
+    if (user !== null) res.send({ valid: true, account: user, message: "" });
+    else
+      res.send({
+        valid: false,
+        account: undefined,
+        message: "Incorrect password, please try again",
+      });
+  });
 };
 
 const createUser = async (req: Request, res: Response) => {
@@ -26,7 +56,12 @@ const createUser = async (req: Request, res: Response) => {
     username: req.body.username,
     password: req.body.password,
   });
-  res.send(await newUser.save());
+  const savedUser = await newUser.save();
+  // assign the created account an origin ID
+  User.findByIdAndUpdate(savedUser._id, { originid: ID_MAP.nextID.toString() }).then((user) => {
+    ID_MAP.nextID++; // increment the ID counter
+    res.send(user);
+  });
 };
 
 // TODO: DRY out getOrCreate functions
@@ -59,25 +94,44 @@ const getOrCreateUser_LINKEDIN = async (req: Request) => {
   );
 };
 
+const getUser_ORIGIN = async (req: Request) => {
+  // search by user provided email and password from request
+  return await User.findOne({ email: req.body.email, originid: { $exists: true } }).then(
+    async (existingUser: UserInterface | null | undefined) => {
+      if (existingUser !== null && existingUser !== undefined) return existingUser;
+      // return nil if existing user w/ matching login credentials not found, handle
+    }
+  );
+};
+
 /**
  * Google-Linkedin account consolidation
  * @param user
  */
 const consolidateProfiles = async (req: Request, res: Response) => {
-  const fields = ["linkedinid", "googleid"];
-  const consolidatedUser = new User({
-    name: req.body.name,
-    email: req.body.email,
-  });
+  const fields = ["linkedinid", "googleid", "originid"];
+  // extract ALL original fields from the currently active profile: use User.findbyID()
+  // for each additional chosen profile, set missing fields one by one
+  const originalUser = await User.findById(req.body.id);
+
   // extract user selected profiles for consolidation only
   const chosenProfiles = fields.filter((field) => req.body.profiles.includes(field));
   for (const field of chosenProfiles) {
+    console.log(field);
     const query = { email: req.body.email, [field]: { $exists: true } };
-    await User.findOneAndDelete(query).then((user) => {
-      if (user) consolidatedUser[field] = user[field];
+    await User.findOneAndDelete(query).then(async (user) => {
+      if (user) {
+        user.schema.eachPath(async (path: string) => {
+          if (originalUser?.get(path) === undefined && user.get(path) !== undefined) {
+            await User.findByIdAndUpdate(req.body.id, { [path]: user[path] });
+          }
+        });
+      }
     });
   }
-  res.send(await consolidatedUser.save());
+
+  const consolidatedUser = await User.findById(req.body.id);
+  res.send(consolidatedUser);
 };
 
 /**
@@ -86,8 +140,8 @@ const consolidateProfiles = async (req: Request, res: Response) => {
  * @returns
  */
 const countProfiles = async (user: UserInterface) => {
-  const fields = ["linkedinid", "googleid"];
-  const currentProfile: string = fields.filter((field) => field in user)[0];
+  const fields = ["linkedinid", "googleid", "originid"];
+  const currentProfile: string = fields.filter((field) => user.get(field) !== undefined)[0];
 
   const query = { email: user.email, [currentProfile]: { $ne: user[currentProfile] } };
   return User.find(query).then((additionalUsers) => {
@@ -106,6 +160,9 @@ const login = async (req: Request, res: Response) => {
       user: linkedinUser,
       consolidate: await countProfiles(linkedinUser),
     });
+  } else if ("originid" in req.body) {
+    const originUser = await getUser_ORIGIN(req);
+    // check for originUser not nil, handle & send appropriate response
   } else {
     verify(req.body.token)
       .then(async (user) => {
@@ -152,4 +209,6 @@ export default {
   logout,
   consolidateProfiles,
   createUser,
+  existingUser,
+  loginUser,
 };

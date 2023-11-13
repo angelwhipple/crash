@@ -22,7 +22,12 @@ type Props = RouteComponentProps & {
   userId: string;
 };
 
-const PLATFORMS = { linkedin: "linkedinid", google: "googleid", fb: "facebookid" };
+const PLATFORMS = {
+  linkedin: "linkedinid",
+  google: "googleid",
+  fb: "facebookid",
+  origin: "originid",
+};
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/linkedin";
@@ -37,8 +42,11 @@ const LoginPanel = (props: Props) => {
     navigate(path);
   };
   const launch_linkedin = (event) => {
-    props.setChosenProfiles([PLATFORMS.linkedin]);
     window.open(LINKEDIN_AUTH_URL, "_self");
+  };
+
+  const create_or_signin = (event) => {
+    setCreate(true);
   };
 
   useEffect(() => {
@@ -97,21 +105,8 @@ const LoginPanel = (props: Props) => {
               >
                 Sign in with Facebook
               </button>
-              {/* <button
-                className="login-button floating-button u-pointer"
-                onClick={(event) => {
-                  route("/airbnb");
-                }}
-              >
-                Sign in with Airbnb
-              </button> */}
-              <button
-                className="login-button floating-button u-pointer"
-                onClick={(event) => {
-                  setCreate(true);
-                }}
-              >
-                Create an account
+              <button className="login-button floating-button u-pointer" onClick={create_or_signin}>
+                Sign in/Create an account
               </button>
             </div>
           </div>

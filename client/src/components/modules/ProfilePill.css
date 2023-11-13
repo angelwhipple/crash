@@ -3,14 +3,13 @@
   border: solid thin;
   border-radius: 12px;
   border-color: var(--white);
-  padding: 2%;
+  padding: 3%;
   display: flex;
   align-items: center;
-  width: fit-content;
   -webkit-text-fill-color: var(--white);
   transition-duration: 0.4s;
   font-size: medium;
-  width: fit-content;
+  column-gap: 5px;
 }
 
 .pill-container:hover {

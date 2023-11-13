@@ -5,6 +5,7 @@ const UserSchema = new Schema({
   username: String,
   googleid: String,
   linkedinid: String,
+  originid: String,
   email: String,
   password: String,
   dob: String,
@@ -18,6 +19,7 @@ export interface User extends Document {
   username: String;
   googleid: string;
   linkedinid: string;
+  originid: string;
   _id: string;
   email: String;
   password: String;

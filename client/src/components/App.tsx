@@ -17,7 +17,12 @@ import Communities from "./pages/Communities";
 import Housing from "./pages/Housing";
 import ProfilePill from "./modules/ProfilePill";
 
-const PLATFORMS = { linkedin: "linkedinid", google: "googleid", fb: "facebookid" };
+const PLATFORMS = {
+  linkedin: "linkedinid",
+  google: "googleid",
+  fb: "facebookid",
+  origin: "originid",
+};
 
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
@@ -44,7 +49,7 @@ const App = () => {
   socket.on("linkedin", async (event) => {
     console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
-    setChosenProfiles((prev: string[]) => [...prev, PLATFORMS.linkedin]); // functional update ensures latest state
+    // setChosenProfiles((prev: string[]) => [...prev, PLATFORMS.linkedin]); // functional update ensures latest state
     post("/api/initsocket", { socketid: socket.id });
 
     if (event.consolidate.eligible) {
@@ -80,7 +85,7 @@ const App = () => {
       token: userToken,
     }).then((response) => {
       setUserId(response.user._id);
-      setChosenProfiles([PLATFORMS.google]);
+      // setChosenProfiles([PLATFORMS.google]);
       console.log(`Chosen profiles: ${chosenProfiles}`);
       post("/api/initsocket", { socketid: socket.id });
 

@@ -6,6 +6,7 @@ import "./ProfilePill.css";
 import linkedin from "../../assets/linkedin.png";
 import google from "../../assets/google.png";
 import facebook from "../../assets/fb.png";
+import origin from "../../assets/origin.png";
 
 type Props = RouteComponentProps & {
   key: number;
@@ -18,6 +19,7 @@ const PROFILE_ICONS = {
   linkedinid: linkedin,
   googleid: google,
   facebookid: facebook,
+  originid: origin,
 };
 
 const ProfilePill = (props) => {
@@ -48,7 +50,8 @@ const ProfilePill = (props) => {
   return (
     <div className="pill-container u-pointer">
       <img src={icon} className="platform-icon"></img>
-      <p>{props.profile.name}</p>
+      {/* use username for origin accounts */}
+      <p>{props.profile.name ? props.profile.name : props.profile.username}</p>
       <input
         id="platformCheck"
         type="checkbox"

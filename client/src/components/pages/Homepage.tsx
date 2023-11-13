@@ -41,6 +41,7 @@ const Homepage = (props: Props) => {
       ></LoginPanel>
       {props.consolidate ? (
         <Merge
+          userId={props.userId}
           extraProfiles={props.extraProfiles}
           chosenProfiles={props.chosenProfiles}
           setConsolidate={props.setConsolidate}

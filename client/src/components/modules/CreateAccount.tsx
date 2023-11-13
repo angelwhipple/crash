@@ -17,6 +17,7 @@ type Invalid = {
 };
 
 const CreateAccount = (props: Props) => {
+  const [exists, setExists] = useState(false);
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
   const [username, setUsername] = useState("");
@@ -72,32 +73,51 @@ const CreateAccount = (props: Props) => {
     event.preventDefault();
     console.log(`Date of birth: ${dobInput.value}`);
     if (!dobInput.value) {
-      dobInput.value = "";
       setInvalid({ ind: true, message: "Please enter a valid date of birth" });
     } else if (validateAge(dobInput.value)) {
       setDob(dobInput.value);
       setInvalid({ ind: false, message: "" });
     } else {
-      dobInput.value = "";
       setInvalid({ ind: true, message: "Must be atleast 16 years of age" });
     }
+    dobInput.value = "";
   };
 
   const handleEmail = (event, emailInput) => {
     event.preventDefault();
     console.log(`Email: ${emailInput.value}`);
     if (validateEmail(emailInput.value)) {
-      // post("/existingaccount", { email: emailInput.value }).then((res) => {
-      //   // if existing account returned, redirect to login
-      //   if (res.exists) setInvalid({ ind: true, message: res.message });
-      //   else setEmail(emailInput.value);
-      // });
+      get("/api/existingaccount", { email: emailInput.value }).then((res) => {
+        // if existing account is returned, skip to password step for login
+        if (res.exists) {
+          setExists(true);
+          setInvalid({
+            ind: true,
+            message: "An existing account was found with that email address. Please login",
+          });
+        }
+      });
       setEmail(emailInput.value);
-      setInvalid({ ind: false, message: "" });
     } else {
       emailInput.value = "";
       setInvalid({ ind: true, message: "Invalid email address" });
     }
+  };
+
+  const handleLogin = (event, emailInput, passwordInput) => {
+    event.preventDefault();
+    get("/api/verifylogin", { email: emailInput.value, password: passwordInput.value }).then(
+      (res) => {
+        if (res.valid) {
+          props.setUserId(res.account._id);
+          setInvalid({ ind: false, message: "" });
+          props.setCreate(false);
+        } else {
+          passwordInput.value = "";
+          setInvalid({ ind: true, message: res.message });
+        }
+      }
+    );
   };
 
   const handleUserPass = (event, usernameInput, passwordInput, confirmInput) => {
@@ -140,6 +160,9 @@ const CreateAccount = (props: Props) => {
     }
   };
 
+  // TODO: login OR create account
+  // IF login, POST to "/api/login": include originid, email, & password in request body
+  // IF create, use existing logic
   return (
     <div className="centered default-container create-container">
       <h3>Create an account</h3>
@@ -162,6 +185,43 @@ const CreateAccount = (props: Props) => {
             onClick={(event) => {
               const emailInput = document.getElementById("email")! as HTMLInputElement;
               handleEmail(event, emailInput);
+            }}
+          ></TbPlayerTrackNextFilled>
+        </>
+      ) : exists === true ? (
+        <>
+          <label className="create-label">
+            Enter your email address:
+            <input
+              id="email2"
+              className="create-input"
+              onKeyDown={(event) => {
+                const emailInput = document.getElementById("email2")! as HTMLInputElement;
+                if (event.key === "Enter") handleEmail(event, emailInput);
+              }}
+              type="email"
+              value={email}
+            ></input>
+          </label>
+          <label className="create-label">
+            Enter your password{" "}
+            <input
+              id="password"
+              className="create-input"
+              type="password"
+              onKeyDown={(event) => {
+                const emailInput = document.getElementById("email2")! as HTMLInputElement;
+                const passwordInput = document.getElementById("password")! as HTMLInputElement;
+                if (event.key === "Enter") handleLogin(event, emailInput, passwordInput);
+              }}
+            ></input>
+          </label>
+          <TbPlayerTrackNextFilled
+            className="nav-icon u-pointer"
+            onClick={(event) => {
+              const emailInput = document.getElementById("email")! as HTMLInputElement;
+              const passwordInput = document.getElementById("password")! as HTMLInputElement;
+              handleLogin(event, emailInput, passwordInput);
             }}
           ></TbPlayerTrackNextFilled>
         </>

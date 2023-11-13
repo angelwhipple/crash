@@ -80,7 +80,8 @@
 .profiles-container {
   display: flex;
   column-gap: 2px;
-  overflow-x: scroll;
+  overflow-x: visible;
+  width: auto;
 }
 
 .profiles-container::-webkit-scrollbar {

@@ -26,8 +26,9 @@ const Merge = (props) => {
             <button
               onClick={(event) => {
                 console.log(`Selected profiles: ${props.chosenProfiles}`);
-                if (props.chosenProfiles.length > 1) {
+                if (props.chosenProfiles.length > 0) {
                   const body = {
+                    id: props.userId,
                     name: props.extraProfiles[0].props.profile.name,
                     email: props.extraProfiles[0].props.profile.email,
                     profiles: props.chosenProfiles,
