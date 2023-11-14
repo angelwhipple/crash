@@ -157,6 +157,14 @@ router.post("/createcommunity", async (req, res) => {
   // res.send(await community.save());
 });
 
+router.get("/getuser", async (req, res) => {
+  console.log(`[BACKEND] Requesting user: ${req.query.id}`);
+  User.findById(req.query.id).then((user) => {
+    console.log(`[BACKEND] Got user: ${user}`);
+    res.send({ user: user });
+  });
+});
+
 router.get("/communities", async (req, res) => {
   User.findById(req.query.id).then((user) => {
     if (user && user.communities.length > 0) {

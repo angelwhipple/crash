@@ -122,8 +122,11 @@ const CreateAccount = (props: Props) => {
     });
   };
 
-  const handleUserPass = (event, usernameInput, passwordInput, confirmInput) => {
+  const handleUserPass = (event) => {
     event.preventDefault();
+    const usernameInput = document.getElementById("username")! as HTMLInputElement;
+    const passwordInput = document.getElementById("password")! as HTMLInputElement;
+    const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
     console.log(`Username: ${usernameInput.value}`);
     if (passwordInput.value !== confirmInput.value) {
       passwordInput.value = "";
@@ -257,7 +260,17 @@ const CreateAccount = (props: Props) => {
             Select a username <input id="username" className="create-input" type="text"></input>
           </label>
           <label className="create-label">
-            Enter a password <input id="password" className="create-input" type="password"></input>
+            Enter a password{" "}
+            <input
+              id="password"
+              className="create-input"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleUserPass(event);
+                }
+              }}
+              type="password"
+            ></input>
           </label>
           <label className="create-label">
             Re-enter your password:{" "}
@@ -266,10 +279,7 @@ const CreateAccount = (props: Props) => {
               className="create-input"
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
-                  const usernameInput = document.getElementById("username")! as HTMLInputElement;
-                  const passwordInput = document.getElementById("password")! as HTMLInputElement;
-                  const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
-                  handleUserPass(event, usernameInput, passwordInput, confirmInput);
+                  handleUserPass(event);
                 }
               }}
               type="password"
@@ -278,10 +288,7 @@ const CreateAccount = (props: Props) => {
           <TbPlayerTrackNextFilled
             className="nav-icon u-pointer"
             onClick={(event) => {
-              const usernameInput = document.getElementById("username")! as HTMLInputElement;
-              const passwordInput = document.getElementById("password")! as HTMLInputElement;
-              const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
-              handleUserPass(event, usernameInput, passwordInput, confirmInput);
+              handleUserPass(event);
             }}
           ></TbPlayerTrackNextFilled>
         </>
