@@ -25,7 +25,8 @@ const Communities = (props) => {
 
   return (
     <>
-      <div className="sidebar"></div>
+      <div className="sidebar-split"></div>
+      <div className="mainpage-split"></div>
       <div className="centered default-container">
         <p>Join Communities</p>
         <p>Coming soon...</p>

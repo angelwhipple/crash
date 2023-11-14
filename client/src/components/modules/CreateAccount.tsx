@@ -95,6 +95,7 @@ const CreateAccount = (props: Props) => {
             ind: true,
             message: "An existing account was found with that email address. Please login",
           });
+          setInvalid({ ind: false, message: "" });
         }
       });
       setEmail(emailInput.value);
@@ -166,7 +167,7 @@ const CreateAccount = (props: Props) => {
   // IF create, use existing logic
   return (
     <div className="centered default-container create-container">
-      <h3>Create an account</h3>
+      {exists === true ? <h3>Sign in</h3> : <h3>Create an account</h3>}
       {email === "" ? (
         <>
           <label className="create-label">

@@ -1,5 +1,19 @@
-.sidebar {
-  float: left;
-  width: 30%;
-  background-color: black;
+.sidebar-split {
+  background-color: var(--black);
+  height: 100%;
+  width: 20%;
+  position: fixed;
+  overflow-x: hidden;
+  top: 0;
+  left: 0;
+}
+
+.mainpage-split {
+  background-color: var(--orange);
+  height: 100%;
+  width: 80%;
+  position: fixed;
+  overflow-x: hidden;
+  top: 0;
+  right: 0;
 }

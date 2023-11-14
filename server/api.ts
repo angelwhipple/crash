@@ -5,7 +5,6 @@ import socketManager from "./server-socket";
 import url from "url";
 import request from "request";
 import assert from "assert";
-// import fetch, { Headers, Request } from "node-fetch";
 // import Community from "./models/Community";
 import { UnaryExpression } from "typescript";
 import http from "http";
@@ -33,7 +32,6 @@ router.post("/linkedin", auth.login);
 router.post("/consolidate", auth.consolidateProfiles);
 router.post("/createuser", auth.createUser);
 router.get("/existingaccount", auth.existingUser);
-// router.post("/verifylogin", auth.login);
 
 // |------------------------------|
 // | write your API methods below!|

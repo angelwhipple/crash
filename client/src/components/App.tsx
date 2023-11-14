@@ -2,12 +2,12 @@ import React, { useState, useEffect, ReactElement } from "react";
 import { Router, useNavigate } from "@reach/router";
 import jwt_decode from "jwt-decode";
 import { CredentialResponse } from "@react-oauth/google";
-// import assert from "assert";
 
 import { get, post } from "../utilities";
 import NotFound from "./pages/NotFound";
 import { socket } from "../client-socket";
 import User from "../../../shared/User";
+import Community from "../../../shared/Community";
 import "../utilities.css";
 import "./pages/Homepage.css";
 import Homepage from "./pages/Homepage";

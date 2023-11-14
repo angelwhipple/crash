@@ -3,7 +3,7 @@
   border: solid thin;
   border-radius: 12px;
   border-color: var(--white);
-  padding: 3%;
+  padding: 6%;
   display: flex;
   align-items: center;
   -webkit-text-fill-color: var(--white);

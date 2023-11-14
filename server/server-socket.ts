@@ -1,14 +1,18 @@
 import type http from "http";
 import { Server, Socket } from "socket.io";
 import User from "../shared/User";
+import Community from "../shared/Community";
 let io: Server;
 
 const userToSocketMap: Map<string, Socket> = new Map<string, Socket>(); // maps user ID to socket object
 const socketToUserMap: Map<string, User> = new Map<string, User>(); // maps socket ID to user object
 
+const socketToCommunityMap: Map<string, Community> = new Map<string, Community>(); // maps socket ID to a community object
+
 export const getSocketFromUserID = (userid: string) => userToSocketMap.get(userid);
 export const getUserFromSocketID = (socketid: string) => socketToUserMap.get(socketid);
 export const getSocketFromSocketID = (socketid: string) => io.sockets.sockets.get(socketid);
+export const getCommunityFromSocketID = (socketid: string) => socketToCommunityMap.get(socketid);
 
 export const addUser = (user: User, socket: Socket): void => {
   const oldSocket = userToSocketMap.get(user._id);
