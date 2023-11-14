@@ -4,11 +4,11 @@ import auth from "./auth";
 import socketManager from "./server-socket";
 import url from "url";
 import request from "request";
-import assert from "assert";
-// import Community from "./models/Community";
-import { UnaryExpression } from "typescript";
-import http from "http";
+import User from "./models/User";
+import Community from "./models/Community";
+import CommunityInterface from "../shared/Community";
 const router = express.Router();
+import mailjet from "node-mailjet";
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
@@ -58,6 +58,9 @@ type profileResponse = Response & {
   lastName: Object;
   profilePicture: Object;
 };
+
+const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
+const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
 
 /**
  * Async helper for making requests to external APIs
@@ -152,6 +155,30 @@ router.post("/createcommunity", async (req, res) => {
   //   variation: req.body.communityType,
   // });
   // res.send(await community.save());
+});
+
+router.get("/communities", async (req, res) => {
+  User.findById(req.query.id).then((user) => {
+    if (user && user.communities.length > 0) {
+      res.send({ valid: true, communities: user.communities });
+    }
+    res.send({ valid: false, communities: [] });
+  });
+});
+
+router.post("/userverification", async (req, res) => {
+  const request = mailjet
+    .apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY)
+    .post("send", { version: "v3.1" })
+    .request(req.body.messages);
+
+  request
+    .then((result) => {
+      console.log(`[BACKEND] Mailjet API response: ${result.body}`);
+    })
+    .catch((err) => {
+      console.log(`[BACKEND] Mailjet API error: ${err}`);
+    });
 });
 
 // anything else falls to this "not found" case

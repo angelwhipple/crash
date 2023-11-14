@@ -3,8 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import User from "./models/User";
 import UserInterface from "../shared/User";
 import socketManager from "./server-socket";
-import assert from "assert";
-import fetch from "node-fetch";
 
 // create a new OAuth client used to verify google sign-in
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";

@@ -127,7 +127,7 @@ const App = () => {
           setConsolidate={setConsolidate}
         />
         <Profile path="/profile" userId={userId}></Profile>
-        <Communities path="/communities"></Communities>
+        <Communities path="/communities" userId={userId}></Communities>
         <Housing path="/housing"></Housing>
         <NotFound default={true} />
       </Router>

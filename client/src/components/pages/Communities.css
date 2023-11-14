@@ -17,3 +17,11 @@
   top: 0;
   right: 0;
 }
+
+.input {
+  width: 100%;
+  height: auto;
+  -webkit-text-fill-color: var(--black);
+  padding: 2%;
+  text-align: center;
+}
