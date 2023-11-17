@@ -1,0 +1,16 @@
+.options-container {
+  display: flex;
+  column-gap: 10px;
+  border-radius: var(--s);
+  align-self: center;
+}
+
+.text-option {
+  -webkit-text-fill-color: var(--white);
+  transition-duration: 0.7s;
+}
+
+.text-option:hover {
+  transition-duration: 0.7s;
+  -webkit-text-fill-color: var(--orange);
+}

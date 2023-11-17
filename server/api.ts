@@ -68,6 +68,12 @@ enum CommunityType {
   "LOCAL",
 }
 
+type CommunityInfo = {
+  community: CommunityInterface;
+  communityCode: String;
+  owner: String;
+};
+
 const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
 const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
 
@@ -88,7 +94,61 @@ const callExternalAPI = (
   });
 };
 
-const createCommunityCode = () => {};
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/**
+ * Generates a random invitation code for a newly created
+ * community, of the format XXXXX-XX
+ */
+const createCommunity = async (req: Request): Promise<CommunityInfo> => {
+  let communityType;
+  switch (req.body.communityType) {
+    case CommunityType.UNIVERSITY: {
+      communityType = "UNIVERSITY";
+    }
+    case CommunityType.WORKPLACE: {
+      communityType = "WORKPLACE";
+    }
+    case CommunityType.LIVING: {
+      communityType = "LIVING";
+    }
+    case CommunityType.LOCAL: {
+      communityType = "LOCAL";
+    }
+  }
+  // generate community code, need some way of checking uniqueness
+  let communityCode = "";
+  for (let i = 0; i < 5; i++) {
+    const rand1 = Math.floor(Math.random() * 10); // generate random int btwn [0, 9] inclusive
+    communityCode += `${rand1}`;
+  }
+  communityCode += `-`;
+  let [min, max] = [0, 24];
+  for (let i = 0; i < 2; i++) {
+    const rand2 = Math.floor(Math.random() * (max - min + 1) + min);
+    communityCode += LETTERS[rand2];
+  }
+
+  const community = new Community({
+    name: req.body.communityName,
+    owner: req.body.userId,
+    members: [req.body.userId],
+    admin: [req.body.userId],
+    type: communityType,
+    code: communityCode,
+  });
+  return await community.save().then((newCommunity) => {
+    return User.findByIdAndUpdate(req.body.userId, {
+      $push: { communities: newCommunity._id },
+    }).then((user) => {
+      return {
+        community: newCommunity,
+        communityCode: newCommunity.code,
+        owner: newCommunity.owner,
+      };
+    });
+  });
+};
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
 router.get("/linkedin", async (req, res) => {
@@ -160,40 +220,11 @@ router.post("/searchprofiles", async (req, res) => {
 });
 
 router.post("/createcommunity", async (req, res) => {
-  let communityType;
-  switch (req.body.communityType) {
-    case CommunityType.UNIVERSITY: {
-      communityType = "UNIVERSITY";
-    }
-    case CommunityType.WORKPLACE: {
-      communityType = "WORKPLACE";
-    }
-    case CommunityType.LIVING: {
-      communityType = "LIVING";
-    }
-    case CommunityType.LOCAL: {
-      communityType = "LOCAL";
-    }
-  }
-  // generate community code
-  const communityCode = "";
-
-  const community = new Community({
-    name: req.body.communityName,
-    owner: req.body.userId,
-    members: [req.body.userId],
-    admin: [req.body.userId],
-    type: communityType,
-    code: communityCode,
-  });
-
-  await community.save().then((newCommunity) => {
+  await createCommunity(req).then((communityInfo) => {
     socketManager
       .getIo()
-      .emit("new community", { owner: newCommunity.owner, code: newCommunity.code });
-    User.findByIdAndUpdate(req.body.userId, { $push: { communities: newCommunity._id } }).then(
-      (user) => res.send(newCommunity)
-    );
+      .emit("new community", { owner: communityInfo.owner, code: communityInfo.communityCode });
+    res.send(communityInfo.community);
   });
 });
 
@@ -209,10 +240,17 @@ router.get("/getuser", async (req, res) => {
   });
 });
 
+// send back a list of community objects
 router.get("/communities", async (req, res) => {
-  await User.findById(req.query.id).then((user) => {
+  await User.findById(req.query.id).then(async (user) => {
     if (user && user.communities.length > 0) {
-      res.send({ valid: true, communities: user.communities });
+      const communityInfos: CommunityInterface[] = [];
+      for (const communityId of user.communities) {
+        await Community.findById(communityId).then((communityInfo) => {
+          communityInfos.push(communityInfo!);
+        });
+      }
+      res.send({ valid: true, communities: communityInfos });
     } else res.send({ valid: false, communities: [] });
   });
 });

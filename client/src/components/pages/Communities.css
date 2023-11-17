@@ -15,6 +15,7 @@
   position: fixed;
   overflow-x: hidden;
   top: 0;
+  left: 20%;
 }
 
 .input {

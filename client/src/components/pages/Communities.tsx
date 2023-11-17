@@ -8,7 +8,8 @@ import "../modules/CreateAccount.css";
 import "../modules/LoginPanel.css";
 import "../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
-import UserModel from "../../../../server/models/User";
+import InviteModal from "../modules/InviteModal";
+import Community from "../../../../shared/Community";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -21,12 +22,13 @@ enum CommunityType {
   "LOCAL",
 }
 
-const Communities = (props) => {
+const Communities = (props: Props) => {
   const [landing, setLanding] = useState(true);
-  const [communties, setCommunties] = useState([]);
+  const [communities, setCommunties] = useState<Array<Community>>([]);
   const [communityType, setType] = useState<CommunityType | undefined>(undefined);
   const [verified, setVerified] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [inviteModal, setInviteModal] = useState(false);
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -41,9 +43,6 @@ const Communities = (props) => {
 
   socket.on("new community", (event) => {
     console.log(event);
-    get("/api/communities", { id: props.userId }).then((res) => {
-      if (res.valid) setCommunties(res.communities);
-    });
   });
 
   useEffect(() => {
@@ -67,7 +66,10 @@ const Communities = (props) => {
       userVerified: verified,
     };
     nameInput.value = "";
-    post("/api/createcommunity", body).then((community) => {});
+    post("/api/createcommunity", body).then((community: Community) => {
+      setCommunties((prev) => [...prev, community]);
+      setInviteModal(true);
+    });
   };
 
   const verification = async (emailInput) => {
@@ -99,10 +101,9 @@ const Communities = (props) => {
     <>
       <div className="sidebar-split"></div>
       <div className="mainpage-split"></div>
-
-      {props.userId === undefined || communties.length > 0 ? (
+      {props.userId === undefined ? (
         <div className="centered default-container">
-          <h3>New content soon...</h3>
+          <h3>Login to see this page</h3>
           <button
             className="login-button u-pointer"
             onClick={(event) => {
@@ -112,6 +113,12 @@ const Communities = (props) => {
           >
             Take me back
           </button>
+        </div>
+      ) : communities.length > 0 && inviteModal ? (
+        <InviteModal communities={communities} setInviteModal={setInviteModal}></InviteModal>
+      ) : communities.length > 0 && !inviteModal ? (
+        <div className="centered default-container">
+          <h3>Community details coming soon</h3>
         </div>
       ) : landing === true && props.userId ? (
         <div className="centered default-container">
