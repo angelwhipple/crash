@@ -9,6 +9,8 @@ import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 const router = express.Router();
 import mailjet from "node-mailjet";
+import e from "express";
+import assert from "assert";
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
@@ -59,6 +61,13 @@ type profileResponse = Response & {
   profilePicture: Object;
 };
 
+enum CommunityType {
+  "UNIVERSITY",
+  "WORKPLACE",
+  "LIVING",
+  "LOCAL",
+}
+
 const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
 const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
 
@@ -78,6 +87,8 @@ const callExternalAPI = (
     });
   });
 };
+
+const createCommunityCode = () => {};
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
 router.get("/linkedin", async (req, res) => {
@@ -149,28 +160,60 @@ router.post("/searchprofiles", async (req, res) => {
 });
 
 router.post("/createcommunity", async (req, res) => {
-  // const community = new Community({
-  //   name: req.body.communityName,
-  //   members: [req.body.id],
-  //   variation: req.body.communityType,
-  // });
-  // res.send(await community.save());
+  let communityType;
+  switch (req.body.communityType) {
+    case CommunityType.UNIVERSITY: {
+      communityType = "UNIVERSITY";
+    }
+    case CommunityType.WORKPLACE: {
+      communityType = "WORKPLACE";
+    }
+    case CommunityType.LIVING: {
+      communityType = "LIVING";
+    }
+    case CommunityType.LOCAL: {
+      communityType = "LOCAL";
+    }
+  }
+  // generate community code
+  const communityCode = "";
+
+  const community = new Community({
+    name: req.body.communityName,
+    owner: req.body.userId,
+    members: [req.body.userId],
+    admin: [req.body.userId],
+    type: communityType,
+    code: communityCode,
+  });
+
+  await community.save().then((newCommunity) => {
+    socketManager
+      .getIo()
+      .emit("new community", { owner: newCommunity.owner, code: newCommunity.code });
+    User.findByIdAndUpdate(req.body.userId, { $push: { communities: newCommunity._id } }).then(
+      (user) => res.send(newCommunity)
+    );
+  });
 });
 
 router.get("/getuser", async (req, res) => {
   console.log(`[BACKEND] Requesting user: ${req.query.id}`);
-  User.findById(req.query.id).then((user) => {
+  await User.findById(req.query.id).then((user) => {
     console.log(`[BACKEND] Got user: ${user}`);
-    res.send({ user: user });
+    if (user !== null) {
+      res.send({ valid: true, user: user });
+    } else {
+      res.send({ valid: false, user: undefined });
+    }
   });
 });
 
 router.get("/communities", async (req, res) => {
-  User.findById(req.query.id).then((user) => {
+  await User.findById(req.query.id).then((user) => {
     if (user && user.communities.length > 0) {
       res.send({ valid: true, communities: user.communities });
-    }
-    res.send({ valid: false, communities: [] });
+    } else res.send({ valid: false, communities: [] });
   });
 });
 
@@ -187,6 +230,16 @@ router.post("/userverification", async (req, res) => {
     .catch((err) => {
       console.log(`[BACKEND] Mailjet API error: ${err}`);
     });
+});
+
+router.get("/verified", async (req, res) => {
+  // assert(typeof req.query.id === "string", "invalid verified user ID");
+  const userId = req.query.id;
+  console.log(`[BACKEND] Verifying user: ${userId}`);
+  User.findByIdAndUpdate(userId, { verified: true }).then((user) => {
+    socketManager.getIo().emit("verified", { userId: userId });
+    res.redirect("/verified");
+  });
 });
 
 // anything else falls to this "not found" case

@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Communities from "./pages/Communities";
 import Housing from "./pages/Housing";
 import ProfilePill from "./modules/ProfilePill";
+import Verified from "./pages/Verified";
 
 const PLATFORMS = {
   linkedin: "linkedinid",
@@ -23,6 +24,13 @@ const PLATFORMS = {
   fb: "facebookid",
   origin: "originid",
 };
+
+enum CommunityType {
+  "UNIVERSITY",
+  "WORKPLACE",
+  "LIVING",
+  "LOCAL",
+}
 
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
@@ -127,8 +135,9 @@ const App = () => {
           setConsolidate={setConsolidate}
         />
         <Profile path="/profile" userId={userId}></Profile>
-        <Communities path="/communities" userId={userId}></Communities>
+        <Communities path="/communities" userId={userId!}></Communities>
         <Housing path="/housing"></Housing>
+        <Verified path="/verified"></Verified>
         <NotFound default={true} />
       </Router>
     </div>

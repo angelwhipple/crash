@@ -9,20 +9,22 @@ const UserSchema = new Schema({
   email: String,
   password: String,
   dob: String,
+  verified: Boolean,
   communities: [String], // array of community IDs
   // likes: [String], // array of liked listing IDs
 });
 
 export interface User extends Document {
+  _id: string;
   name: string;
   username: string;
   googleid: string;
   linkedinid: string;
   originid: string;
-  _id: string;
   email: string;
   password: string;
   dob: string;
+  verified: Boolean;
   communities: string[];
   // likes: string[];
 }
