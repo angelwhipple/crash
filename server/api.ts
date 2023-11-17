@@ -39,9 +39,19 @@ router.get("/existingaccount", auth.existingUser);
 // | write your API methods below!|
 // |------------------------------|
 
+/**
+ * SECRETS & KEYS
+ */
+
 const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
 const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/linkedin";
+const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
+const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
+
+/**
+ * CUSTOM TYPES
+ */
 
 /**
  * Record type for a Linkedin access token response
@@ -74,8 +84,9 @@ type CommunityInfo = {
   owner: String;
 };
 
-const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
-const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
+/**
+ * HELPER FUNCTIONS
+ */
 
 /**
  * Async helper for making requests to external APIs
@@ -97,8 +108,12 @@ const callExternalAPI = (
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /**
+ * TODO
+ *
  * Generates a random invitation code for a newly created
  * community, of the format XXXXX-XX
+ * @param req
+ * @returns
  */
 const createCommunity = async (req: Request): Promise<CommunityInfo> => {
   let communityType;
@@ -149,6 +164,10 @@ const createCommunity = async (req: Request): Promise<CommunityInfo> => {
     });
   });
 };
+
+/**
+ * USERS, ACCOUNTS, & VERIFICATION
+ */
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
 router.get("/linkedin", async (req, res) => {
@@ -214,10 +233,45 @@ router.get("/linkedin", async (req, res) => {
   res.redirect("/"); // redirects back to homepage
 });
 
-router.post("/searchprofiles", async (req, res) => {
-  console.log(`[BACKEND] Profile search query: ${req.body.query}`); // main search, filtered by user profiles
-  res.send({});
+router.get("/getuser", async (req, res) => {
+  console.log(`[BACKEND] Requesting user: ${req.query.id}`);
+  await User.findById(req.query.id).then((user) => {
+    console.log(`[BACKEND] Got user: ${user}`);
+    if (user !== null) {
+      res.send({ valid: true, user: user });
+    } else {
+      res.send({ valid: false, user: undefined });
+    }
+  });
 });
+
+router.post("/userverification", async (req, res) => {
+  const request = mailjet
+    .apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY)
+    .post("send", { version: "v3.1" })
+    .request(req.body.messages);
+
+  request
+    .then((result) => {
+      console.log(`[BACKEND] Mailjet API response: ${result.body}`);
+    })
+    .catch((err) => {
+      console.log(`[BACKEND] Mailjet API error: ${err}`);
+    });
+});
+
+router.get("/verified", async (req, res) => {
+  const userId = req.query.id;
+  console.log(`[BACKEND] Verifying user: ${userId}`);
+  User.findByIdAndUpdate(userId, { verified: true }).then((user) => {
+    socketManager.getIo().emit("verified", { userId: userId });
+    res.redirect("/verified");
+  });
+});
+
+/**
+ * COMMUNITIES
+ */
 
 router.post("/createcommunity", async (req, res) => {
   await createCommunity(req).then((communityInfo) => {
@@ -228,14 +282,17 @@ router.post("/createcommunity", async (req, res) => {
   });
 });
 
-router.get("/getuser", async (req, res) => {
-  console.log(`[BACKEND] Requesting user: ${req.query.id}`);
-  await User.findById(req.query.id).then((user) => {
-    console.log(`[BACKEND] Got user: ${user}`);
-    if (user !== null) {
-      res.send({ valid: true, user: user });
+router.post("/joincommunity", async (req, res) => {
+  Community.find({ code: req.body.code }).then((communities) => {
+    if (communities.length !== 0) {
+      const dstCommunity = communities[0]; // only 1 unique join code per community
+      Community.findByIdAndUpdate(dstCommunity._id, { $push: { members: req.body.userId } }).then(
+        (updatedCommunity) => {
+          res.send({ valid: true, community: updatedCommunity });
+        }
+      );
     } else {
-      res.send({ valid: false, user: undefined });
+      res.send({ valid: false, community: undefined });
     }
   });
 });
@@ -255,44 +312,13 @@ router.get("/communities", async (req, res) => {
   });
 });
 
-router.post("/userverification", async (req, res) => {
-  const request = mailjet
-    .apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY)
-    .post("send", { version: "v3.1" })
-    .request(req.body.messages);
+/**
+ * SEARCH
+ */
 
-  request
-    .then((result) => {
-      console.log(`[BACKEND] Mailjet API response: ${result.body}`);
-    })
-    .catch((err) => {
-      console.log(`[BACKEND] Mailjet API error: ${err}`);
-    });
-});
-
-router.post("/joincommunity", async (req, res) => {
-  Community.find({ code: req.body.code }).then((communities) => {
-    if (communities.length !== 0) {
-      const dstCommunity = communities[0]; // only 1 unique join code per community
-      Community.findByIdAndUpdate(dstCommunity._id, { $push: { members: req.body.userId } }).then(
-        (updatedCommunity) => {
-          res.send({ valid: true, community: updatedCommunity });
-        }
-      );
-    } else {
-      res.send({ valid: false, community: undefined });
-    }
-  });
-});
-
-router.get("/verified", async (req, res) => {
-  // assert(typeof req.query.id === "string", "invalid verified user ID");
-  const userId = req.query.id;
-  console.log(`[BACKEND] Verifying user: ${userId}`);
-  User.findByIdAndUpdate(userId, { verified: true }).then((user) => {
-    socketManager.getIo().emit("verified", { userId: userId });
-    res.redirect("/verified");
-  });
+router.post("/searchprofiles", async (req, res) => {
+  console.log(`[BACKEND] Profile search query: ${req.body.query}`); // main search, filtered by user profiles
+  res.send({});
 });
 
 // anything else falls to this "not found" case

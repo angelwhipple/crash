@@ -16,7 +16,8 @@ import Profile from "./pages/Profile";
 import Communities from "./pages/communities/Communities";
 import Housing from "./pages/Housing";
 import ProfilePill from "./modules/accounts/ProfilePill";
-import Verified from "./pages/Verified";
+import Verified from "./pages/throwaway/Verified";
+import Joined from "./pages/throwaway/Joined";
 
 const PLATFORMS = {
   linkedin: "linkedinid",
@@ -138,6 +139,7 @@ const App = () => {
         <Communities path="/communities" userId={userId!}></Communities>
         <Housing path="/housing"></Housing>
         <Verified path="/verified"></Verified>
+        <Joined path="/joined"></Joined>
         <NotFound default={true} />
       </Router>
     </div>

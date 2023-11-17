@@ -88,7 +88,7 @@ const Communities = (props: Props) => {
 
         setJoining(false);
       } else {
-        console.log("Bad join code"); // handle
+        console.log("Bad join code"); // TODO: display error msg
       }
     });
   };
