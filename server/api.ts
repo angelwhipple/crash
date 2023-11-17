@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, response, Response } from "express";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import auth from "./auth";
 import socketManager from "./server-socket";
@@ -268,6 +268,21 @@ router.post("/userverification", async (req, res) => {
     .catch((err) => {
       console.log(`[BACKEND] Mailjet API error: ${err}`);
     });
+});
+
+router.post("/joincommunity", async (req, res) => {
+  Community.find({ code: req.body.code }).then((communities) => {
+    if (communities.length !== 0) {
+      const dstCommunity = communities[0]; // only 1 unique join code per community
+      Community.findByIdAndUpdate(dstCommunity._id, { $push: { members: req.body.userId } }).then(
+        (updatedCommunity) => {
+          res.send({ valid: true, community: updatedCommunity });
+        }
+      );
+    } else {
+      res.send({ valid: false, community: undefined });
+    }
+  });
 });
 
 router.get("/verified", async (req, res) => {

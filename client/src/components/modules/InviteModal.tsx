@@ -13,7 +13,9 @@ type Props = RouteComponentProps & {
 
 const InviteModal = (props: Props) => {
   const newest: Community = props.communities[props.communities.length - 1];
-  const message = "";
+  const joinLink = `https://localhost:5050/api/joincommunity?code=${newest.code}`;
+  const subject = `Join ${newest.name} on Crash!`;
+  const message = `I just launched a new community called ${newest.name} on Crash! Create an account and join with community code ${newest.code}, or follow this link: ${joinLink}`;
 
   return (
     <div className="centered default-container">
@@ -21,8 +23,7 @@ const InviteModal = (props: Props) => {
       <h1
         className="u-pointer"
         onClick={(event) => {
-          // copy invite code to clipboard
-          navigator.clipboard.writeText(newest.code.toString());
+          navigator.clipboard.writeText(newest.code.toString()); // copy invite code to clipboard
         }}
       >
         {newest.code}
@@ -31,7 +32,7 @@ const InviteModal = (props: Props) => {
         <button
           className="login-button u-pointer"
           onClick={(event) => {
-            // window.open(); // open mail with default msg including unique invite code
+            window.open(`mailto:?subject=${subject}&body=${message}`); // open mail with default msg containing unique invite code/link
           }}
         >
           Email invite code

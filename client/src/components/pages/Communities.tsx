@@ -29,6 +29,7 @@ const Communities = (props: Props) => {
   const [verified, setVerified] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [inviteModal, setInviteModal] = useState(false);
+  const [joining, setJoining] = useState(false);
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -69,6 +70,25 @@ const Communities = (props: Props) => {
     post("/api/createcommunity", body).then((community: Community) => {
       setCommunties((prev) => [...prev, community]);
       setInviteModal(true);
+    });
+  };
+
+  const joinCommunity = async (codeInput) => {
+    const body = {
+      code: codeInput.value,
+      userId: props.userId,
+    };
+    codeInput.value = "";
+    post("/api/joincommunity", body).then((res) => {
+      if (res.valid) {
+        setCommunties((prev) => [...prev, res.community]);
+
+        // open a confirmation window here?
+
+        setJoining(false);
+      } else {
+        console.log("Bad join code"); // handle
+      }
     });
   };
 
@@ -119,6 +139,15 @@ const Communities = (props: Props) => {
       ) : communities.length > 0 && !inviteModal ? (
         <div className="centered default-container">
           <h3>Community details coming soon</h3>
+          <button
+            className="login-button u-pointer"
+            onClick={(event) => {
+              route("/");
+              socket.emit("toggleAll", {});
+            }}
+          >
+            Take me back
+          </button>
         </div>
       ) : landing === true && props.userId ? (
         <div className="centered default-container">
@@ -131,7 +160,41 @@ const Communities = (props: Props) => {
           >
             Create a community
           </button>
-          <button className="login-button u-pointer">Join your first community</button>
+          <button
+            className="login-button u-pointer"
+            onClick={(event) => {
+              setLanding(false);
+              setJoining(true);
+            }}
+          >
+            Join your first community
+          </button>
+        </div>
+      ) : joining === true && props.userId ? (
+        <div className="centered default-container">
+          <div className="u-flex">
+            <label className="create-label">
+              Invite code:
+              <input
+                id="inv_code"
+                type="text"
+                className="create-input"
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
+                    joinCommunity(codeInput);
+                  }
+                }}
+              ></input>
+            </label>
+            <TbPlayerTrackNextFilled
+              className="nav-icon u-pointer"
+              onClick={(event) => {
+                const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
+                joinCommunity(codeInput);
+              }}
+            ></TbPlayerTrackNextFilled>
+          </div>
         </div>
       ) : communityType === undefined && props.userId ? (
         <div className="centered default-container">
