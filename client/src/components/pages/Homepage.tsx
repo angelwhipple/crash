@@ -9,7 +9,7 @@ import {
 import "./Homepage.css";
 import { RouteComponentProps } from "@reach/router";
 import LoginPanel from "../modules/LoginPanel";
-import Merge from "../modules/Merge";
+import Merge from "../modules/accounts/Merge";
 
 type Props = RouteComponentProps & {
   userId?: any;

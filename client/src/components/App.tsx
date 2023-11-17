@@ -13,9 +13,9 @@ import "./pages/Homepage.css";
 import Homepage from "./pages/Homepage";
 import NavBar from "../components/modules/NavBar";
 import Profile from "./pages/Profile";
-import Communities from "./pages/Communities";
+import Communities from "./pages/communities/Communities";
 import Housing from "./pages/Housing";
-import ProfilePill from "./modules/ProfilePill";
+import ProfilePill from "./modules/accounts/ProfilePill";
 import Verified from "./pages/Verified";
 
 const PLATFORMS = {

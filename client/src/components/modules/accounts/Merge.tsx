@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { socket } from "../../client-socket";
-import { get, post } from "../../utilities";
+import { socket } from "../../../client-socket";
+import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
-import "./Modal.css";
+import "../Modal.css";
 import "./Merge.css";
 
 type Props = RouteComponentProps & {

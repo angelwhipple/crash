@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { socket } from "../../client-socket";
-import { get, post } from "../../utilities";
+import { socket } from "../../../client-socket";
+import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./CreateAccount.css";
-import "./NavBar.css";
+import "../NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 
 type Props = RouteComponentProps & {

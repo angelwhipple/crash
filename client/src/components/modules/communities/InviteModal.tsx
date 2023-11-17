@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { socket } from "../../client-socket";
-import { get, post } from "../../utilities";
+import { socket } from "../../../client-socket";
+import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
-import Community from "../../../../shared/Community";
-import "../modules/LoginPanel.css";
+import Community from "../../../../../shared/Community";
+import "../../modules/LoginPanel.css";
 import "./InviteModal.css";
 
 type Props = RouteComponentProps & {

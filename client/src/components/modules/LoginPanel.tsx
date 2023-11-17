@@ -11,7 +11,7 @@ import {
 } from "@react-oauth/google";
 import "./Modal.css";
 import "./LoginPanel.css";
-import CreateAccount from "./CreateAccount";
+import CreateAccount from "./accounts/CreateAccount";
 
 type Props = RouteComponentProps & {
   handleLogin: any;
@@ -73,10 +73,7 @@ const LoginPanel = (props: Props) => {
           </div>
         </>
       ) : create ? (
-        <CreateAccount
-          setCreate={setCreate}
-          setUserId={props.setUserId}
-        ></CreateAccount>
+        <CreateAccount setCreate={setCreate} setUserId={props.setUserId}></CreateAccount>
       ) : (
         <div className="modal-Container">
           <div className="modal-Content">

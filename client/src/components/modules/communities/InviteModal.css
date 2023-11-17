@@ -10,7 +10,8 @@
   transition-duration: 0.7s;
 }
 
-.text-option:hover {
+.text-option:hover,
+.text-option:visited {
   transition-duration: 0.7s;
   -webkit-text-fill-color: var(--orange);
 }

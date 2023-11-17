@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { socket } from "../../client-socket";
+import { socket } from "../../../client-socket";
 import { io } from "socket.io-client";
-import { get, post } from "../../utilities";
+import { get, post } from "../../../utilities";
 import { Link, RouteComponentProps, useNavigate } from "@reach/router";
 import "./Communities.css";
-import "../modules/CreateAccount.css";
-import "../modules/LoginPanel.css";
-import "../modules/NavBar.css";
+import "../../modules/accounts/CreateAccount.css";
+import "../../modules/LoginPanel.css";
+import "../../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
-import InviteModal from "../modules/InviteModal";
-import Community from "../../../../shared/Community";
+import InviteModal from "../../modules/communities/InviteModal";
+import Community from "../../../../../shared/Community";
+import CommunityMenu from "../../modules/communities/CommunityMenu";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -119,7 +120,9 @@ const Communities = (props: Props) => {
 
   return (
     <>
-      <div className="sidebar-split"></div>
+      <div className="sidebar-split">
+        <CommunityMenu userId={props.userId}></CommunityMenu>
+      </div>
       <div className="mainpage-split"></div>
       {props.userId === undefined ? (
         <div className="centered default-container">

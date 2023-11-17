@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { socket } from "../../client-socket";
-import { get, post } from "../../utilities";
+import { socket } from "../../../client-socket";
+import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./ProfilePill.css";
-import linkedin from "../../assets/linkedin.png";
-import google from "../../assets/google.png";
-import facebook from "../../assets/fb.png";
-import origin from "../../assets/origin.png";
+import linkedin from "../../../assets/linkedin.png";
+import google from "../../../assets/google.png";
+import facebook from "../../../assets/fb.png";
+import origin from "../../../assets/origin.png";
 
 type Props = RouteComponentProps & {
   key: number;
