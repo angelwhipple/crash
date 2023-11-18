@@ -6,22 +6,15 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Profile.css";
 import "../modules/LoginPanel.css";
 
-type Props = RouteComponentProps & {};
+type Props = RouteComponentProps & {
+  userId: string;
+};
 
-const Profile = (props) => {
+const Profile = (props: Props) => {
   const navigate = useNavigate();
   const route = (path) => {
     navigate(path);
   };
-
-  //   useEffect(() => {
-  //     const socket = io("http://localhost:3000");
-
-  //     // disconnect socket on dismount
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   }, []);
 
   return (
     <div className="centered default-container">

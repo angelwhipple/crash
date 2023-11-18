@@ -5,7 +5,7 @@ import {
   googleLogout,
   CredentialResponse,
 } from "@react-oauth/google";
-
+import { socket } from "../../client-socket";
 import "./Homepage.css";
 import { RouteComponentProps } from "@reach/router";
 import LoginPanel from "../modules/LoginPanel";
@@ -27,9 +27,6 @@ const Homepage = (props: Props) => {
 
   return (
     <div className="u-flexColumn u-alignCenter">
-      {/* <ul>
-        <li>Add a favicon to your website at the path client/dist/favicon.ico</li>
-      </ul> */}
       <LoginPanel
         handleLogin={handleLogin}
         googleLogout={googleLogout}

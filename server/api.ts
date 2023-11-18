@@ -9,8 +9,7 @@ import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 const router = express.Router();
 import mailjet from "node-mailjet";
-import e from "express";
-import assert from "assert";
+import { socket } from "../client/src/client-socket";
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
@@ -50,7 +49,7 @@ const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
 const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
 
 /**
- * CUSTOM TYPES
+ * TYPES & CONSTANTS
  */
 
 /**
@@ -63,26 +62,24 @@ type tokenResponse = {
   refresh_token_expires_in: number;
   scope: string;
 };
-
 type profileResponse = Response & {
   ID: string | undefined;
   firstName: Object;
   lastName: Object;
   profilePicture: Object;
 };
-
 enum CommunityType {
   "UNIVERSITY",
   "WORKPLACE",
   "LIVING",
   "LOCAL",
 }
-
 type CommunityInfo = {
   community: CommunityInterface;
   communityCode: String;
   owner: String;
 };
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /**
  * HELPER FUNCTIONS
@@ -104,8 +101,6 @@ const callExternalAPI = (
     });
   });
 };
-
-const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /**
  * TODO
@@ -295,6 +290,12 @@ router.post("/joincommunity", async (req, res) => {
       res.send({ valid: false, community: undefined });
     }
   });
+});
+
+// TODO: redirect to login & join community via link
+router.get("/joincommunity", async (req, res) => {
+  socketManager.getIo().emit("join link", { communityCode: req.body.code }); // emit that someone used an invite link (while logged out)
+  res.redirect("/");
 });
 
 // send back a list of community objects

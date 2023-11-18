@@ -174,7 +174,7 @@ const CreateAccount = (props: Props) => {
       {email === "" ? (
         <>
           <label className="create-label">
-            Enter your email address:
+            Enter your email address
             <input
               id="email"
               className="create-input"
@@ -196,7 +196,7 @@ const CreateAccount = (props: Props) => {
       ) : exists === true ? (
         <>
           <label className="create-label">
-            Enter your email address:
+            Enter your email address
             <input
               id="email2"
               className="create-input"
@@ -273,7 +273,7 @@ const CreateAccount = (props: Props) => {
             ></input>
           </label>
           <label className="create-label">
-            Re-enter your password:{" "}
+            Re-enter your password{" "}
             <input
               id="confirm"
               className="create-input"

@@ -38,6 +38,7 @@ const App = () => {
   const [consolidate, setConsolidate] = useState(false);
   const [extraProfiles, setExtraProfiles]: any[] = useState([]);
   const [chosenProfiles, setChosenProfiles]: any[] = useState([]);
+  const [joinCode, setJoinCode] = useState("");
 
   const generatePills = (profiles: Array<JSON>) => {
     const pills = profiles.map((profile, index) => (
@@ -71,6 +72,14 @@ const App = () => {
       setConsolidate(true);
     }
   });
+
+  socket.on("join link", (event) => setJoinCode(event.communityCode));
+
+  useEffect(() => {
+    if (joinCode !== "" && userId !== undefined) {
+      post("/api/joincommunity", { code: joinCode, userId: userId });
+    }
+  }, [userId]);
 
   useEffect(() => {
     get("/api/whoami")
@@ -135,7 +144,7 @@ const App = () => {
           setUserId={setUserId}
           setConsolidate={setConsolidate}
         />
-        <Profile path="/profile" userId={userId}></Profile>
+        <Profile path="/profile" userId={userId!}></Profile>
         <Communities path="/communities" userId={userId!}></Communities>
         <Housing path="/housing"></Housing>
         <Verified path="/verified"></Verified>

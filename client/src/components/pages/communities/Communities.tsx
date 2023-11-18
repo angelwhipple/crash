@@ -8,6 +8,7 @@ import "../../modules/accounts/CreateAccount.css";
 import "../../modules/LoginPanel.css";
 import "../../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
+import { FaBackward } from "react-icons/fa";
 import InviteModal from "../../modules/communities/InviteModal";
 import Community from "../../../../../shared/Community";
 import CommunityMenu from "../../modules/communities/CommunityMenu";
@@ -177,7 +178,7 @@ const Communities = (props: Props) => {
         <div className="centered default-container">
           <div className="u-flex">
             <label className="create-label">
-              Invite code:
+              Invitation code
               <input
                 id="inv_code"
                 type="text"
@@ -198,6 +199,10 @@ const Communities = (props: Props) => {
               }}
             ></TbPlayerTrackNextFilled>
           </div>
+          <FaBackward
+            className="nav-icon back-button u-pointer"
+            onClick={(event) => setJoining(false)}
+          ></FaBackward>
         </div>
       ) : communityType === undefined && props.userId ? (
         <div className="centered default-container">
@@ -236,12 +241,16 @@ const Communities = (props: Props) => {
           >
             Locality
           </button>
+          <FaBackward
+            className="nav-icon back-button u-pointer"
+            onClick={(event) => setLanding(true)}
+          ></FaBackward>
         </div>
       ) : communityType !== undefined && props.userId && verifying === true ? (
         <div className="centered default-container">
           <h3>
             Enter your {communityType === CommunityType.WORKPLACE ? "work" : "school"} email address
-            for verification:
+            for verification
           </h3>
           <div className="u-flex">
             <input
@@ -263,6 +272,10 @@ const Communities = (props: Props) => {
               }}
             ></TbPlayerTrackNextFilled>
           </div>
+          <FaBackward
+            className="nav-icon back-button u-pointer"
+            onClick={(event) => setType(undefined)}
+          ></FaBackward>
         </div>
       ) : (props.userId &&
           (communityType == CommunityType.UNIVERSITY || communityType == CommunityType.WORKPLACE) &&
@@ -272,7 +285,7 @@ const Communities = (props: Props) => {
         <div className="centered default-container">
           <div className="u-flex">
             <label className="create-label">
-              Community name:
+              Community name
               <input
                 id="community_name"
                 className="create-input"
@@ -294,6 +307,10 @@ const Communities = (props: Props) => {
               }}
             ></TbPlayerTrackNextFilled>
           </div>
+          <FaBackward
+            className="nav-icon back-button u-pointer"
+            onClick={(event) => setType(undefined)}
+          ></FaBackward>
         </div>
       ) : (
         <></>

@@ -1,15 +1,18 @@
 .create-container {
   align-items: center;
+  width: max-content;
 }
 
 .create-label {
   display: flex;
   font-size: small;
   column-gap: 8px;
+  white-space: nowrap;
+  align-items: center;
 }
 
 .create-input {
-  width: 70%;
+  width: 60%;
   height: auto;
   -webkit-text-fill-color: var(--black);
   padding: 2%;

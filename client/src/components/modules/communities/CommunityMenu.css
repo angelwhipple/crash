@@ -1,0 +1,54 @@
+.menu-options-container {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.menu-option {
+  background-color: black;
+  border: var(--s) solid transparent;
+  padding: 5%;
+  width: 100%;
+  transition-duration: 0.7s;
+}
+.menu-option:hover {
+  border: var(--s) solid var(--orange);
+  transition-duration: 0.9s;
+}
+
+.reg {
+}
+.reg:hover {
+  border-image: linear-gradient(#ff8400, #bd1209) 10;
+}
+
+.inv {
+}
+.inv:hover {
+  border-image: linear-gradient(#bd1209, #ff8400) 10;
+}
+
+.menu-icon {
+  width: var(--l);
+  height: var(--l);
+  transition-duration: 0.7s;
+}
+.menu-icon-sel {
+  width: var(--l);
+  height: var(--l);
+  transition-duration: 0.9s;
+}
+
+.icon-reg {
+  color: var(--white);
+}
+.icon-reg-sel {
+  color: var(--orange);
+}
+
+.icon-inv {
+  color: var(--white);
+}
+.icon-inv-sel {
+  color: var(--red);
+}
