@@ -12,9 +12,12 @@ import { FaBackward } from "react-icons/fa";
 import InviteModal from "../../modules/communities/InviteModal";
 import Community from "../../../../../shared/Community";
 import CommunityMenu from "../../modules/communities/CommunityMenu";
+import CommunityDetails from "./Details";
+import ManageCommunity from "./Manage";
 
 type Props = RouteComponentProps & {
   userId: string;
+  setUserId: any;
 };
 
 enum CommunityType {
@@ -22,6 +25,14 @@ enum CommunityType {
   "WORKPLACE",
   "LIVING",
   "LOCAL",
+}
+
+enum MenuAction {
+  "DETAILS", // view/edit community details
+  "MANAGE", // manage members/admin, settings, etc (ADMIN/OWNER ONLY)
+  "ANNOUCEMENTS", // view/post community-wide announcements (post ADMIN ONLY)
+  "EXPLORE", // community feed, see recent posts & updates
+  "TOGGLE", // switch between communities
 }
 
 const Communities = (props: Props) => {
@@ -32,6 +43,7 @@ const Communities = (props: Props) => {
   const [verifying, setVerifying] = useState(false);
   const [inviteModal, setInviteModal] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [menuAction, setMenuAction] = useState<MenuAction | undefined>(undefined);
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -122,7 +134,12 @@ const Communities = (props: Props) => {
   return (
     <>
       <div className="sidebar-split">
-        <CommunityMenu userId={props.userId}></CommunityMenu>
+        <CommunityMenu
+          userId={props.userId}
+          menuAction={menuAction}
+          setMenuAction={setMenuAction}
+          setUserId={props.setUserId}
+        ></CommunityMenu>
       </div>
       <div className="mainpage-split"></div>
       {props.userId === undefined ? (

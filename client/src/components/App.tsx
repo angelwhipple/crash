@@ -26,13 +26,6 @@ const PLATFORMS = {
   origin: "originid",
 };
 
-enum CommunityType {
-  "UNIVERSITY",
-  "WORKPLACE",
-  "LIVING",
-  "LOCAL",
-}
-
 const App = () => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [consolidate, setConsolidate] = useState(false);
@@ -108,7 +101,6 @@ const App = () => {
       token: userToken,
     }).then((response) => {
       setUserId(response.user._id);
-      // setChosenProfiles([PLATFORMS.google]);
       console.log(`Chosen profiles: ${chosenProfiles}`);
       post("/api/initsocket", { socketid: socket.id });
 
@@ -129,7 +121,7 @@ const App = () => {
   return (
     <div className="background">
       <Router primary={false}>
-        <NavBar default userId={userId}></NavBar>
+        <NavBar default userId={userId!} setUserId={setUserId}></NavBar>
       </Router>
       <Router>
         <Homepage
@@ -145,7 +137,7 @@ const App = () => {
           setConsolidate={setConsolidate}
         />
         <Profile path="/profile" userId={userId!}></Profile>
-        <Communities path="/communities" userId={userId!}></Communities>
+        <Communities path="/communities" userId={userId!} setUserId={setUserId}></Communities>
         <Housing path="/housing"></Housing>
         <Verified path="/verified"></Verified>
         <Joined path="/joined"></Joined>

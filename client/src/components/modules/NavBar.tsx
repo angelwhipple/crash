@@ -10,10 +10,14 @@ import { HiHome } from "react-icons/hi";
 import { BsSearch, BsPersonFill } from "react-icons/bs";
 import { IoIosPeople } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
+import { ImExit } from "react-icons/im";
 
-type Props = RouteComponentProps & {};
+type Props = RouteComponentProps & {
+  userId: string;
+  setUserId: any;
+};
 
-const NavBar = (props) => {
+const NavBar = (props: Props) => {
   const [profile, setProfile] = useState(false);
   const [communities, setCommunities] = useState(false);
   const [housing, setHousing] = useState(false);
@@ -52,20 +56,6 @@ const NavBar = (props) => {
     post("/api/existingaccount", body).then((res) => {});
   };
 
-  //   useEffect(() => {
-  //     const socket = io("http://localhost:3000");
-
-  //     socket.on("toggleAll", (event) => {
-  //       console.log("Received return to homepage socket event");
-  //       toggleTabs(() => {}, true);
-  //     });
-
-  //     // disconnect socket on dismount
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   }, []);
-
   const navigate = useNavigate();
   const route = (path) => {
     navigate(path);
@@ -73,7 +63,20 @@ const NavBar = (props) => {
 
   return (
     <nav className="nav-bar-container">
+      {props.userId !== undefined ? (
+        <ImExit
+          title="Logout"
+          className={`u-pointer nav-icon`}
+          onClick={(event) => {
+            props.setUserId(undefined);
+            post("/api/logout").then((res) => route("/"));
+          }}
+        ></ImExit>
+      ) : (
+        <></>
+      )}
       <BsPersonFill
+        title="Profile"
         className={`u-pointer ${profile ? "nav-icon-selected" : "nav-icon"}`}
         onClick={(event) => {
           route("/profile");
@@ -81,6 +84,7 @@ const NavBar = (props) => {
         }}
       ></BsPersonFill>
       <HiHome
+        title="Housing"
         className={`u-pointer ${housing ? "nav-icon-selected" : "nav-icon"}`}
         onClick={(event) => {
           route("/housing");
@@ -88,6 +92,7 @@ const NavBar = (props) => {
         }}
       ></HiHome>
       <IoIosPeople
+        title="Communities"
         className={`u-pointer ${communities ? "nav-icon-selected" : "nav-icon"}`}
         onClick={(event) => {
           route("/communities");
@@ -108,6 +113,7 @@ const NavBar = (props) => {
       <div className={`search-bar-container ${querying ? "search-bar-open" : "search-bar-close"}`}>
         <div className="search-filters-container">
           <GoFilter
+            title="Search filters"
             className={`u-pointer ${filtering ? "nav-icon-selected" : "nav-icon"}`}
             onClick={(event) => {
               toggleTabs(setFiltering, false, true);
