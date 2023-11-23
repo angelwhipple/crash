@@ -8,10 +8,8 @@ type Props = RouteComponentProps & {
   activeCommunity: Community;
 };
 
-// TODO
-
-const ManageCommunity = (props: Props) => {
-  return <div className="centered default-container">Admin community management coming soon</div>;
+const Annoucements = (props: Props) => {
+  return <div className="centered default-container">Community announcements coming soon</div>;
 };
 
-export default ManageCommunity;
+export default Annoucements;

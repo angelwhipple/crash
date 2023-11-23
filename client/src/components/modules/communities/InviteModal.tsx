@@ -5,14 +5,15 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import Community from "../../../../../shared/Community";
 import "../../modules/LoginPanel.css";
 import "./InviteModal.css";
+import "../Modal.css";
 
 type Props = RouteComponentProps & {
-  communities: Community[];
+  newCommunity: Community;
   setInviteModal: any;
 };
 
 const InviteModal = (props: Props) => {
-  const newest: Community = props.communities[props.communities.length - 1];
+  const newest: Community = props.newCommunity;
   const joinLink = `http://localhost:5050/api/joincommunity?code=${newest.code}`;
   const subject = `Join ${newest.name} on Crash!`;
   const message = `I just launched a new community called ${newest.name} on Crash! Create an account and join with community code ${newest.code}, or follow this link: ${joinLink}`;
@@ -21,6 +22,7 @@ const InviteModal = (props: Props) => {
     <div className="centered default-container">
       <h2>Invite users to join {newest.name} on Crash!</h2>
       <h1
+        title="Copy invite code"
         className="u-pointer"
         onClick={(event) => {
           navigator.clipboard.writeText(newest.code.toString()); // copy invite code to clipboard

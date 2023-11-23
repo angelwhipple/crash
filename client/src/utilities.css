@@ -129,4 +129,5 @@ form {
   border-radius: var(--m);
   -webkit-text-fill-color: var(--white);
   row-gap: var(--l);
+  /* align-self: center; */
 }

@@ -240,6 +240,15 @@ router.get("/getuser", async (req, res) => {
   });
 });
 
+// router.get("/fetchusers", async (req, res) => {
+//   const userObjs = [];
+//   for (const userId of req.query.users!) {
+//     await User.findById(userId).then((user) => {
+//       userObjs.push(user!);
+//     });
+//   }
+// });
+
 router.post("/userverification", async (req, res) => {
   const request = mailjet
     .apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY)
@@ -268,6 +277,13 @@ router.get("/verified", async (req, res) => {
  * COMMUNITIES
  */
 
+router.get("/fetchcommunity", async (req, res) => {
+  Community.findById(req.query.communityId).then((community) => {
+    if (community !== undefined) res.send({ valid: true, community: community });
+    else res.send({ valid: false, community: undefined });
+  });
+});
+
 router.post("/createcommunity", async (req, res) => {
   await createCommunity(req).then((communityInfo) => {
     socketManager
@@ -278,27 +294,41 @@ router.post("/createcommunity", async (req, res) => {
 });
 
 router.post("/joincommunity", async (req, res) => {
-  Community.find({ code: req.body.code }).then((communities) => {
+  await Community.find({ code: req.body.code }).then(async (communities) => {
     if (communities.length !== 0) {
       const dstCommunity = communities[0]; // only 1 unique join code per community
-      Community.findByIdAndUpdate(dstCommunity._id, { $push: { members: req.body.userId } }).then(
-        (updatedCommunity) => {
-          res.send({ valid: true, community: updatedCommunity });
+      await Community.findById(dstCommunity._id).then(async (community) => {
+        if (community?.members.includes(req.body.userId)) {
+          // user already joined community
+          res.send({ valid: true, community: community });
+        } else {
+          await Community.findByIdAndUpdate(dstCommunity._id, {
+            $push: { members: req.body.userId },
+          }).then(async (updatedCommunity) => {
+            await User.findByIdAndUpdate(req.body.userId, {
+              $push: { communities: updatedCommunity?._id },
+            }).then((updatedUser) => {
+              socketManager.getIo().emit("joined community", {
+                communityId: updatedCommunity?._id,
+                user: updatedUser?._id,
+              });
+              res.send({ valid: true, community: updatedCommunity });
+            });
+          });
         }
-      );
+      });
     } else {
       res.send({ valid: false, community: undefined });
     }
   });
 });
 
-// TODO: redirect to login & join community via link
 router.get("/joincommunity", async (req, res) => {
   socketManager.getIo().emit("join link", { communityCode: req.body.code }); // emit that someone used an invite link (while logged out)
   res.redirect("/");
 });
 
-// send back a list of community objects
+// return a list of community objects associated to a single user
 router.get("/communities", async (req, res) => {
   await User.findById(req.query.id).then(async (user) => {
     if (user && user.communities.length > 0) {

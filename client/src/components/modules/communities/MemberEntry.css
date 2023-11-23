@@ -1,0 +1,29 @@
+.entry-container {
+  width: inherit;
+  display: flex;
+  column-gap: 15%;
+  justify-content: center;
+  padding: 5%;
+  border: solid transparent;
+  transition-duration: 0.6s;
+}
+
+.entry-container:hover {
+  border: solid var(--orange);
+  transition-duration: 0.6s;
+  -webkit-text-fill-color: var(--orange);
+}
+
+.icon-sel {
+  color: var(--orange);
+}
+
+.x-icon {
+  color: var(--red);
+}
+.check-icon {
+  color: green;
+}
+.crown-icon {
+  color: black;
+}

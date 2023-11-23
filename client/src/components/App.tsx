@@ -18,6 +18,7 @@ import Housing from "./pages/Housing";
 import ProfilePill from "./modules/accounts/ProfilePill";
 import Verified from "./pages/throwaway/Verified";
 import Joined from "./pages/throwaway/Joined";
+import { GoPaperAirplane } from "react-icons/go";
 
 const PLATFORMS = {
   linkedin: "linkedinid",
@@ -101,7 +102,6 @@ const App = () => {
       token: userToken,
     }).then((response) => {
       setUserId(response.user._id);
-      console.log(`Chosen profiles: ${chosenProfiles}`);
       post("/api/initsocket", { socketid: socket.id });
 
       console.log(`Google login response: ${JSON.stringify(response)}`);

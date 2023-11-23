@@ -14,6 +14,8 @@ import Community from "../../../../../shared/Community";
 import CommunityMenu from "../../modules/communities/CommunityMenu";
 import CommunityDetails from "./Details";
 import ManageCommunity from "./Manage";
+import Explore from "./Explore";
+import Annoucements from "./Annoucements";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -38,6 +40,7 @@ enum MenuAction {
 const Communities = (props: Props) => {
   const [landing, setLanding] = useState(true);
   const [communities, setCommunties] = useState<Array<Community>>([]);
+  const [activeCommunity, setActiveCommunity] = useState<Community | undefined>(undefined);
   const [communityType, setType] = useState<CommunityType | undefined>(undefined);
   const [verified, setVerified] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -60,10 +63,22 @@ const Communities = (props: Props) => {
     console.log(event);
   });
 
+  socket.on("joined community", async (event) => {
+    if (event.communityId === activeCommunity?._id) {
+      await get("/api/fetchcommunity", { communityId: activeCommunity?._id }).then((res) => {
+        console.log(`Refreshed community: ${JSON.stringify(res)}`);
+        setActiveCommunity(res.community); // refresh state of active community object
+      });
+    }
+  });
+
   useEffect(() => {
     if (props.userId) {
       get("/api/communities", { id: props.userId }).then((res) => {
-        if (res.valid) setCommunties(res.communities);
+        if (res.valid) {
+          setCommunties(res.communities);
+          setActiveCommunity(res.communities[res.communities.length - 1]);
+        }
       });
       get("/api/getuser", { id: props.userId }).then((res) => {
         if (res.valid && res.user.verified === true) {
@@ -71,6 +86,7 @@ const Communities = (props: Props) => {
         }
       });
     }
+    setMenuAction(MenuAction.EXPLORE);
   }, []);
 
   const createCommunity = async (nameInput) => {
@@ -83,6 +99,7 @@ const Communities = (props: Props) => {
     nameInput.value = "";
     post("/api/createcommunity", body).then((community: Community) => {
       setCommunties((prev) => [...prev, community]);
+      setActiveCommunity(community);
       setInviteModal(true);
     });
   };
@@ -96,9 +113,7 @@ const Communities = (props: Props) => {
     post("/api/joincommunity", body).then((res) => {
       if (res.valid) {
         setCommunties((prev) => [...prev, res.community]);
-
-        // open a confirmation window here?
-
+        setActiveCommunity(res.community);
         setJoining(false);
       } else {
         console.log("Bad join code"); // TODO: display error msg
@@ -141,197 +156,200 @@ const Communities = (props: Props) => {
           setUserId={props.setUserId}
         ></CommunityMenu>
       </div>
-      <div className="mainpage-split"></div>
-      {props.userId === undefined ? (
-        <div className="centered default-container">
-          <h3>Login to see this page</h3>
-          <button
-            className="login-button u-pointer"
-            onClick={(event) => {
-              route("/");
-              socket.emit("toggleAll", {});
-            }}
-          >
-            Take me back
-          </button>
-        </div>
-      ) : communities.length > 0 && inviteModal ? (
-        <InviteModal communities={communities} setInviteModal={setInviteModal}></InviteModal>
-      ) : communities.length > 0 && !inviteModal ? (
-        <div className="centered default-container">
-          <h3>Community details coming soon</h3>
-          <button
-            className="login-button u-pointer"
-            onClick={(event) => {
-              route("/");
-              socket.emit("toggleAll", {});
-            }}
-          >
-            Take me back
-          </button>
-        </div>
-      ) : landing === true && props.userId ? (
-        <div className="centered default-container">
-          <h3>You aren't a member of any communities yet.</h3>
-          <button
-            className="login-button u-pointer"
-            onClick={(event) => {
-              setLanding(false);
-            }}
-          >
-            Create a community
-          </button>
-          <button
-            className="login-button u-pointer"
-            onClick={(event) => {
-              setLanding(false);
-              setJoining(true);
-            }}
-          >
-            Join your first community
-          </button>
-        </div>
-      ) : joining === true && props.userId ? (
-        <div className="centered default-container">
-          <div className="u-flex">
-            <label className="create-label">
-              Invitation code
+      <div className="mainpage-split">
+        {props.userId === undefined ? (
+          <div className="centered default-container">
+            <h3>Login to see this page</h3>
+            <button
+              className="login-button u-pointer"
+              onClick={(event) => {
+                route("/");
+                socket.emit("toggleAll", {});
+              }}
+            >
+              Take me back
+            </button>
+          </div>
+        ) : activeCommunity && inviteModal ? (
+          <InviteModal newCommunity={activeCommunity} setInviteModal={setInviteModal}></InviteModal>
+        ) : activeCommunity && (menuAction === undefined || menuAction === MenuAction.EXPLORE) ? (
+          <Explore activeCommunity={activeCommunity}></Explore>
+        ) : activeCommunity && menuAction === MenuAction.DETAILS ? (
+          <CommunityDetails
+            userId={props.userId}
+            activeCommunity={activeCommunity}
+          ></CommunityDetails>
+        ) : activeCommunity && menuAction === MenuAction.MANAGE ? (
+          <ManageCommunity activeCommunity={activeCommunity}></ManageCommunity>
+        ) : activeCommunity && menuAction === MenuAction.ANNOUCEMENTS ? (
+          <Annoucements activeCommunity={activeCommunity}></Annoucements>
+        ) : landing === true && props.userId ? (
+          <div className="centered default-container">
+            <h3>You aren't a member of any communities yet.</h3>
+            <button
+              className="login-button u-pointer"
+              onClick={(event) => {
+                setLanding(false);
+              }}
+            >
+              Create a community
+            </button>
+            <button
+              className="login-button u-pointer"
+              onClick={(event) => {
+                setLanding(false);
+                setJoining(true);
+              }}
+            >
+              Join your first community
+            </button>
+          </div>
+        ) : joining === true && props.userId ? (
+          <div className="centered default-container">
+            <div className="u-flex">
+              <label className="create-label">
+                Invitation code
+                <input
+                  id="inv_code"
+                  type="text"
+                  className="create-input"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
+                      joinCommunity(codeInput);
+                    }
+                  }}
+                ></input>
+              </label>
+              <TbPlayerTrackNextFilled
+                className="nav-icon u-pointer"
+                onClick={(event) => {
+                  const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
+                  joinCommunity(codeInput);
+                }}
+              ></TbPlayerTrackNextFilled>
+            </div>
+            <FaBackward
+              className="nav-icon back-button u-pointer"
+              onClick={(event) => {
+                setJoining(false);
+                setLanding(true);
+              }}
+            ></FaBackward>
+          </div>
+        ) : communityType === undefined && props.userId ? (
+          <div className="centered default-container">
+            <h3>What type of community is this?</h3>
+            <button
+              onClick={(event) => {
+                setType((prev) => CommunityType.UNIVERSITY);
+                if (!verified) setVerifying(true);
+              }}
+              className="login-button u-pointer"
+            >
+              College/university
+            </button>
+            <button
+              onClick={(event) => {
+                setType((prev) => CommunityType.WORKPLACE);
+                if (!verified) setVerifying(true);
+              }}
+              className="login-button u-pointer"
+            >
+              Workplace
+            </button>
+            <button
+              onClick={(event) => {
+                setType((prev) => CommunityType.LIVING);
+              }}
+              className="login-button u-pointer"
+            >
+              Living group
+            </button>
+            <button
+              onClick={(event) => {
+                setType((prev) => CommunityType.LOCAL);
+              }}
+              className="login-button u-pointer"
+            >
+              Locality
+            </button>
+            <FaBackward
+              className="nav-icon back-button u-pointer"
+              onClick={(event) => setLanding(true)}
+            ></FaBackward>
+          </div>
+        ) : communityType !== undefined && props.userId && verifying === true ? (
+          <div className="centered default-container">
+            <h3>
+              Enter your {communityType === CommunityType.WORKPLACE ? "work" : "school"} email
+              address for verification
+            </h3>
+            <div className="u-flex">
               <input
-                id="inv_code"
-                type="text"
-                className="create-input"
+                id="email"
+                type="email"
+                className="input"
                 onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
-                    joinCommunity(codeInput);
+                  if (event.key == "Enter") {
+                    const emailInput = document.getElementById("email")! as HTMLInputElement;
+                    verification(emailInput);
                   }
                 }}
               ></input>
-            </label>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const codeInput = document.getElementById("inv_code")! as HTMLInputElement;
-                joinCommunity(codeInput);
-              }}
-            ></TbPlayerTrackNextFilled>
-          </div>
-          <FaBackward
-            className="nav-icon back-button u-pointer"
-            onClick={(event) => setJoining(false)}
-          ></FaBackward>
-        </div>
-      ) : communityType === undefined && props.userId ? (
-        <div className="centered default-container">
-          <h3>What type of community is this?</h3>
-          <button
-            onClick={(event) => {
-              setType((prev) => CommunityType.UNIVERSITY);
-              if (!verified) setVerifying(true);
-            }}
-            className="login-button u-pointer"
-          >
-            College/university
-          </button>
-          <button
-            onClick={(event) => {
-              setType((prev) => CommunityType.WORKPLACE);
-              if (!verified) setVerifying(true);
-            }}
-            className="login-button u-pointer"
-          >
-            Workplace
-          </button>
-          <button
-            onClick={(event) => {
-              setType((prev) => CommunityType.LIVING);
-            }}
-            className="login-button u-pointer"
-          >
-            Living group
-          </button>
-          <button
-            onClick={(event) => {
-              setType((prev) => CommunityType.LOCAL);
-            }}
-            className="login-button u-pointer"
-          >
-            Locality
-          </button>
-          <FaBackward
-            className="nav-icon back-button u-pointer"
-            onClick={(event) => setLanding(true)}
-          ></FaBackward>
-        </div>
-      ) : communityType !== undefined && props.userId && verifying === true ? (
-        <div className="centered default-container">
-          <h3>
-            Enter your {communityType === CommunityType.WORKPLACE ? "work" : "school"} email address
-            for verification
-          </h3>
-          <div className="u-flex">
-            <input
-              id="email"
-              type="email"
-              className="input"
-              onKeyDown={(event) => {
-                if (event.key == "Enter") {
+              <TbPlayerTrackNextFilled
+                className="nav-icon u-pointer"
+                onClick={(event) => {
                   const emailInput = document.getElementById("email")! as HTMLInputElement;
                   verification(emailInput);
-                }
-              }}
-            ></input>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const emailInput = document.getElementById("email")! as HTMLInputElement;
-                verification(emailInput);
-              }}
-            ></TbPlayerTrackNextFilled>
-          </div>
-          <FaBackward
-            className="nav-icon back-button u-pointer"
-            onClick={(event) => setType(undefined)}
-          ></FaBackward>
-        </div>
-      ) : (props.userId &&
-          (communityType == CommunityType.UNIVERSITY || communityType == CommunityType.WORKPLACE) &&
-          verified === true) ||
-        communityType == CommunityType.LIVING ||
-        communityType == CommunityType.LOCAL ? (
-        <div className="centered default-container">
-          <div className="u-flex">
-            <label className="create-label">
-              Community name
-              <input
-                id="community_name"
-                className="create-input"
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    const nameInput = document.getElementById(
-                      "community_name"
-                    )! as HTMLInputElement;
-                    createCommunity(nameInput);
-                  }
                 }}
-              ></input>
-            </label>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const nameInput = document.getElementById("community_name")! as HTMLInputElement;
-                createCommunity(nameInput);
-              }}
-            ></TbPlayerTrackNextFilled>
+              ></TbPlayerTrackNextFilled>
+            </div>
+            <FaBackward
+              className="nav-icon back-button u-pointer"
+              onClick={(event) => setType(undefined)}
+            ></FaBackward>
           </div>
-          <FaBackward
-            className="nav-icon back-button u-pointer"
-            onClick={(event) => setType(undefined)}
-          ></FaBackward>
-        </div>
-      ) : (
-        <></>
-      )}
+        ) : (props.userId &&
+            (communityType == CommunityType.UNIVERSITY ||
+              communityType == CommunityType.WORKPLACE) &&
+            verified === true) ||
+          communityType == CommunityType.LIVING ||
+          communityType == CommunityType.LOCAL ? (
+          <div className="centered default-container">
+            <div className="u-flex">
+              <label className="create-label">
+                Community name
+                <input
+                  id="community_name"
+                  className="create-input"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      const nameInput = document.getElementById(
+                        "community_name"
+                      )! as HTMLInputElement;
+                      createCommunity(nameInput);
+                    }
+                  }}
+                ></input>
+              </label>
+              <TbPlayerTrackNextFilled
+                className="nav-icon u-pointer"
+                onClick={(event) => {
+                  const nameInput = document.getElementById("community_name")! as HTMLInputElement;
+                  createCommunity(nameInput);
+                }}
+              ></TbPlayerTrackNextFilled>
+            </div>
+            <FaBackward
+              className="nav-icon back-button u-pointer"
+              onClick={(event) => setType(undefined)}
+            ></FaBackward>
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
     </>
   );
 };
