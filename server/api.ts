@@ -11,6 +11,15 @@ const router = express.Router();
 import mailjet from "node-mailjet";
 import { socket } from "../client/src/client-socket";
 
+/**
+ * AWS S3
+ */
+const AWS = require("aws-sdk");
+const s3 = new AWS.S3();
+const { v4: uuidv4 } = require("uuid"); // for generating unique keys
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() }); // Store files in memory as Buffers
+
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
 router.get("/whoami", (req, res) => {
@@ -25,6 +34,15 @@ router.post("/initsocket", (req, res) => {
   if (req.user) {
     const socket = socketManager.getSocketFromSocketID(req.body.socketid);
     if (socket !== undefined) socketManager.addUser(req.user, socket);
+
+    AWS.config.getCredentials(function (err) {
+      if (err) console.log(err.stack);
+      // credentials not loaded
+      else {
+        console.log(`AWS Access key ID: ${AWS.config.credentials.accessKeyId}`);
+        console.log(`AWS Secret access key: ${AWS.config.credentials.secretAccessKey}`);
+      }
+    });
   }
   res.send({});
 });
@@ -47,6 +65,7 @@ const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/linkedin";
 const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
 const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
+const S3_BUCKET_NAME = "crash-images";
 
 /**
  * TYPES & CONSTANTS
@@ -80,6 +99,18 @@ type CommunityInfo = {
   owner: String;
 };
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+interface CustomRequest extends Request {
+  files?: MulterFile[];
+}
 
 /**
  * HELPER FUNCTIONS
@@ -166,22 +197,22 @@ const createCommunity = async (req: Request): Promise<CommunityInfo> => {
 
 // Linkedin redirect URI: http://localhost:5050/api/linkedin?
 router.get("/linkedin", async (req, res) => {
-  console.log("[BACKEND] Initializing Linkedin OAuth flow");
+  console.log("[LINKEDIN] Initializing OAuth flow");
   // LINKEDIN OAUTH STEP 1: AUTHORIZATION CODE
   const query = url.parse(req.url, true).query;
   const auth_code = query.code;
-  console.log(`[BACKEND] Authorization code: ${auth_code}`);
+  console.log(`[LINKEDIN] Authorization code: ${auth_code}`);
 
-  console.log("[BACKEND] Requesting Linkedin access token");
+  console.log("[LINKEDIN] Requesting access token");
   // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
   let endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
   await callExternalAPI(endpoint_url)
     .then(async (token_response: tokenResponse) => {
       const access_token = token_response.access_token; // default: 60 day lifespan
-      console.log(`[BACKEND] Access token: ${access_token}`);
+      console.log(`[LINKEDIN] Access token: ${access_token}`);
 
       // LINKEDIN OAUTH STEP 3: AUTHENTICATED REQUESTS FOR USER INFORMATION
-      console.log(`[BACKEND] Attempting user info requests with token ${access_token}`);
+      console.log(`[LINKEDIN] Attempting user info requests with token ${access_token}`);
       endpoint_url = `https://api.linkedin.com/v2/me`;
       const headers = { Authorization: `Bearer ${access_token}` };
       const axiosConfig = { headers };
@@ -192,19 +223,19 @@ router.get("/linkedin", async (req, res) => {
           liteProfile.localizedLastName,
           liteProfile.id,
         ];
-        console.log(`[BACKEND] Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
+        console.log(`[LINKEDIN] Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
         endpoint_url = `https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))`;
         axios.get(endpoint_url, axiosConfig).then((response) => {
           // const email = JSON.stringify(response.data); // convert Response Object back into readable JSON
           const emailAddress = response.data.elements[0]["handle~"]["emailAddress"];
-          console.log(`[BACKEND] Email address: ${emailAddress}`);
+          console.log(`[LINKEDIN] Email address: ${emailAddress}`);
           endpoint_url = `https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
           axios.get(endpoint_url, axiosConfig).then((response) => {
             const profilePictureUrl =
               response.data.profilePicture["displayImage~"]["elements"][0]["identifiers"][0][
                 "identifier"
               ];
-            console.log(`[BACKEND] Profile picture url: ${profilePictureUrl}`);
+            console.log(`[LINKEDIN] Profile picture url: ${profilePictureUrl}`);
             const loginUrl = `http://localhost:5050/api/login`;
             const loginBody = {
               name: `${firstName} ${lastName}`,
@@ -222,16 +253,16 @@ router.get("/linkedin", async (req, res) => {
       });
     })
     .catch((token_error) => {
-      console.log(`[BACKEND] Token response error: ${token_error}`);
+      console.log(`[LINKEDIN] Token response error: ${token_error}`);
       res.send(token_error);
     });
   res.redirect("/"); // redirects back to homepage
 });
 
 router.get("/getuser", async (req, res) => {
-  console.log(`[BACKEND] Requesting user: ${req.query.id}`);
+  console.log(`[MONGODB] Requesting user: ${req.query.id}`);
   await User.findById(req.query.id).then((user) => {
-    console.log(`[BACKEND] Got user: ${user}`);
+    console.log(`[MONGODB] Got user: ${user}`);
     if (user !== null) {
       res.send({ valid: true, user: user });
     } else {
@@ -257,16 +288,16 @@ router.post("/userverification", async (req, res) => {
 
   request
     .then((result) => {
-      console.log(`[BACKEND] Mailjet API response: ${result.body}`);
+      console.log(`[MAILJET] API response: ${result.body}`);
     })
     .catch((err) => {
-      console.log(`[BACKEND] Mailjet API error: ${err}`);
+      console.log(`[MAILJET] API error: ${err}`);
     });
 });
 
 router.get("/verified", async (req, res) => {
   const userId = req.query.id;
-  console.log(`[BACKEND] Verifying user: ${userId}`);
+  console.log(`[MONGODB] Verifying user: ${userId}`);
   User.findByIdAndUpdate(userId, { verified: true }).then((user) => {
     socketManager.getIo().emit("verified", { userId: userId });
     res.redirect("/verified");
@@ -276,6 +307,37 @@ router.get("/verified", async (req, res) => {
 /**
  * COMMUNITIES
  */
+
+router.post("/communityphoto", upload.any(), async (req: CustomRequest, res) => {
+  console.log("[S3] Listing buckets");
+  s3.listBuckets({}, (err, data) => {
+    if (err) console.error(err);
+    else console.log(data);
+  });
+
+  if (req.files) {
+    const key = `communityPhotos/${req.body.communityId}_${uuidv4()}`;
+    const file = req.files[0];
+    const arrayBuffer = Buffer.from(file.buffer);
+    const objectParams = {
+      Bucket: S3_BUCKET_NAME,
+      Key: key,
+      Body: arrayBuffer,
+    };
+
+    s3.upload(objectParams, (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "[S3]: Failed to upload community picture" });
+      }
+
+      const s3Url = data.Location;
+      Community.findByIdAndUpdate(req.body.communityId, { aws_img_key: key }).then((community) => {
+        res.send({ url: s3Url });
+      });
+    });
+  } else res.send({});
+});
 
 router.get("/fetchcommunity", async (req, res) => {
   Community.findById(req.query.communityId).then((community) => {

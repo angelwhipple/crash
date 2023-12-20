@@ -60,7 +60,7 @@ const Communities = (props: Props) => {
   });
 
   socket.on("new community", (event) => {
-    console.log(event);
+    // console.log(event);
   });
 
   socket.on("joined community", async (event) => {

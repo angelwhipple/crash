@@ -26,6 +26,21 @@ const CommunityDetails = (props: Props) => {
     selectorFn(true);
   };
 
+  const uploadPhoto = async (event) => {
+    const fileInput = document.getElementById("photo") as HTMLInputElement;
+    const file = fileInput.files![0];
+    fileInput.value = "";
+
+    const formData = new FormData();
+    formData.append("photo", file);
+    formData.append("communityId", props.activeCommunity._id);
+
+    fetch("/api/communityphoto", { method: "POST", body: formData }).then(async (res) => {
+      const data = await res.json();
+      console.log(`S3 Image url: ${data.url}`);
+    });
+  };
+
   useEffect(() => {
     populateUsers();
   }, []);
@@ -61,7 +76,13 @@ const CommunityDetails = (props: Props) => {
         <div className="u-flexColumn u-alignCenter">
           <div className="community-img">IMG</div>
           {props.userId === props.activeCommunity.owner ? (
-            <IoMdCloudUpload className="gradient-icon u-pointer"></IoMdCloudUpload>
+            <div className="u-flex">
+              <input id="photo" type="file" name="photo"></input>
+              <IoMdCloudUpload
+                className="gradient-icon u-pointer"
+                onClick={uploadPhoto}
+              ></IoMdCloudUpload>
+            </div>
           ) : (
             <></>
           )}

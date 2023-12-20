@@ -137,7 +137,7 @@ const countProfiles = async (user: UserInterface) => {
   const currentProfile: string = fields.filter((field) => user.get(field) !== undefined)[0];
   const query = { email: user.email, [currentProfile]: { $ne: user[currentProfile] } };
   return User.find(query).then((additionalUsers) => {
-    console.log(`[BACKEND] Found extra profiles: ${additionalUsers}`);
+    console.log(`[MONGODB] Found extra profiles: ${additionalUsers}`);
     const response = { eligible: additionalUsers.length > 0, profiles: additionalUsers };
     return response;
   });

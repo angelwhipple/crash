@@ -6,7 +6,6 @@ import { CgDetailsMore } from "react-icons/cg";
 import { MdOutlineAnnouncement } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
 import { MdExplore } from "react-icons/md";
-import { ImExit } from "react-icons/im";
 import "./CommunityMenu.css";
 import { response } from "express";
 

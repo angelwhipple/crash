@@ -7,6 +7,7 @@ const CommunitySchema = new Schema({
   members: [String],
   type: String,
   code: String, // join code
+  aws_img_key: { type: String, required: false },
 });
 
 export interface Community extends Document {
@@ -17,6 +18,7 @@ export interface Community extends Document {
   members: string[];
   type: String;
   code: String;
+  aws_img_key?: String;
 }
 
 const CommunityModel = model<Community>("Community", CommunitySchema);
