@@ -20,7 +20,7 @@ export interface Community extends Document {
   type: String;
   code: String;
   aws_img_key?: String;
-  description?: String;
+  description?: string;
 }
 
 const CommunityModel = model<Community>("Community", CommunitySchema);

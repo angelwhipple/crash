@@ -15,9 +15,7 @@ const EditDescription = (props: Props) => {
     if (descriptionInput.value) {
       const body = { communityId: props.communityId, description: descriptionInput.value };
       descriptionInput.value = "";
-      post("/api/community/description", body).then((res) => {
-        console.log(res);
-      });
+      post("/api/community/description", body);
     }
   };
 

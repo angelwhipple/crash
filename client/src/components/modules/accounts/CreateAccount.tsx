@@ -87,7 +87,7 @@ const CreateAccount = (props: Props) => {
     event.preventDefault();
     console.log(`Email: ${emailInput.value}`);
     if (validateEmail(emailInput.value)) {
-      get("/api/existingaccount", { email: emailInput.value }).then((res) => {
+      get("/api/user/exists", { email: emailInput.value }).then((res) => {
         // if existing account is returned, skip to password step for login
         if (res.exists) {
           setExists(true);
@@ -146,7 +146,7 @@ const CreateAccount = (props: Props) => {
           email: email,
           dob: dob,
         };
-        post("/api/createuser", body).then((user) => {
+        post("/api/user/create", body).then((user) => {
           console.log(user);
           props.setUserId(user._id);
           props.setCreate(false);

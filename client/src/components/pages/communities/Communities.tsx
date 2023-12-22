@@ -65,7 +65,7 @@ const Communities = (props: Props) => {
 
   socket.on("joined community", async (event) => {
     if (event.communityId === activeCommunity?._id) {
-      await get("/api/fetchcommunity", { communityId: activeCommunity?._id }).then((res) => {
+      await get("/api/community/fetch", { communityId: activeCommunity?._id }).then((res) => {
         console.log(`Refreshed community: ${JSON.stringify(res)}`);
         setActiveCommunity(res.community); // refresh state of active community object
       });
@@ -74,13 +74,13 @@ const Communities = (props: Props) => {
 
   useEffect(() => {
     if (props.userId) {
-      get("/api/communities", { id: props.userId }).then((res) => {
+      get("/api/user/communities", { id: props.userId }).then((res) => {
         if (res.valid) {
           setCommunties(res.communities);
           setActiveCommunity(res.communities[res.communities.length - 1]);
         }
       });
-      get("/api/getuser", { id: props.userId }).then((res) => {
+      get("/api/user/fetch", { id: props.userId }).then((res) => {
         if (res.valid && res.user.verified === true) {
           setVerified(true);
         }
@@ -97,7 +97,7 @@ const Communities = (props: Props) => {
       userVerified: verified,
     };
     nameInput.value = "";
-    post("/api/createcommunity", body).then((community: Community) => {
+    post("/api/community/create", body).then((community: Community) => {
       setCommunties((prev) => [...prev, community]);
       setActiveCommunity(community);
       setShowInvite(true);
@@ -110,7 +110,7 @@ const Communities = (props: Props) => {
       userId: props.userId,
     };
     codeInput.value = "";
-    post("/api/joincommunity", body).then((res) => {
+    post("/api/community/join", body).then((res) => {
       if (res.valid) {
         setCommunties((prev) => [...prev, res.community]);
         setActiveCommunity(res.community);
@@ -122,7 +122,7 @@ const Communities = (props: Props) => {
   };
 
   const verification = async (emailInput) => {
-    get("/api/getuser", { id: props.userId }).then((res) => {
+    get("/api/user/fetch", { id: props.userId }).then((res) => {
       const sender = { email: "awhipp@mit.edu", name: "Crash MIT" }; // registered e-mail with Mailjet API
       const sendee = {
         email: emailInput.value,
@@ -137,12 +137,12 @@ const Communities = (props: Props) => {
             From: { Email: sender.email, Name: sender.name }, // single sender object
             To: [{ Email: sendee.email, Name: sendee.name }], // list of sendee objects
             Subject: "Verify your e-mail with Crash",
-            HtmlPart: `<a href="http://localhost:5050/api/verified?id=${props.userId}">Click here to confirm your email address</a>`,
+            HtmlPart: `<a href="http://localhost:5050/api/user/verified?id=${props.userId}">Click here to confirm your email address</a>`,
           },
         ],
       };
 
-      post("/api/userverification", { messages: messages });
+      post("/api/user/verification", { messages: messages });
     });
   };
 

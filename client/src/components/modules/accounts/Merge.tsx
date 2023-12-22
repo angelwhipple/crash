@@ -33,7 +33,7 @@ const Merge = (props) => {
                     email: props.extraProfiles[0].props.profile.email,
                     profiles: props.chosenProfiles,
                   };
-                  post("/api/consolidate", body).then((res) => {
+                  post("/api/user/consolidate", body).then((res) => {
                     console.log(`Conslidated user: ${JSON.stringify(res)}`);
                   });
                 }

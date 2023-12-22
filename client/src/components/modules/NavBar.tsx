@@ -53,7 +53,6 @@ const NavBar = (props: Props) => {
     const body = { query: query };
     setQuery("");
     event.target.value = "";
-    post("/api/existingaccount", body).then((res) => {});
   };
 
   const navigate = useNavigate();

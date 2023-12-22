@@ -20,6 +20,7 @@ const CommunityDetails = (props: Props) => {
   const [showMedia, setShowMedia] = useState(false);
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
   const [img, setImg] = useState("");
+  const [description, setDescription] = useState("");
   const [editDes, setEditDes] = useState(false);
 
   const toggle = (selectorFn: any) => {
@@ -34,28 +35,42 @@ const CommunityDetails = (props: Props) => {
     formData.append("photo", file);
     formData.append("communityId", props.activeCommunity._id);
 
-    fetch("/api/communityphoto", { method: "POST", body: formData }).then(async (res) => {
+    fetch("/api/community/updatephoto", { method: "POST", body: formData }).then(async (res) => {
       const data = await res.json();
       console.log(`S3 Image url: ${data.url}`);
     });
   };
 
-  const updatePhoto = async () => {
-    get("/api/community/loadphoto", { communityId: props.activeCommunity._id }).then((res) => {
-      if (res.valid) {
-        const buffer = res.buffer.Body.data;
-        const base64Image = btoa(
-          new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
-        );
-        const src = `data:image/jpeg;base64,${base64Image}`;
-        setImg(src);
-      }
-    });
+  const updatePhoto = async (imageBuffer: ArrayBuffer) => {
+    const base64Image = btoa(
+      new Uint8Array(imageBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+    );
+    const src = `data:image/jpeg;base64,${base64Image}`;
+    setImg(src);
   };
+
+  socket.on("community photo", (event) => {
+    const buffer = event.image;
+    updatePhoto(buffer);
+  });
+
+  socket.on("community description", (event) => {
+    setDescription(event.description);
+  });
 
   useEffect(() => {
     populateUsers();
-    updatePhoto();
+    if (props.activeCommunity.description !== undefined) {
+      setDescription(props.activeCommunity.description.toString());
+    } else setDescription(`Add a description`);
+    get("/api/community/loadphoto", { communityId: props.activeCommunity._id }).then((res) => {
+      if (res.valid) {
+        const buffer = res.buffer.Body.data;
+        updatePhoto(buffer);
+      } else {
+        // default community photo
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -65,7 +80,7 @@ const CommunityDetails = (props: Props) => {
   const populateUsers = async (): Promise<void> => {
     const memberProfiles: JSX.Element[] = [];
     for (const memberId of props.activeCommunity.members) {
-      await get("/api/getuser", { id: memberId }).then((res) => {
+      await get("/api/user/fetch", { id: memberId }).then((res) => {
         const member = (
           <Member key={res.user._id} user={res.user} community={props.activeCommunity}></Member>
         );
@@ -110,7 +125,7 @@ const CommunityDetails = (props: Props) => {
         </div>
         <div className="u-flexColumn u-alignCenter">
           <h2>{props.activeCommunity.name}</h2>
-          <p>{props.activeCommunity.description}</p>
+          <p>{description}</p>
           {props.userId === props.activeCommunity.owner ? (
             <label className="update-container">
               <FaEdit
