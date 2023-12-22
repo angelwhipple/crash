@@ -76,41 +76,37 @@ const LoginPanel = (props: Props) => {
       ) : create ? (
         <CreateAccount setCreate={setCreate} setUserId={props.setUserId}></CreateAccount>
       ) : (
-        <div className="modal-Container">
-          <div className="modal-Content">
-            <div className="login-container">
-              <GoogleLogin
-                onSuccess={(credentialResponse: CredentialResponse) => {
-                  props.handleLogin(credentialResponse);
-                  setVisibility(false);
-                }}
-                onError={() => {
-                  console.log("Error logging in");
-                }}
-                type="standard"
-                theme="filled_black"
-                shape="pill"
-                size="medium"
-                text="signin_with"
-                logo_alignment="left"
-                click_listener={() => {}}
-              ></GoogleLogin>
-              <button className="login-button floating-button u-pointer" onClick={launch_linkedin}>
-                Sign in with Linkedin
-              </button>
-              <button
-                className="login-button floating-button u-pointer"
-                onClick={(event) => {
-                  route("/facebook");
-                }}
-              >
-                Sign in with Facebook
-              </button>
-              <button className="login-button floating-button u-pointer" onClick={create_or_signin}>
-                Sign in/Create an account
-              </button>
-            </div>
-          </div>
+        <div className="login-container">
+          <GoogleLogin
+            onSuccess={(credentialResponse: CredentialResponse) => {
+              props.handleLogin(credentialResponse);
+              setVisibility(false);
+            }}
+            onError={() => {
+              console.log("Error logging in");
+            }}
+            type="standard"
+            theme="filled_black"
+            shape="pill"
+            size="medium"
+            text="signin_with"
+            logo_alignment="left"
+            click_listener={() => {}}
+          ></GoogleLogin>
+          <button className="login-button floating-button u-pointer" onClick={launch_linkedin}>
+            Sign in with Linkedin
+          </button>
+          <button
+            className="login-button floating-button u-pointer"
+            onClick={(event) => {
+              route("/facebook");
+            }}
+          >
+            Sign in with Facebook
+          </button>
+          <button className="login-button floating-button u-pointer" onClick={create_or_signin}>
+            Sign in/Create an account
+          </button>
         </div>
       )}
     </GoogleOAuthProvider>

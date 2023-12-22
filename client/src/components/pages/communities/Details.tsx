@@ -7,6 +7,7 @@ import "./Details.css";
 import { IoMdCloudUpload } from "react-icons/io";
 import { FaEdit } from "react-icons/fa";
 import Member from "../../modules/communities/MemberEntry";
+import EditDescription from "../../modules/communities/EditDescription";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -18,6 +19,8 @@ const CommunityDetails = (props: Props) => {
   const [showMembers, setShowMembers] = useState(true);
   const [showMedia, setShowMedia] = useState(false);
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
+  const [img, setImg] = useState("");
+  const [editDes, setEditDes] = useState(false);
 
   const toggle = (selectorFn: any) => {
     for (const selFn of [setShowRules, setShowMembers, setShowMedia]) {
@@ -26,11 +29,7 @@ const CommunityDetails = (props: Props) => {
     selectorFn(true);
   };
 
-  const uploadPhoto = async (event) => {
-    const fileInput = document.getElementById("photo") as HTMLInputElement;
-    const file = fileInput.files![0];
-    fileInput.value = "";
-
+  const uploadPhoto = async (file: File) => {
     const formData = new FormData();
     formData.append("photo", file);
     formData.append("communityId", props.activeCommunity._id);
@@ -41,8 +40,22 @@ const CommunityDetails = (props: Props) => {
     });
   };
 
+  const updatePhoto = async () => {
+    get("/api/community/loadphoto", { communityId: props.activeCommunity._id }).then((res) => {
+      if (res.valid) {
+        const buffer = res.buffer.Body.data;
+        const base64Image = btoa(
+          new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+        );
+        const src = `data:image/jpeg;base64,${base64Image}`;
+        setImg(src);
+      }
+    });
+  };
+
   useEffect(() => {
     populateUsers();
+    updatePhoto();
   }, []);
 
   useEffect(() => {
@@ -74,29 +87,43 @@ const CommunityDetails = (props: Props) => {
     <div className="page-container">
       <div className="community-header">
         <div className="u-flexColumn u-alignCenter">
-          <div className="community-img">IMG</div>
+          <img className="community-img" src={img}></img>
           {props.userId === props.activeCommunity.owner ? (
-            <div className="u-flex">
-              <input id="photo" type="file" name="photo"></input>
-              <IoMdCloudUpload
-                className="gradient-icon u-pointer"
-                onClick={uploadPhoto}
-              ></IoMdCloudUpload>
-            </div>
+            <label className="update-container">
+              <input
+                type="file"
+                name="photo"
+                onChange={async (event) => {
+                  if (event.target.files && event.target.files[0]) {
+                    const file = event.target.files[0];
+                    event.target.value = "";
+                    await uploadPhoto(file);
+                  }
+                }}
+              ></input>
+              <IoMdCloudUpload className="gradient-icon u-pointer"></IoMdCloudUpload>
+              <p className="update-label">Upload photo </p>
+            </label>
           ) : (
             <></>
           )}
         </div>
         <div className="u-flexColumn u-alignCenter">
           <h2>{props.activeCommunity.name}</h2>
-          <div className="u-flex u-alignCenter">
-            {props.userId === props.activeCommunity.owner ? (
-              <FaEdit className="gradient-icon u-pointer"></FaEdit>
-            ) : (
-              <></>
-            )}
-            <p>Description</p>
-          </div>
+          <p>{props.activeCommunity.description}</p>
+          {props.userId === props.activeCommunity.owner ? (
+            <label className="update-container">
+              <FaEdit
+                className="gradient-icon u-pointer"
+                onClick={(event) => {
+                  setEditDes(true);
+                }}
+              ></FaEdit>
+              Edit description
+            </label>
+          ) : (
+            <></>
+          )}
         </div>
         <p>{props.activeCommunity.members.length} members</p>
       </div>
@@ -135,6 +162,14 @@ const CommunityDetails = (props: Props) => {
         </>
       ) : showMedia ? (
         <></>
+      ) : (
+        <></>
+      )}
+      {editDes ? (
+        <EditDescription
+          setEditDes={setEditDes}
+          communityId={props.activeCommunity._id}
+        ></EditDescription>
       ) : (
         <></>
       )}

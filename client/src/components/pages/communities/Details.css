@@ -51,6 +51,21 @@
   transition-duration: 0.7s;
 }
 
+input[type="file"] {
+  display: none;
+}
+
+.update-container {
+  border: 1px solid var(--white);
+  border-radius: 5%;
+  display: flex;
+  padding: 5%;
+  align-items: center;
+  font-size: small;
+  column-gap: 5px;
+  white-space: nowrap;
+}
+
 .upload-icon {
   width: var(--l);
   height: var(--l);
@@ -69,7 +84,7 @@
   transition-duration: 0.5s;
 }
 
-.member-view {
+.gradient-icon-hover .member-view {
   display: flex;
   flex-direction: column;
   row-gap: var(--s);

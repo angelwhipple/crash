@@ -13,7 +13,7 @@ type Props = RouteComponentProps & {
 
 const Merge = (props) => {
   return (
-    <div className="modal-Container">
+    <div className="modal-overlay">
       <div className="merge-modal-container">
         <div className="merge-modal">
           <h1>Is this you?</h1>

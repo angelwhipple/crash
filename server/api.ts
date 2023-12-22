@@ -1,4 +1,4 @@
-import express, { Request, response, Response } from "express";
+import express, { json, Request, response, Response } from "express";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import auth from "./auth";
 import socketManager from "./server-socket";
@@ -71,9 +71,18 @@ const S3_BUCKET_NAME = "crash-images";
  * TYPES & CONSTANTS
  */
 
-/**
- * Record type for a Linkedin access token response
- */
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+interface CustomRequest extends Request {
+  files?: MulterFile[];
+}
+// Record type for a Linkedin access token response
 type tokenResponse = {
   access_token: string;
   expires_in: number;
@@ -99,18 +108,6 @@ type CommunityInfo = {
   owner: String;
 };
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
-interface CustomRequest extends Request {
-  files?: MulterFile[];
-}
 
 /**
  * HELPER FUNCTIONS
@@ -307,6 +304,29 @@ router.get("/verified", async (req, res) => {
 /**
  * COMMUNITIES
  */
+
+router.post("/community/description", async (req, res) => {
+  Community.findByIdAndUpdate(req.body.communityId, { description: req.body.description }).then(
+    (community) => {
+      res.send({ updated: community });
+    }
+  );
+});
+router.get("/community/loadphoto", async (req, res) => {
+  Community.findById(req.query.communityId).then((community) => {
+    if (community?.aws_img_key) {
+      const objectParams = { Bucket: S3_BUCKET_NAME, Key: community?.aws_img_key };
+      s3.getObject(objectParams, (err, data) => {
+        if (err) console.log(err, err.stack);
+        else {
+          res.send({ valid: true, buffer: data });
+        }
+      });
+    } else {
+      res.send({ valid: false });
+    }
+  });
+});
 
 router.post("/communityphoto", upload.any(), async (req: CustomRequest, res) => {
   console.log("[S3] Listing buckets");

@@ -19,6 +19,8 @@
   display: flex;
   flex-direction: column;
   row-gap: var(--l);
+  height: 100vh;
+  justify-content: center;
 }
 
 .floating-button {

@@ -4,15 +4,15 @@ import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import Community from "../../../../../shared/Community";
 import "../../modules/LoginPanel.css";
-import "./InviteModal.css";
+import "./Invite.css";
 import "../Modal.css";
 
 type Props = RouteComponentProps & {
   newCommunity: Community;
-  setInviteModal: any;
+  setShowInvite: any;
 };
 
-const InviteModal = (props: Props) => {
+const Invite = (props: Props) => {
   const newest: Community = props.newCommunity;
   const joinLink = `http://localhost:5050/api/joincommunity?code=${newest.code}`;
   const subject = `Join ${newest.name} on Crash!`;
@@ -43,11 +43,11 @@ const InviteModal = (props: Props) => {
           Message Crash user
         </button>
       </div>
-      <p className="text-option u-pointer" onClick={(event) => props.setInviteModal(false)}>
+      <p className="text-option u-pointer" onClick={(event) => props.setShowInvite(false)}>
         Maybe later
       </p>
     </div>
   );
 };
 
-export default InviteModal;
+export default Invite;

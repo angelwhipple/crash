@@ -9,7 +9,7 @@ import "../../modules/LoginPanel.css";
 import "../../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { FaBackward } from "react-icons/fa";
-import InviteModal from "../../modules/communities/InviteModal";
+import Invite from "../../modules/communities/Invite";
 import Community from "../../../../../shared/Community";
 import CommunityMenu from "../../modules/communities/CommunityMenu";
 import CommunityDetails from "./Details";
@@ -44,7 +44,7 @@ const Communities = (props: Props) => {
   const [communityType, setType] = useState<CommunityType | undefined>(undefined);
   const [verified, setVerified] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [inviteModal, setInviteModal] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
   const [joining, setJoining] = useState(false);
   const [menuAction, setMenuAction] = useState<MenuAction | undefined>(undefined);
 
@@ -100,7 +100,7 @@ const Communities = (props: Props) => {
     post("/api/createcommunity", body).then((community: Community) => {
       setCommunties((prev) => [...prev, community]);
       setActiveCommunity(community);
-      setInviteModal(true);
+      setShowInvite(true);
     });
   };
 
@@ -170,8 +170,8 @@ const Communities = (props: Props) => {
               Take me back
             </button>
           </div>
-        ) : activeCommunity && inviteModal ? (
-          <InviteModal newCommunity={activeCommunity} setInviteModal={setInviteModal}></InviteModal>
+        ) : activeCommunity && showInvite ? (
+          <Invite newCommunity={activeCommunity} setShowInvite={setShowInvite}></Invite>
         ) : activeCommunity && (menuAction === undefined || menuAction === MenuAction.EXPLORE) ? (
           <Explore activeCommunity={activeCommunity}></Explore>
         ) : activeCommunity && menuAction === MenuAction.DETAILS ? (
