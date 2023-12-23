@@ -12,7 +12,7 @@
   transition-duration: 0.7s;
 }
 .menu-option:hover {
-  border: var(--s) solid var(--orange);
+  border: var(--s) solid var(--primary-light);
   transition-duration: 0.9s;
 }
 
@@ -22,7 +22,7 @@
   padding: 5%;
   width: 100%;
   transition-duration: 0.7s;
-  border: var(--s) solid var(--orange);
+  border: var(--s) solid var(--primary-light);
   transition-duration: 0.9s;
 }
 
@@ -30,14 +30,14 @@
 }
 .reg:hover,
 .reg-sel {
-  border-image: linear-gradient(#ff8400, #bd1209) 10;
+  border-image: linear-gradient(var(--primary-light), var(--primary)) 10;
 }
 
 .inv {
 }
 .inv:hover,
 .inv-sel {
-  border-image: linear-gradient(#bd1209, #ff8400) 10;
+  border-image: linear-gradient(var(--primary), var(--primary-light)) 10;
 }
 
 .menu-icon {
@@ -56,12 +56,12 @@
   color: var(--white);
 }
 .icon-reg-sel {
-  color: var(--orange);
+  color: var(--primary-light);
 }
 
 .icon-inv {
   color: var(--white);
 }
 .icon-inv-sel {
-  color: var(--red);
+  color: var(--primary);
 }

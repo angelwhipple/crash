@@ -1,4 +1,156 @@
-.profile-background {
-  background-image: url("../../assets/background3.jpg");
+.profile-split {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  align-items: center;
+  display: flex;
+  padding: 1%;
+}
+
+.details-split {
+  position: fixed;
+  top: inherit;
+  height: 100%;
+  width: 50%;
+  left: 30%;
+  padding: 1%;
+}
+
+.settings-split {
+  position: fixed;
+  top: inherit;
+  height: 100%;
+  width: 20%;
+  left: 80%;
+  padding: 1%;
+}
+
+.card-container {
+  position: relative;
+  background-color: white;
+  -webkit-text-fill-color: black;
+  width: 100%;
+  height: 65%;
+  border-radius: 4%;
+  justify-content: center;
+  display: flex;
+}
+
+.profile-pic {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+.profile-info-container {
+  position: absolute;
+  width: 30%;
+  height: auto;
+  top: 10%;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
+
+.follow-cts {
+  display: flex;
+  column-gap: 20%;
+  justify-content: center;
+}
+
+.follow-cts p {
+  margin: 0;
+  padding: 10px;
+}
+
+.connected-view {
+  position: absolute;
+  top: 60%;
+  width: 90%;
+  height: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 5%;
   z-index: 1;
+}
+
+.edit-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5%;
+  font-size: 24px;
+  transition-duration: 0.3s;
+}
+
+.edit-icon:hover {
+  color: var(--primary-dim);
+  transition-duration: 0.3s;
+}
+
+.bar {
+  width: 5px; /* Set the width of the vertical line */
+  height: 100%; /* Set the height of the vertical line */
+  background-color: white; /* Set the color of the vertical line */
+  margin: 0;
+}
+
+.account-pill {
+  align-self: center;
+  background: var(--black);
+  border-radius: 25%;
+  -webkit-text-fill-color: var(--white);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  padding: 5%;
+  height: auto;
+  width: fit-content;
+  position: relative;
+}
+
+.account-pill::before,
+.account-pill::after {
+  content: "";
+  position: absolute;
+  inset: -0.15rem;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--glow-1),
+    var(--glow-2),
+    var(--glow-3),
+    var(--glow-4),
+    var(--glow-5),
+    var(--glow-4),
+    var(--glow-3),
+    var(--glow-2),
+    var(--glow-1)
+  );
+  animation: rotation 3s linear infinite;
+}
+
+.account-pill::after {
+  filter: blur(3.5rem);
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotation {
+  0% {
+    --gradient-angle: 0deg;
+  }
+  100% {
+    --gradient-angle: 360deg;
+  }
 }

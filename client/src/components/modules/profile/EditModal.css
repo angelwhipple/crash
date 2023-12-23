@@ -1,0 +1,7 @@
+.edit-label {
+  -webkit-text-fill-color: black;
+}
+
+.edit-label:hover {
+  -webkit-text-fill-color: var(--primary-dim);
+}

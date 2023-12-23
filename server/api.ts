@@ -8,7 +8,6 @@ import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 const router = express.Router();
 import mailjet from "node-mailjet";
-import { socket } from "../client/src/client-socket";
 import helpers from "./helpers";
 import { CustomRequest, TokenResponse } from "./types";
 
@@ -172,6 +171,18 @@ router.get("/user/verified", async (req, res) => {
   });
 });
 
+router.post("/user/update", upload.any(), async (req: CustomRequest, res) => {
+  console.log("[S3] Listing buckets");
+  s3.listBuckets({}, (err, data) => {
+    if (err) console.error(err);
+    else console.log(data);
+  });
+
+  // TODO: update user profile information
+
+  res.send({});
+});
+
 // return a list of community objects associated to a single user
 router.get("/user/communities", async (req, res) => {
   await User.findById(req.query.id).then(async (user) => {
@@ -230,6 +241,7 @@ router.post("/community/updatephoto", upload.any(), async (req: CustomRequest, r
       Bucket: S3_BUCKET_NAME,
       Key: key,
       Body: arrayBuffer,
+      ContentType: "image/jpeg",
     };
 
     s3.upload(objectParams, (err, data) => {

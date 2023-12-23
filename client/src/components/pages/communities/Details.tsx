@@ -7,7 +7,7 @@ import "./Details.css";
 import { IoMdCloudUpload } from "react-icons/io";
 import { FaEdit } from "react-icons/fa";
 import Member from "../../modules/communities/MemberEntry";
-import EditDescription from "../../modules/communities/EditDescription";
+import EditModal from "../../modules/communities/EditModal";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -181,10 +181,7 @@ const CommunityDetails = (props: Props) => {
         <></>
       )}
       {editDes ? (
-        <EditDescription
-          setEditDes={setEditDes}
-          communityId={props.activeCommunity._id}
-        ></EditDescription>
+        <EditModal setEditDes={setEditDes} communityId={props.activeCommunity._id}></EditModal>
       ) : (
         <></>
       )}

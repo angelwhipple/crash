@@ -1,8 +1,7 @@
-import express, { json, Request, response, Response } from "express";
+import { Request } from "express";
 import request from "request";
 import Community from "./models/Community";
 import User from "./models/User";
-
 import { TokenResponse, ProfileResponse, CommunityType, CommunityInfo, LETTERS } from "./types";
 
 /**

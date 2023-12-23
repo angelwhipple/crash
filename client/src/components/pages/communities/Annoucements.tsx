@@ -9,7 +9,7 @@ type Props = RouteComponentProps & {
 };
 
 const Annoucements = (props: Props) => {
-  return <div className="centered default-container">Community announcements coming soon</div>;
+  return <div className="centered default-container">Community messaging coming soon</div>;
 };
 
 export default Annoucements;

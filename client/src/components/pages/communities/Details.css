@@ -1,6 +1,7 @@
 .page-container {
   background-color: white;
   height: inherit;
+  position: relative;
 }
 
 .community-header {
@@ -45,7 +46,7 @@
 .gradient-text:hover,
 .gradient-text-sel {
   font-size: large;
-  background: -webkit-linear-gradient(#bd1209, #ff8400);
+  background: -webkit-linear-gradient(var(--primary), var(--primary-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition-duration: 0.7s;
@@ -80,7 +81,7 @@ input[type="file"] {
 }
 
 .gradient-icon:hover {
-  fill: var(--red);
+  fill: var(--primary-dim);
   transition-duration: 0.5s;
 }
 
@@ -115,7 +116,7 @@ input[type="file"] {
 .wave {
   width: 5px;
   height: 100px;
-  background: linear-gradient(45deg, var(--black), var(--orange));
+  background: linear-gradient(45deg, var(--black), var(--primary-dim));
   margin: 10px;
   animation: wave 1s linear infinite;
   border-radius: 20px;

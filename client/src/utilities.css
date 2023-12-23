@@ -18,15 +18,21 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
 
 :root {
-  --purple: #396dff;
   --orange: #ff8400;
-  --primary--dim: #6987db;
+  --primary: #0a12ff;
+  --primary-dim: #4249ff;
+  --primary-light: #575dfb;
   --darkgrey: #d4d4d4;
   --medgrey: #e0e0e0;
   --grey: #f7f7f7;
   --white: #fff;
   --black: #020006;
   --red: #bd1209;
+  --glow-1: #8185fa;
+  --glow-2: #666bfd;
+  --glow-3: #4249ff;
+  --glow-4: #0a12ff;
+  --glow-5: #090fc5;
 
   --xs: 4px;
   --s: 8px;
@@ -130,4 +136,21 @@ form {
   -webkit-text-fill-color: var(--white);
   row-gap: var(--l);
   /* align-self: center; */
+}
+
+.default-button {
+  border: none;
+  -webkit-text-fill-color: inherit;
+  background-color: inherit;
+  font-size: medium;
+  /* transition-duration: 3.7s; */
+}
+
+.default-button:hover {
+  /* transition-duration: 3.7s; */
+  -webkit-text-fill-color: var(--primary-dim);
+}
+.action-container {
+  display: flex;
+  column-gap: 10%;
 }

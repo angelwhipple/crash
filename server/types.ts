@@ -1,5 +1,3 @@
-import User from "./models/User";
-import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 import { Request, Response } from "express";
 

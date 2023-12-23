@@ -3,14 +3,13 @@ import { socket } from "../../../client-socket";
 import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "../Modal.css";
-import "../LoginPanel.css";
 
 type Props = RouteComponentProps & {
   setEditDes: any;
   communityId: string;
 };
 
-const EditDescription = (props: Props) => {
+const EditModal = (props: Props) => {
   const updateDescription = (descriptionInput: HTMLInputElement) => {
     if (descriptionInput.value) {
       const body = { communityId: props.communityId, description: descriptionInput.value };
@@ -23,7 +22,7 @@ const EditDescription = (props: Props) => {
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-content">
-          <h3>Enter a new description</h3>
+          <h3>Edit community details</h3>
           <input
             id="description"
             type="text"
@@ -31,21 +30,23 @@ const EditDescription = (props: Props) => {
               if (event.key === "Enter") {
                 const descriptionInput = document.getElementById("description") as HTMLInputElement;
                 updateDescription(descriptionInput);
+                props.setEditDes(false);
               }
             }}
           ></input>
-          <div className="u-flex u-justifyCenter">
+          <div className="action-container">
             <button
-              className="login-button u-pointer"
+              className="default-button u-pointer"
               onClick={(event) => {
                 const descriptionInput = document.getElementById("description") as HTMLInputElement;
                 updateDescription(descriptionInput);
+                props.setEditDes(false);
               }}
             >
               submit
             </button>
             <button
-              className="login-button u-pointer"
+              className="default-button u-pointer"
               onClick={(event) => {
                 props.setEditDes(false);
               }}
@@ -59,4 +60,4 @@ const EditDescription = (props: Props) => {
   );
 };
 
-export default EditDescription;
+export default EditModal;

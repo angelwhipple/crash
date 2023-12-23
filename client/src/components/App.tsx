@@ -71,7 +71,7 @@ const App = () => {
 
   useEffect(() => {
     if (joinCode !== "" && userId !== undefined) {
-      post("/api/joincommunity", { code: joinCode, userId: userId });
+      post("/api/community/join", { code: joinCode, userId: userId });
     }
   }, [userId]);
 

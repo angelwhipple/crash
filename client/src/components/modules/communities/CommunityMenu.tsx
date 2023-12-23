@@ -65,7 +65,7 @@ const CommunityMenu = (props: Props) => {
         />
       </button>
       <button
-        title="Annoucements"
+        title="Messaging"
         className={`${
           props.menuAction === MenuAction.ANNOUCEMENTS
             ? `menu-option-sel inv-sel u-pointer`
@@ -90,7 +90,7 @@ const CommunityMenu = (props: Props) => {
         />
       </button>
       <button
-        title="Community details"
+        title="Details"
         className={`${
           props.menuAction === MenuAction.DETAILS
             ? `menu-option-sel reg-sel u-pointer`
@@ -115,7 +115,7 @@ const CommunityMenu = (props: Props) => {
         />
       </button>
       <button
-        title="Manage community"
+        title="Manage"
         className={`${
           props.menuAction === MenuAction.MANAGE
             ? `menu-option-sel inv-sel u-pointer`
