@@ -1,8 +1,6 @@
 import express, { json, Request, response, Response } from "express";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import auth from "./auth";
 import socketManager from "./server-socket";
-import url from "url";
 import User from "./models/User";
 import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
@@ -70,70 +68,7 @@ router.post("/user/create", auth.createUser);
 router.post("/user/linkedin", auth.login);
 router.post("/user/consolidate", auth.consolidateProfiles);
 router.get("/user/exists", auth.existingUser);
-
-router.get("/user/linkedin", async (req, res) => {
-  console.log("[LINKEDIN] Initializing OAuth flow");
-  // LINKEDIN OAUTH STEP 1: AUTHORIZATION CODE
-  const query = url.parse(req.url, true).query;
-  const auth_code = query.code;
-  console.log(`[LINKEDIN] Authorization code: ${auth_code}`);
-
-  console.log("[LINKEDIN] Requesting access token");
-  // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
-  let endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
-  await helpers
-    .callExternalAPI(endpoint_url)
-    .then(async (token_response: TokenResponse) => {
-      const access_token = token_response.access_token; // default: 60 day lifespan
-      console.log(`[LINKEDIN] Access token: ${access_token}`);
-
-      // LINKEDIN OAUTH STEP 3: AUTHENTICATED REQUESTS FOR USER INFORMATION
-      console.log(`[LINKEDIN] Attempting user info requests with token ${access_token}`);
-      endpoint_url = `https://api.linkedin.com/v2/me`;
-      const headers = { Authorization: `Bearer ${access_token}` };
-      const axiosConfig = { headers };
-      axios.get(endpoint_url, axiosConfig).then((response) => {
-        const liteProfile = response.data;
-        const [firstName, lastName, linkedinId] = [
-          liteProfile.localizedFirstName,
-          liteProfile.localizedLastName,
-          liteProfile.id,
-        ];
-        console.log(`[LINKEDIN] Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
-        endpoint_url = `https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))`;
-        axios.get(endpoint_url, axiosConfig).then((response) => {
-          // const email = JSON.stringify(response.data); // convert Response Object back into readable JSON
-          const emailAddress = response.data.elements[0]["handle~"]["emailAddress"];
-          console.log(`[LINKEDIN] Email address: ${emailAddress}`);
-          endpoint_url = `https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
-          axios.get(endpoint_url, axiosConfig).then((response) => {
-            const profilePictureUrl =
-              response.data.profilePicture["displayImage~"]["elements"][0]["identifiers"][0][
-                "identifier"
-              ];
-            console.log(`[LINKEDIN] Profile picture url: ${profilePictureUrl}`);
-            const loginUrl = `http://localhost:5050/api/login`;
-            const loginBody = {
-              name: `${firstName} ${lastName}`,
-              linkedinid: linkedinId,
-              email: emailAddress,
-              pfp: profilePictureUrl,
-            };
-
-            axios.post(loginUrl, loginBody).then((response) => {
-              // const readable = JSON.stringify(response.data);
-              socketManager.getIo().emit("linkedin", response.data);
-            });
-          });
-        });
-      });
-    })
-    .catch((token_error) => {
-      console.log(`[LINKEDIN] Token response error: ${token_error}`);
-      res.send(token_error);
-    });
-  res.redirect("/"); // redirects back to homepage
-});
+router.get("/user/linkedin", auth.linkedin);
 
 router.get("/user/fetch", async (req, res) => {
   console.log(`[MONGODB] Requesting user: ${req.query.id}`);
@@ -172,15 +107,36 @@ router.get("/user/verified", async (req, res) => {
 });
 
 router.post("/user/update", upload.any(), async (req: CustomRequest, res) => {
-  console.log("[S3] Listing buckets");
-  s3.listBuckets({}, (err, data) => {
-    if (err) console.error(err);
-    else console.log(data);
+  if (req.files && req.files[0]) {
+    const key = `profilePhotos/${req.body.userId}_${uuidv4()}`;
+    const file = req.files[0];
+    try {
+      const { url, buffer } = await helpers.uploadImageToS3(file, key);
+      User.findByIdAndUpdate(req.body.userId, { aws_img_key: key }).then((user) => {
+        socketManager.getIo().emit("profile photo", { image: buffer });
+        res.send({ valid: true, url: url });
+      });
+    } catch (error) {
+      console.error(`[S3] Error uploading image: ${error}`);
+      res.status(500).send({ valid: false, url: "" });
+    }
+  } else res.send({});
+});
+
+router.get("/user/loadphoto", async (req, res) => {
+  User.findById(req.query.userId).then(async (user) => {
+    if (user?.aws_img_key) {
+      try {
+        const buffer = await helpers.getImageS3(user.aws_img_key.toString());
+        res.send({ valid: true, buffer: buffer });
+      } catch (error) {
+        console.error(`[S3] Error loading image from S3: ${error}`);
+        res.status(500).send({ valid: false });
+      }
+    } else {
+      res.send({ valid: false });
+    }
   });
-
-  // TODO: update user profile information
-
-  res.send({});
 });
 
 // return a list of community objects associated to a single user
@@ -211,15 +167,15 @@ router.post("/community/description", async (req, res) => {
   );
 });
 router.get("/community/loadphoto", async (req, res) => {
-  Community.findById(req.query.communityId).then((community) => {
+  Community.findById(req.query.communityId).then(async (community) => {
     if (community?.aws_img_key) {
-      const objectParams = { Bucket: S3_BUCKET_NAME, Key: community?.aws_img_key };
-      s3.getObject(objectParams, (err, data) => {
-        if (err) console.log(err, err.stack);
-        else {
-          res.send({ valid: true, buffer: data });
-        }
-      });
+      try {
+        const buffer = await helpers.getImageS3(community.aws_img_key.toString());
+        res.send({ valid: true, buffer: buffer });
+      } catch (error) {
+        console.error(`[S3] Error loading image from S3: ${error}`);
+        res.status(500).send({ valid: false });
+      }
     } else {
       res.send({ valid: false });
     }
@@ -227,35 +183,19 @@ router.get("/community/loadphoto", async (req, res) => {
 });
 
 router.post("/community/updatephoto", upload.any(), async (req: CustomRequest, res) => {
-  console.log("[S3] Listing buckets");
-  s3.listBuckets({}, (err, data) => {
-    if (err) console.error(err);
-    else console.log(data);
-  });
-
   if (req.files) {
     const key = `communityPhotos/${req.body.communityId}_${uuidv4()}`;
     const file = req.files[0];
-    const arrayBuffer = Buffer.from(file.buffer);
-    const objectParams = {
-      Bucket: S3_BUCKET_NAME,
-      Key: key,
-      Body: arrayBuffer,
-      ContentType: "image/jpeg",
-    };
-
-    s3.upload(objectParams, (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "[S3]: Failed to upload community picture" });
-      }
-
-      const s3Url = data.Location;
+    try {
+      const { url, buffer } = await helpers.uploadImageToS3(file, key);
       Community.findByIdAndUpdate(req.body.communityId, { aws_img_key: key }).then((community) => {
-        socketManager.getIo().emit("community photo", { image: arrayBuffer });
-        res.send({ url: s3Url });
+        socketManager.getIo().emit("community photo", { image: buffer });
+        res.send({ valid: true, url: url });
       });
-    });
+    } catch (error) {
+      console.error(`[S3] Error uploading image: ${error}`);
+      res.status(500).send({ valid: false, url: "" });
+    }
   } else res.send({});
 });
 

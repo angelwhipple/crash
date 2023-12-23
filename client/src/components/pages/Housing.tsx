@@ -4,7 +4,6 @@ import { io } from "socket.io-client";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Housing.css";
-import "../modules/LoginPanel.css";
 
 type Props = RouteComponentProps & {};
 
@@ -28,7 +27,7 @@ const Housing = (props) => {
       <p>Find Housing</p>
       <p>Coming soon...</p>
       <button
-        className="login-button u-pointer"
+        className="default-button u-pointer"
         onClick={(event) => {
           route("/");
           socket.emit("toggleAll", {});

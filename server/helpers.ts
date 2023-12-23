@@ -2,11 +2,66 @@ import { Request } from "express";
 import request from "request";
 import Community from "./models/Community";
 import User from "./models/User";
-import { TokenResponse, ProfileResponse, CommunityType, CommunityInfo, LETTERS } from "./types";
+import {
+  TokenResponse,
+  ProfileResponse,
+  CommunityType,
+  CommunityInfo,
+  LETTERS,
+  MulterFile,
+} from "./types";
+
+/**
+ * AWS S3 CONFIG
+ */
+
+const AWS = require("aws-sdk");
+const s3 = new AWS.S3();
+const sts = new AWS.STS();
+const S3_BUCKET_NAME = "crash-images";
+const IAM_ROLE_ARN = "arn:aws:iam::416540946578:user/crash-admin";
 
 /**
  * HELPER FUNCTIONS
  */
+
+const uploadImageToS3 = async (
+  file: MulterFile,
+  key: string
+): Promise<{ url: string; buffer: ArrayBuffer }> => {
+  return new Promise<{ url: string; buffer: ArrayBuffer }>((resolve, reject) => {
+    console.log("[S3] Uploading image file");
+    const arrayBuffer = Buffer.from(file.buffer);
+    const objectParams = {
+      Bucket: S3_BUCKET_NAME,
+      Key: key,
+      Body: arrayBuffer,
+      ContentType: "image/jpeg",
+    };
+    s3.upload(objectParams, (err, data) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      }
+      const s3Url = data.Location;
+      resolve({ url: s3Url, buffer: arrayBuffer });
+    });
+  });
+};
+
+const getImageS3 = async (key: string): Promise<ArrayBuffer> => {
+  console.log("[S3] Loading image file");
+  return new Promise<ArrayBuffer>((resolve, reject) => {
+    const objectParams = { Bucket: S3_BUCKET_NAME, Key: key };
+    s3.getObject(objectParams, (err, data) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      }
+      resolve(data);
+    });
+  });
+};
 
 /**
  * Async helper for making requests to external APIs
@@ -86,4 +141,6 @@ const createCommunity = async (req: Request): Promise<CommunityInfo> => {
 export default {
   createCommunity,
   callExternalAPI,
+  uploadImageToS3,
+  getImageS3,
 };

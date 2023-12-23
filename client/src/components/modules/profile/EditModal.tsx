@@ -6,20 +6,25 @@ import "../Modal.css";
 import "./EditModal.css";
 
 type Props = RouteComponentProps & {
+  userId: string;
   setEditing: any;
 };
 
 const EditModal = (props: Props) => {
-  const [filename, setFilename] = useState("Upload new photo");
+  const [file, setFile] = useState<File | undefined>(undefined);
 
   const updateProfile = async (
-    fileInput: HTMLInputElement,
+    file?: File,
     bioInput?: HTMLInputElement,
     nameInput?: HTMLInputElement
   ) => {
-    const body = {};
-    post("/api/user/update", body).then((res) => {
-      console.log(res);
+    const formData = new FormData();
+    formData.append("userId", props.userId);
+    if (file) formData.append("image", file);
+
+    fetch("/api/user/update", { method: "POST", body: formData }).then(async (res) => {
+      const data = await res.json();
+      if (data.valid) console.log(`S3 Profile image url: ${data.url}`);
     });
   };
 
@@ -34,19 +39,19 @@ const EditModal = (props: Props) => {
               type="file"
               onChange={(event) => {
                 if (event.target.files && event.target.files[0]) {
-                  const file = event.target.files[0];
-                  setFilename(file.name);
+                  const imgFile = event.target.files[0];
+                  setFile(imgFile);
                   event.target.value = "";
                 }
               }}
             ></input>
-            <p>{filename}</p>
+            <p>{file ? file.name : "Upload a new photo"}</p>
           </label>
           <div className="action-container">
             <button
               onClick={async (event) => {
                 const imageInput = document.getElementById("image") as HTMLInputElement;
-                await updateProfile(imageInput);
+                await updateProfile(file);
                 props.setEditing(false);
               }}
               className="default-button u-pointer"

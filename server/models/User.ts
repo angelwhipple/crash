@@ -15,6 +15,7 @@ const UserSchema = new Schema({
   // likes: [String], // array of liked listing IDs
   followers: { type: [String], default: [] },
   following: { type: [String], default: [] },
+  aws_img_key: { type: String, required: false },
 });
 
 export interface User extends Document {
@@ -33,6 +34,7 @@ export interface User extends Document {
   // likes: string[];
   followers?: string[];
   following?: string[];
+  aws_img_key?: String;
 }
 
 const UserModel = model<User>("User", UserSchema);

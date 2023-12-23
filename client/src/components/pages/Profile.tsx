@@ -16,6 +16,7 @@ type Props = RouteComponentProps & {
 
 const Profile = (props: Props) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [pfp, setPfp] = useState<any>(blank);
   const [editing, setEditing] = useState(false);
 
   const navigate = useNavigate();
@@ -23,10 +24,31 @@ const Profile = (props: Props) => {
     navigate(path);
   };
 
+  const updatePhoto = async (imageBuffer: ArrayBuffer) => {
+    const base64Image = btoa(
+      new Uint8Array(imageBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+    );
+    const src = `data:image/jpeg;base64,${base64Image}`;
+    setPfp(src);
+  };
+
+  socket.on("profile photo", (event) => {
+    const buffer = event.image;
+    updatePhoto(buffer);
+  });
+
   useEffect(() => {
     if (props.userId !== undefined) {
       get("/api/user/fetch", { id: props.userId }).then((res) => {
-        if (res.valid) setUser(res.user);
+        if (res.valid) {
+          setUser(res.user);
+          get("/api/user/loadphoto", { userId: res.user._id }).then((res) => {
+            if (res.valid) {
+              const buffer = res.buffer.Body.data;
+              updatePhoto(buffer);
+            }
+          });
+        }
       });
     }
   }, []);
@@ -35,7 +57,7 @@ const Profile = (props: Props) => {
     <>
       {props.userId ? (
         <>
-          {editing ? <EditModal setEditing={setEditing}></EditModal> : <></>}
+          {editing ? <EditModal userId={props.userId} setEditing={setEditing}></EditModal> : <></>}
           <div className="profile-split">
             <div className="card-container">
               <FaGear
@@ -46,7 +68,7 @@ const Profile = (props: Props) => {
               ></FaGear>
               <div className="profile-info-container">
                 <h3>@{user?.username !== undefined ? user.username : "defaultuser420"}</h3>
-                <img src={blank} className="profile-pic"></img>
+                <img src={pfp} className="profile-pic"></img>
                 <h4>{user?.name !== undefined ? user.name : "Crash User"}</h4>
                 <p>{user?.bio !== undefined ? user.bio : `Add a bio`}</p>
                 <div className="follow-cts">

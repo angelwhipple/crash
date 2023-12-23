@@ -37,7 +37,7 @@ const CommunityDetails = (props: Props) => {
 
     fetch("/api/community/updatephoto", { method: "POST", body: formData }).then(async (res) => {
       const data = await res.json();
-      console.log(`S3 Image url: ${data.url}`);
+      if (data.valid) console.log(`S3 Community image url: ${data.url}`);
     });
   };
 

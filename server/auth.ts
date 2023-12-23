@@ -3,9 +3,16 @@ import { NextFunction, Request, Response } from "express";
 import User from "./models/User";
 import UserInterface from "../shared/User";
 import socketManager from "./server-socket";
+import axios from "axios";
+import url from "url";
+import { TokenResponse } from "./types";
+import helpers from "./helpers";
 
 // create a new OAuth client used to verify google sign-in
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
+const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
+const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
+const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // holds next new account ID, revise to avoid resetting to 0 on server restart
@@ -190,6 +197,70 @@ const logout = (req: Request, res: Response) => {
   res.send({});
 };
 
+const linkedin = async (req: Request, res: Response) => {
+  console.log("[LINKEDIN] Initializing OAuth flow");
+  // LINKEDIN OAUTH STEP 1: AUTHORIZATION CODE
+  const query = url.parse(req.url, true).query;
+  const auth_code = query.code;
+  console.log(`[LINKEDIN] Authorization code: ${auth_code}`);
+
+  console.log("[LINKEDIN] Requesting access token");
+  // LINKEDIN OAUTH STEP 2: TOKEN REQUEST
+  let endpoint_url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${auth_code}&client_id=${LINKEDIN_CLIENT_ID}&client_secret=${LINKEDIN_CLIENT_SECRET}&redirect_uri=${LINKEDIN_REDIRECT_URI}`;
+  await helpers
+    .callExternalAPI(endpoint_url)
+    .then(async (token_response: TokenResponse) => {
+      const access_token = token_response.access_token; // default: 60 day lifespan
+      console.log(`[LINKEDIN] Access token: ${access_token}`);
+
+      // LINKEDIN OAUTH STEP 3: AUTHENTICATED REQUESTS FOR USER INFORMATION
+      console.log(`[LINKEDIN] Attempting user info requests with token ${access_token}`);
+      endpoint_url = `https://api.linkedin.com/v2/me`;
+      const headers = { Authorization: `Bearer ${access_token}` };
+      const axiosConfig = { headers };
+      axios.get(endpoint_url, axiosConfig).then((response) => {
+        const liteProfile = response.data;
+        const [firstName, lastName, linkedinId] = [
+          liteProfile.localizedFirstName,
+          liteProfile.localizedLastName,
+          liteProfile.id,
+        ];
+        console.log(`[LINKEDIN] Name: ${firstName} ${lastName}, Linkedin ID: ${linkedinId}`);
+        endpoint_url = `https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))`;
+        axios.get(endpoint_url, axiosConfig).then((response) => {
+          // const email = JSON.stringify(response.data); // convert Response Object back into readable JSON
+          const emailAddress = response.data.elements[0]["handle~"]["emailAddress"];
+          console.log(`[LINKEDIN] Email address: ${emailAddress}`);
+          endpoint_url = `https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
+          axios.get(endpoint_url, axiosConfig).then((response) => {
+            const profilePictureUrl =
+              response.data.profilePicture["displayImage~"]["elements"][0]["identifiers"][0][
+                "identifier"
+              ];
+            console.log(`[LINKEDIN] Profile picture url: ${profilePictureUrl}`);
+            const loginUrl = `http://localhost:5050/api/login`;
+            const loginBody = {
+              name: `${firstName} ${lastName}`,
+              linkedinid: linkedinId,
+              email: emailAddress,
+              pfp: profilePictureUrl,
+            };
+
+            axios.post(loginUrl, loginBody).then((response) => {
+              // const readable = JSON.stringify(response.data);
+              socketManager.getIo().emit("linkedin", response.data);
+            });
+          });
+        });
+      });
+    })
+    .catch((token_error) => {
+      console.log(`[LINKEDIN] Token response error: ${token_error}`);
+      res.send(token_error);
+    });
+  res.redirect("/"); // redirects back to homepage
+};
+
 const populateCurrentUser = (req: Request, _res: Response, next: NextFunction) => {
   req.user = req.session.user;
   next();
@@ -208,6 +279,7 @@ export default {
   populateCurrentUser,
   login,
   logout,
+  linkedin,
   consolidateProfiles,
   createUser,
   existingUser,

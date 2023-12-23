@@ -148,20 +148,24 @@ const Communities = (props: Props) => {
 
   return (
     <>
-      <div className="sidebar-split">
-        <CommunityMenu
-          userId={props.userId}
-          menuAction={menuAction}
-          setMenuAction={setMenuAction}
-          setUserId={props.setUserId}
-        ></CommunityMenu>
-      </div>
+      {props.userId !== undefined ? (
+        <div className="sidebar-split">
+          <CommunityMenu
+            userId={props.userId}
+            menuAction={menuAction}
+            setMenuAction={setMenuAction}
+            setUserId={props.setUserId}
+          ></CommunityMenu>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="mainpage-split">
         {props.userId === undefined ? (
           <div className="centered default-container">
             <h3>Login to see this page</h3>
             <button
-              className="default-button u-pointer"
+              className="login-button u-pointer"
               onClick={(event) => {
                 route("/");
                 // socket.emit("toggleAll", {});
