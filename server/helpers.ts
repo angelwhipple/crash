@@ -15,22 +15,47 @@ import {
  * AWS S3 CONFIG
  */
 
+const IAM_ROLE_ARN = "arn:aws:iam::416540946578:user/crash-admin";
+const IAM_SESSION_NAME = "admin-session";
 const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
 const sts = new AWS.STS();
 const S3_BUCKET_NAME = "crash-images";
-const IAM_ROLE_ARN = "arn:aws:iam::416540946578:user/crash-admin";
 
 /**
  * HELPER FUNCTIONS
  */
 
+const configureAWS = async (iamRoleARN: string, iamRoleSession: string) => {
+  return new Promise<any>((resolve, reject) => {
+    const params = { RoleArn: iamRoleARN, RoleSessionName: iamRoleSession };
+    sts.assumeRole(params, (err, data) => {
+      if (err) {
+        console.error(`[S3] Error assuming IAM role for ${iamRoleARN} - ${iamRoleSession}: ${err}`);
+        reject(err);
+      } else {
+        const credentials = data.credentials;
+        const newAWSConfig = new AWS.Config({
+          accessKeyId: credentials.AccessKeyId,
+          secretAccessKey: credentials.SecretAccessKey,
+          sessionToken: credentials.SessionToken,
+          region: "us-east-2",
+        });
+        resolve(newAWSConfig);
+      }
+    });
+  });
+};
+
 const uploadImageToS3 = async (
   file: MulterFile,
   key: string
 ): Promise<{ url: string; buffer: ArrayBuffer }> => {
+  console.log("[S3] Attempting to upload image file");
+  //   const config = await configureAWS(IAM_ROLE_ARN, IAM_SESSION_NAME);
+  //   const s3 = new AWS.S3(config);
+
   return new Promise<{ url: string; buffer: ArrayBuffer }>((resolve, reject) => {
-    console.log("[S3] Uploading image file");
     const arrayBuffer = Buffer.from(file.buffer);
     const objectParams = {
       Bucket: S3_BUCKET_NAME,
@@ -50,7 +75,10 @@ const uploadImageToS3 = async (
 };
 
 const getImageS3 = async (key: string): Promise<ArrayBuffer> => {
-  console.log("[S3] Loading image file");
+  console.log("[S3] Attempting to load image file");
+  //   const config = configureAWS(IAM_ROLE_ARN, IAM_SESSION_NAME);
+  //   const s3 = new AWS.S3(config);
+
   return new Promise<ArrayBuffer>((resolve, reject) => {
     const objectParams = { Bucket: S3_BUCKET_NAME, Key: key };
     s3.getObject(objectParams, (err, data) => {
@@ -81,7 +109,7 @@ const callExternalAPI = (
 };
 
 /**
- * TODO
+ * TODO: revise
  *
  * Generates a random invitation code for a newly created
  * community, of the format XXXXX-XX

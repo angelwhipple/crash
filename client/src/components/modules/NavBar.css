@@ -16,7 +16,7 @@ body {
 
 .nav-bar-container {
   position: relative;
-  /* overflow: hidden; */
+  overflow: hidden;
   z-index: 1;
   background-color: var(--black);
   display: flex;
@@ -48,11 +48,11 @@ body {
 }
 
 .search-bar-open {
-  animation: fadeIn 1.5s;
+  animation: fadeIn 0.5s;
 }
 
 .search-bar-close {
-  animation: fadeOut 0.75s;
+  animation: fadeOut 0.5s;
   opacity: 0;
 }
 

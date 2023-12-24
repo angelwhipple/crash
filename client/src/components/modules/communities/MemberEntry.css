@@ -27,3 +27,9 @@
 .crown-icon {
   color: black;
 }
+
+.member-img {
+  width: auto;
+  height: 100px;
+  border-radius: 50%;
+}

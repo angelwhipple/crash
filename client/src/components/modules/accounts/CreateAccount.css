@@ -37,3 +37,15 @@
     opacity: 1;
   }
 }
+
+.info-icon {
+  color: white;
+  font-size: 24px;
+  opacity: 0.5;
+  transition-duration: 0.5s;
+}
+
+.info-icon:hover {
+  opacity: 1;
+  transition-duration: 0.5s;
+}

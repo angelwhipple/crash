@@ -5,6 +5,7 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./CreateAccount.css";
 import "../NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
+import { MdInfoOutline } from "react-icons/md";
 
 type Props = RouteComponentProps & {
   setCreate: (bool: boolean) => void;
@@ -165,6 +166,10 @@ const CreateAccount = (props: Props) => {
     }
   };
 
+  useEffect(() => {
+    return () => {};
+  });
+
   // TODO: login OR create account
   // IF login, POST to "/api/login": include originid, email, & password in request body
   // IF create, use existing logic
@@ -260,6 +265,7 @@ const CreateAccount = (props: Props) => {
             Select a username <input id="username" className="create-input" type="text"></input>
           </label>
           <label className="create-label">
+            <MdInfoOutline className="info-icon u-pointer" onClick={(event) => {}}></MdInfoOutline>
             Enter a password{" "}
             <input
               id="password"

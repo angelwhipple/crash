@@ -1,18 +1,18 @@
 import { Schema, model, Document } from "mongoose";
 
 const UserSchema = new Schema({
-  name: String,
-  username: { type: String, required: false },
-  googleid: String,
-  linkedinid: String,
-  originid: String,
-  email: String,
-  password: String,
-  dob: String,
+  name: { type: String, required: true },
+  username: { type: String, required: true },
+  googleid: { type: String, required: false },
+  linkedinid: { type: String, required: false },
+  originid: { type: String, required: false },
+  email: { type: String, required: true },
+  hashed_pw: { type: String, required: false },
+  pw_salt: { type: String, required: false },
+  dob: { type: String, required: false },
   bio: { type: String, required: false },
-  verified: Boolean,
+  verified: String,
   communities: [String], // array of community IDs
-  // likes: [String], // array of liked listing IDs
   followers: { type: [String], default: [] },
   following: { type: [String], default: [] },
   aws_img_key: { type: String, required: false },
@@ -21,17 +21,17 @@ const UserSchema = new Schema({
 export interface User extends Document {
   _id: string;
   name: string;
-  username?: string;
-  googleid: string;
-  linkedinid: string;
-  originid: string;
+  username: string;
+  googleid?: string;
+  linkedinid?: string;
+  originid?: string;
   email: string;
-  password: string;
-  dob: string;
-  bio: string;
-  verified: Boolean;
+  hashed_pw?: string;
+  pw_salt?: string;
+  dob?: string;
+  bio?: string;
+  verified?: Boolean;
   communities: string[];
-  // likes: string[];
   followers?: string[];
   following?: string[];
   aws_img_key?: String;

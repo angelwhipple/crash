@@ -6,21 +6,43 @@
 
 .community-header {
   display: flex;
-  column-gap: 10%;
+  /* column-gap: 10%; */
   align-items: center;
-  padding: 3%;
+  padding: 2%;
   background-color: black;
   -webkit-text-fill-color: white;
   justify-content: center;
+  position: relative;
 }
 
 .community-img {
-  width: 100px;
-  height: auto;
+  width: auto;
+  height: 150px;
   border-radius: var(--s);
   border: medium solid black;
   align-self: center;
   text-align: center;
+}
+
+.community-details {
+  align-self: baseline;
+  padding: 1%;
+}
+
+.gear-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2%;
+  width: var(--l);
+  height: var(--l);
+  fill: white;
+  transition-duration: 0.5s;
+}
+
+.gear-icon:hover {
+  transition-duration: 0.5s;
+  fill: var(--primary-dim);
 }
 
 .toggle-container {

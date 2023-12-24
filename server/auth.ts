@@ -4,19 +4,22 @@ import User from "./models/User";
 import UserInterface from "../shared/User";
 import socketManager from "./server-socket";
 import axios from "axios";
+import dotenv from "dotenv";
 import url from "url";
 import { TokenResponse } from "./types";
 import helpers from "./helpers";
 
+dotenv.config({});
+
 // create a new OAuth client used to verify google sign-in
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
-const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
-const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
+const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID;
+const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
+const SALT_ROUNDS = 10;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-
-// holds next new account ID, revise to avoid resetting to 0 on server restart
-const ID_MAP = { nextID: 0 };
+const { v4: uuidv4 } = require("uuid"); // for generating unique keys
+const bcrypt = require("bcrypt");
 
 const verify = (token: string) => {
   return client
@@ -27,6 +30,11 @@ const verify = (token: string) => {
     .then((ticket) => ticket.getPayload());
 };
 
+/**
+ * TODO
+ * @param req
+ * @param res
+ */
 const existingUser = async (req: Request, res: Response) => {
   User.findOne({ email: req.query.email?.toString(), originid: { $exists: true } }).then((user) => {
     if (user !== null) {
@@ -37,31 +45,41 @@ const existingUser = async (req: Request, res: Response) => {
   });
 };
 
+/**
+ * TODO
+ * @param req
+ * @param res
+ */
 const createUser = async (req: Request, res: Response) => {
-  // ENCRYPT
-
+  const salt = await bcrypt.genSalt(SALT_ROUNDS); // encryption
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const newUser = new User({
     email: req.body.email,
     dob: req.body.dob,
+    name: `Crash User`,
     username: req.body.username,
-    password: req.body.password,
+    hashed_pw: hashedPassword,
+    pw_salt: salt,
+    originid: uuidv4().toString(),
   });
-  const savedUser = await newUser.save();
-  // assign the created account an origin ID
-  User.findByIdAndUpdate(savedUser._id, { originid: ID_MAP.nextID.toString() }).then((user) => {
-    ID_MAP.nextID++; // increment the ID counter
+  await newUser.save().then((user) => {
     res.send(user);
   });
 };
 
-// TODO: DRY out getOrCreate functions
-// refactor to check for existing accounts based on input type
+/**
+ * TODO
+ * @param user
+ * @returns
+ */
 const getOrCreateUser_GOOGLE = async (user: TokenPayload) => {
   return User.findOne({ googleid: user.sub }).then(
     async (existingUser: UserInterface | null | undefined) => {
       if (existingUser !== null && existingUser !== undefined) return existingUser;
+      const uniqueId = uuidv4().toString();
       const newUser = new User({
         name: user.name,
+        username: `user_${uniqueId.slice(0, 8)}`,
         googleid: user.sub,
         email: user.email,
       });
@@ -70,12 +88,19 @@ const getOrCreateUser_GOOGLE = async (user: TokenPayload) => {
   );
 };
 
+/**
+ * TODO
+ * @param req
+ * @returns
+ */
 const getOrCreateUser_LINKEDIN = async (req: Request) => {
   return await User.findOne({ email: req.body.email, linkedinid: { $exists: true } }).then(
     async (existingUser: UserInterface | null | undefined) => {
       if (existingUser !== null && existingUser !== undefined) return existingUser;
+      const uniqueId = uuidv4().toString();
       const newUser = new User({
         name: req.body.name,
+        username: `user_${uniqueId.slice(0, 8)}`,
         linkedinid: req.body.linkedinid,
         email: req.body.email,
       });
@@ -84,15 +109,20 @@ const getOrCreateUser_LINKEDIN = async (req: Request) => {
   );
 };
 
+/**
+ * TODO
+ * @param req
+ * @returns
+ */
 const loginUser_ORIGIN = async (req: Request) => {
   return await User.findOne({
     email: req.body.email?.toString(),
     originid: { $exists: true },
-    password: req.body.password?.toString(),
   }).then(async (user) => {
-    // if login credentials match, returns a valid user & status
-    if (user !== null) return { user: user, status: { valid: true, account: user, message: "" } };
-    else
+    const hashedEnteredPassword = await bcrypt.hash(req.body.password, user!.pw_salt);
+    if (hashedEnteredPassword === user!.hashed_pw) {
+      return { user: user, status: { valid: true, account: user, message: "" } };
+    } else {
       return {
         user: undefined,
         status: {
@@ -101,10 +131,12 @@ const loginUser_ORIGIN = async (req: Request) => {
           message: "Incorrect password, please try again",
         },
       };
+    }
   });
 };
 
 /**
+ * TODO
  * Google-Linkedin account consolidation
  * @param user
  */
@@ -129,13 +161,12 @@ const consolidateProfiles = async (req: Request, res: Response) => {
       }
     });
   }
-
   const consolidatedUser = await User.findById(req.body.id);
   res.send(consolidatedUser);
 };
 
 /**
- *
+ * TODO
  * @param user
  * @returns
  */
@@ -162,8 +193,8 @@ const login = async (req: Request, res: Response) => {
   } else if ("originid" in req.body) {
     const { user, status } = await loginUser_ORIGIN(req);
     if (status.valid && user !== undefined) {
-      console.log(`Logged in user: ${user.username}`);
-      socketManager.getIo().emit("origin", { user: user, consolidate: await countProfiles(user) });
+      console.log(`Logged in user: ${user!.username}`);
+      socketManager.getIo().emit("origin", { user: user, consolidate: await countProfiles(user!) });
       res.send({
         valid: status.valid,
         account: status.account,

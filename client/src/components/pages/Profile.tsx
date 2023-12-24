@@ -67,9 +67,9 @@ const Profile = (props: Props) => {
                 }}
               ></FaGear>
               <div className="profile-info-container">
-                <h3>@{user?.username !== undefined ? user.username : "defaultuser420"}</h3>
+                <h3>@{user?.username}</h3>
                 <img src={pfp} className="profile-pic"></img>
-                <h4>{user?.name !== undefined ? user.name : "Crash User"}</h4>
+                <h4>{user?.name}</h4>
                 <p>{user?.bio !== undefined ? user.bio : `Add a bio`}</p>
                 <div className="follow-cts">
                   <p>0 followers</p>

@@ -8,6 +8,7 @@ import { IoMdCloudUpload } from "react-icons/io";
 import { FaEdit } from "react-icons/fa";
 import Member from "../../modules/communities/MemberEntry";
 import EditModal from "../../modules/communities/EditModal";
+import { FaGear } from "react-icons/fa6";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -21,7 +22,7 @@ const CommunityDetails = (props: Props) => {
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
   const [img, setImg] = useState("");
   const [description, setDescription] = useState("");
-  const [editDes, setEditDes] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const toggle = (selectorFn: any) => {
     for (const selFn of [setShowRules, setShowMembers, setShowMedia]) {
@@ -77,31 +78,65 @@ const CommunityDetails = (props: Props) => {
     populateUsers();
   }, [props.activeCommunity]);
 
-  const populateUsers = async (): Promise<void> => {
+  const populateUsers = async () => {
     const memberProfiles: JSX.Element[] = [];
-    for (const memberId of props.activeCommunity.members) {
-      await get("/api/user/fetch", { id: memberId }).then((res) => {
-        const member = (
-          <Member key={res.user._id} user={res.user} community={props.activeCommunity}></Member>
-        );
-        memberProfiles.push(member);
-      });
-    }
-    setMembers(memberProfiles);
+    return await get("/api/community/fetch", { communityId: props.activeCommunity._id }).then(
+      async (res) => {
+        if (res.valid) {
+          for (const memberId of res.community.members) {
+            await get("/api/user/fetch", { id: memberId }).then(async (res) => {
+              const member = (
+                <Member
+                  key={res.user._id}
+                  user={res.user}
+                  community={props.activeCommunity}
+                ></Member>
+              );
+              memberProfiles.push(member);
+            });
+          }
+          setMembers(memberProfiles);
+        }
+      }
+    );
   };
 
-  // socket.on("joined community", (event) => {
-  //   console.log(event);
-  //   if (event.communityId === props.activeCommunity._id) {
-  //     const newMember = <Member key={event.user._id} user={event.user}></Member>;
-  //     setMembers((prev) => [...prev, newMember]);
-  //   }
-  // });
+  socket.on("joined community", (event) => {
+    console.log(event);
+    if (event.communityId === props.activeCommunity._id) {
+      get("/api/user/fetch", { userId: event.user }).then((res) => {
+        console.log(res);
+        if (res.valid) {
+          const newMember = (
+            <Member
+              key={event.user._id}
+              user={event.user}
+              community={props.activeCommunity}
+            ></Member>
+          );
+          setMembers((prev) => [...prev, newMember]);
+        }
+      });
+    }
+  });
 
   return (
     <div className="page-container">
       <div className="community-header">
-        <div className="u-flexColumn u-alignCenter">
+        <FaGear
+          className="gear-icon u-pointer"
+          onClick={(event) => {
+            setEditing(true);
+          }}
+        ></FaGear>
+        <img className="community-img" src={img}></img>
+        <div className="community-details">
+          <h3>{props.activeCommunity.name}</h3>
+          <p>{members.length} members</p>
+          <p>{description}</p>
+        </div>
+
+        {/* <div className="u-flexColumn u-alignCenter">
           <img className="community-img" src={img}></img>
           {props.userId === props.activeCommunity.owner ? (
             <label className="update-container">
@@ -140,7 +175,7 @@ const CommunityDetails = (props: Props) => {
             <></>
           )}
         </div>
-        <p>{props.activeCommunity.members.length} members</p>
+        <p>{members.length} members</p> */}
       </div>
 
       <div className="toggle-container">
@@ -180,8 +215,8 @@ const CommunityDetails = (props: Props) => {
       ) : (
         <></>
       )}
-      {editDes ? (
-        <EditModal setEditDes={setEditDes} communityId={props.activeCommunity._id}></EditModal>
+      {editing ? (
+        <EditModal setEditing={setEditing} communityId={props.activeCommunity._id}></EditModal>
       ) : (
         <></>
       )}

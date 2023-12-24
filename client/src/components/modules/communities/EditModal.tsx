@@ -5,7 +5,7 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "../Modal.css";
 
 type Props = RouteComponentProps & {
-  setEditDes: any;
+  setEditing: any;
   communityId: string;
 };
 
@@ -30,7 +30,7 @@ const EditModal = (props: Props) => {
               if (event.key === "Enter") {
                 const descriptionInput = document.getElementById("description") as HTMLInputElement;
                 updateDescription(descriptionInput);
-                props.setEditDes(false);
+                props.setEditing(false);
               }
             }}
           ></input>
@@ -40,7 +40,7 @@ const EditModal = (props: Props) => {
               onClick={(event) => {
                 const descriptionInput = document.getElementById("description") as HTMLInputElement;
                 updateDescription(descriptionInput);
-                props.setEditDes(false);
+                props.setEditing(false);
               }}
             >
               submit
@@ -48,7 +48,7 @@ const EditModal = (props: Props) => {
             <button
               className="default-button u-pointer"
               onClick={(event) => {
-                props.setEditDes(false);
+                props.setEditing(false);
               }}
             >
               exit

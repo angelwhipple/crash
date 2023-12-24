@@ -1,36 +1,41 @@
 import express, { json, Request, response, Response } from "express";
 import auth from "./auth";
+import dotenv from "dotenv";
 import socketManager from "./server-socket";
 import User from "./models/User";
 import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 const router = express.Router();
+const AWS = require("aws-sdk");
 import mailjet from "node-mailjet";
 import helpers from "./helpers";
 import { CustomRequest, TokenResponse } from "./types";
 
 /**
- * SECRETS & KEYS
+ * CONFIG
  */
 
-const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
-const LINKEDIN_CLIENT_SECRET = "g23XbgeEPXedo7Ag";
-const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
-const MAILJET_API_KEY = "ad0a209d6cdfaf5bc197bdc13c5b5715";
-const MAILJET_SECRET_KEY = "301cba84814bffab66a60d29e22b7235";
-const S3_BUCKET_NAME = "crash-images";
-
-/**
- * AWS S3
- */
-const AWS = require("aws-sdk");
-const s3 = new AWS.S3();
-const { v4: uuidv4 } = require("uuid"); // for generating unique keys
+dotenv.config({});
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+const { v4: uuidv4 } = require("uuid"); // generates unique keys
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() }); // Store files in memory as Buffers
+const mailjet_api = mailjet.apiConnect(
+  process.env.MAILJET_API_KEY!,
+  process.env.MAILJET_SECRET_KEY!
+);
+
+/**
+ * AUTH
+ */
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
+
 router.get("/whoami", (req, res) => {
   if (!req.user) {
     // Not logged in.
@@ -38,6 +43,7 @@ router.get("/whoami", (req, res) => {
   }
   res.send(req.user);
 });
+
 router.post("/initsocket", (req, res) => {
   // do nothing if user not logged in
   if (req.user) {
@@ -56,9 +62,9 @@ router.post("/initsocket", (req, res) => {
   res.send({});
 });
 
-// |------------------------------|
-// | write your API methods below!|
-// |------------------------------|
+// |--------------------------|
+// | custom API methods below!|
+// |--------------------------|
 
 /**
  * USERS, ACCOUNTS, & VERIFICATION
@@ -83,11 +89,7 @@ router.get("/user/fetch", async (req, res) => {
 });
 
 router.post("/user/verification", async (req, res) => {
-  const request = mailjet
-    .apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY)
-    .post("send", { version: "v3.1" })
-    .request(req.body.messages);
-
+  const request = mailjet_api.post("send", { version: "v3.1" }).request(req.body.messages);
   request
     .then((result) => {
       console.log(`[MAILJET] API response: ${result.body}`);
@@ -166,6 +168,7 @@ router.post("/community/description", async (req, res) => {
     }
   );
 });
+
 router.get("/community/loadphoto", async (req, res) => {
   Community.findById(req.query.communityId).then(async (community) => {
     if (community?.aws_img_key) {
