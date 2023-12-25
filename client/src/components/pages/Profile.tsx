@@ -16,8 +16,10 @@ type Props = RouteComponentProps & {
 
 const Profile = (props: Props) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [username, setUsername] = useState(`default_user420`);
   const [pfp, setPfp] = useState<any>(blank);
   const [editing, setEditing] = useState(false);
+  const [bio, setBio] = useState(`Add a bio`);
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -32,9 +34,13 @@ const Profile = (props: Props) => {
     setPfp(src);
   };
 
-  socket.on("profile photo", (event) => {
-    const buffer = event.image;
-    updatePhoto(buffer);
+  socket.on("updated user", (event) => {
+    if (event.image) {
+      const buffer = event.image;
+      updatePhoto(buffer);
+    }
+    if (event.username) setUsername(event.username);
+    if (event.bio) setBio(event.bio);
   });
 
   useEffect(() => {
@@ -42,6 +48,8 @@ const Profile = (props: Props) => {
       get("/api/user/fetch", { id: props.userId }).then((res) => {
         if (res.valid) {
           setUser(res.user);
+          setUsername(res.user.username);
+          if (res.user.bio) setBio(res.user.bio);
           get("/api/user/loadphoto", { userId: res.user._id }).then((res) => {
             if (res.valid) {
               const buffer = res.buffer.Body.data;
@@ -67,10 +75,10 @@ const Profile = (props: Props) => {
                 }}
               ></FaGear>
               <div className="profile-info-container">
-                <h3>@{user?.username}</h3>
+                <h3>@{username}</h3>
                 <img src={pfp} className="profile-pic"></img>
                 <h4>{user?.name}</h4>
-                <p>{user?.bio !== undefined ? user.bio : `Add a bio`}</p>
+                <p>{bio}</p>
                 <div className="follow-cts">
                   <p>0 followers</p>
                   <p>0 following</p>

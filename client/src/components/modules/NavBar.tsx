@@ -12,6 +12,7 @@ import { IoIosPeople } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
 import { ImExit } from "react-icons/im";
 import Filters from "./FiltersModal";
+import { SearchFilters, FILTERS_TO_IDS } from "./types";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -25,6 +26,7 @@ const NavBar = (props: Props) => {
   const [querying, setQuerying] = useState(false);
   const [filtering, setFiltering] = useState(false);
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState(SearchFilters.ALL);
 
   /**
    * TODO
@@ -47,13 +49,19 @@ const NavBar = (props: Props) => {
 
   const handleQuery = (event) => {
     setQuery(event.target.value);
-    console.log(`Search query: ${query}`);
   };
 
   const handleSearch = (event) => {
     const body = { query: query };
+    console.log(`Search query: ${query}`);
     setQuery("");
     event.target.value = "";
+
+    setFiltering(false);
+    const route = FILTERS_TO_IDS[filter];
+    post(`/api/search/${route}`, body).then((res) => {
+      console.log(res);
+    });
   };
 
   const navigate = useNavigate();
@@ -61,9 +69,22 @@ const NavBar = (props: Props) => {
     navigate(path);
   };
 
+  useEffect(() => {
+    console.log(`Search filter: ${filter}`);
+  }, [filter]);
+
   return (
     <>
-      {filtering ? <Filters setFiltering={setFiltering} setQuerying={setQuerying} /> : <></>}
+      {filtering ? (
+        <Filters
+          filter={filter}
+          setFilter={setFilter}
+          setFiltering={setFiltering}
+          setQuerying={setQuerying}
+        />
+      ) : (
+        <></>
+      )}
       <nav className="nav-bar-container">
         {/* {props.userId !== undefined ? (
           <ImExit

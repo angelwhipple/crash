@@ -4,6 +4,7 @@ import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "../Modal.css";
 import "./EditModal.css";
+import helpers from "../helpers";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -14,17 +15,20 @@ const EditModal = (props: Props) => {
   const [file, setFile] = useState<File | undefined>(undefined);
 
   const updateProfile = async (
-    file?: File,
-    bioInput?: HTMLInputElement,
-    nameInput?: HTMLInputElement
+    nameInput: HTMLInputElement,
+    bioInput: HTMLInputElement,
+    file?: File
   ) => {
     const formData = new FormData();
     formData.append("userId", props.userId);
+    // validate username
+    if (nameInput.value) formData.append("username", nameInput.value);
+    if (bioInput.value) formData.append("bio", bioInput.value);
     if (file) formData.append("image", file);
 
     fetch("/api/user/update", { method: "POST", body: formData }).then(async (res) => {
       const data = await res.json();
-      if (data.valid) console.log(`S3 Profile image url: ${data.url}`);
+      if (data.valid) console.log(data);
     });
   };
 
@@ -47,11 +51,20 @@ const EditModal = (props: Props) => {
             ></input>
             <p>{file ? file.name : "Upload a new photo"}</p>
           </label>
+          <label>
+            New username
+            <input id="username" type="text"></input>
+          </label>
+          <label>
+            New bio
+            <input id="bio" type="text"></input>
+          </label>
           <div className="action-container">
             <button
               onClick={async (event) => {
-                const imageInput = document.getElementById("image") as HTMLInputElement;
-                await updateProfile(file);
+                const usernameInput = document.getElementById("username") as HTMLInputElement;
+                const bioInput = document.getElementById("bio") as HTMLInputElement;
+                await updateProfile(usernameInput, bioInput, file);
                 props.setEditing(false);
               }}
               className="default-button u-pointer"

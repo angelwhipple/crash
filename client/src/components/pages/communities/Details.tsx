@@ -21,7 +21,8 @@ const CommunityDetails = (props: Props) => {
   const [showMedia, setShowMedia] = useState(false);
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
   const [img, setImg] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState(props.activeCommunity.name);
+  const [description, setDescription] = useState(`Add a description`);
   const [editing, setEditing] = useState(false);
 
   const toggle = (selectorFn: any) => {
@@ -31,15 +32,19 @@ const CommunityDetails = (props: Props) => {
     selectorFn(true);
   };
 
-  const uploadPhoto = async (file: File) => {
-    const formData = new FormData();
-    formData.append("photo", file);
-    formData.append("communityId", props.activeCommunity._id);
-
-    fetch("/api/community/updatephoto", { method: "POST", body: formData }).then(async (res) => {
-      const data = await res.json();
-      if (data.valid) console.log(`S3 Community image url: ${data.url}`);
-    });
+  const displayImage = (src: string) => {
+    const imageWindow = window.open("", "_blank", "width=400,height=400");
+    imageWindow!.document.write(`
+      <html>
+      <head>
+          <title>Image Window</title>
+      </head>
+      <body style="margin: 0; display: flex; justify-content: center; align-items: center;">
+          <img src=${src} alt="Image">
+      </body>
+      </html>
+    `);
+    imageWindow!.document.close();
   };
 
   const updatePhoto = async (imageBuffer: ArrayBuffer) => {
@@ -50,20 +55,40 @@ const CommunityDetails = (props: Props) => {
     setImg(src);
   };
 
-  socket.on("community photo", (event) => {
-    const buffer = event.image;
-    updatePhoto(buffer);
+  socket.on("updated community", (event) => {
+    if (event.image) {
+      const buffer = event.image;
+      updatePhoto(buffer);
+      // displayImage(src);
+    }
+    if (event.name) setName(event.name);
+    if (event.description) setDescription(event.description);
   });
 
-  socket.on("community description", (event) => {
-    setDescription(event.description);
+  socket.on("joined community", (event) => {
+    console.log(event);
+    if (event.communityId === props.activeCommunity._id) {
+      get("/api/user/fetch", { userId: event.user }).then((res) => {
+        console.log(res);
+        if (res.valid) {
+          const newMember = (
+            <Member
+              key={event.user._id}
+              user={event.user}
+              community={props.activeCommunity}
+            ></Member>
+          );
+          setMembers((prev) => [...prev, newMember]);
+        }
+      });
+    }
   });
 
   useEffect(() => {
     populateUsers();
     if (props.activeCommunity.description !== undefined) {
       setDescription(props.activeCommunity.description.toString());
-    } else setDescription(`Add a description`);
+    }
     get("/api/community/loadphoto", { communityId: props.activeCommunity._id }).then((res) => {
       if (res.valid) {
         const buffer = res.buffer.Body.data;
@@ -101,25 +126,6 @@ const CommunityDetails = (props: Props) => {
     );
   };
 
-  socket.on("joined community", (event) => {
-    console.log(event);
-    if (event.communityId === props.activeCommunity._id) {
-      get("/api/user/fetch", { userId: event.user }).then((res) => {
-        console.log(res);
-        if (res.valid) {
-          const newMember = (
-            <Member
-              key={event.user._id}
-              user={event.user}
-              community={props.activeCommunity}
-            ></Member>
-          );
-          setMembers((prev) => [...prev, newMember]);
-        }
-      });
-    }
-  });
-
   return (
     <div className="page-container">
       <div className="community-header">
@@ -131,51 +137,10 @@ const CommunityDetails = (props: Props) => {
         ></FaGear>
         <img className="community-img" src={img}></img>
         <div className="community-details">
-          <h3>{props.activeCommunity.name}</h3>
+          <h3>{name}</h3>
           <p>{members.length} members</p>
           <p>{description}</p>
         </div>
-
-        {/* <div className="u-flexColumn u-alignCenter">
-          <img className="community-img" src={img}></img>
-          {props.userId === props.activeCommunity.owner ? (
-            <label className="update-container">
-              <input
-                type="file"
-                name="photo"
-                onChange={async (event) => {
-                  if (event.target.files && event.target.files[0]) {
-                    const file = event.target.files[0];
-                    event.target.value = "";
-                    await uploadPhoto(file);
-                  }
-                }}
-              ></input>
-              <IoMdCloudUpload className="gradient-icon u-pointer"></IoMdCloudUpload>
-              <p className="update-label">Upload photo </p>
-            </label>
-          ) : (
-            <></>
-          )}
-        </div>
-        <div className="u-flexColumn u-alignCenter">
-          <h2>{props.activeCommunity.name}</h2>
-          <p>{description}</p>
-          {props.userId === props.activeCommunity.owner ? (
-            <label className="update-container">
-              <FaEdit
-                className="gradient-icon u-pointer"
-                onClick={(event) => {
-                  setEditDes(true);
-                }}
-              ></FaEdit>
-              Edit description
-            </label>
-          ) : (
-            <></>
-          )}
-        </div>
-        <p>{members.length} members</p> */}
       </div>
 
       <div className="toggle-container">

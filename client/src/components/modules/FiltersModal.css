@@ -1,5 +1,11 @@
 label {
   display: flex;
   align-items: center;
-  column-gap: 5%;
+  font-size: small;
+  column-gap: 2px;
+}
+
+.filter-container {
+  display: flex;
+  column-gap: 10px;
 }

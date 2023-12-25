@@ -142,12 +142,13 @@ form {
   border: none;
   -webkit-text-fill-color: inherit;
   background-color: inherit;
-  font-size: medium;
-  /* transition-duration: 3.7s; */
+  font-size: small;
+  white-space: nowrap;
+  /* transition-duration: 0.5s; */
 }
 
 .default-button:hover {
-  /* transition-duration: 3.7s; */
+  /* transition-duration: 0.5s; */
   -webkit-text-fill-color: var(--primary-dim);
 }
 .action-container {

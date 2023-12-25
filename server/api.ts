@@ -16,11 +16,11 @@ import { CustomRequest, TokenResponse } from "./types";
  */
 
 dotenv.config({});
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: "us-east-2",
-});
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: "us-east-2",
+// });
 const { v4: uuidv4 } = require("uuid"); // generates unique keys
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() }); // Store files in memory as Buffers
@@ -109,20 +109,35 @@ router.get("/user/verified", async (req, res) => {
 });
 
 router.post("/user/update", upload.any(), async (req: CustomRequest, res) => {
+  const [params, event] = [{}, {}];
+
   if (req.files && req.files[0]) {
     const key = `profilePhotos/${req.body.userId}_${uuidv4()}`;
     const file = req.files[0];
     try {
       const { url, buffer } = await helpers.uploadImageToS3(file, key);
-      User.findByIdAndUpdate(req.body.userId, { aws_img_key: key }).then((user) => {
-        socketManager.getIo().emit("profile photo", { image: buffer });
-        res.send({ valid: true, url: url });
-      });
+      params["aws_img_key"] = key;
+      event["image"] = buffer;
     } catch (error) {
       console.error(`[S3] Error uploading image: ${error}`);
-      res.status(500).send({ valid: false, url: "" });
+      res.status(500).send({ valid: false });
     }
-  } else res.send({});
+  }
+  if (req.body.username) {
+    params["username"] = req.body.username;
+    event["username"] = req.body.username;
+  }
+  if (req.body.bio) {
+    params["bio"] = req.body.bio;
+    event["bio"] = req.body.bio;
+  }
+
+  if (Object.keys(params).length > 0) {
+    User.findByIdAndUpdate(req.body.userId, params).then((user) => {
+      socketManager.getIo().emit("updated user", event);
+      res.send({ valid: true, user: user });
+    });
+  }
 });
 
 router.get("/user/loadphoto", async (req, res) => {
@@ -167,6 +182,38 @@ router.post("/community/description", async (req, res) => {
       res.send({ updated: community });
     }
   );
+});
+
+router.post("/community/update", upload.any(), async (req: CustomRequest, res) => {
+  const [params, event] = [{}, {}];
+
+  if (req.files && req.files[0]) {
+    const key = `communityPhotos/${req.body.communityId}_${uuidv4()}`;
+    const file = req.files[0];
+    try {
+      const { url, buffer } = await helpers.uploadImageToS3(file, key);
+      params["aws_img_key"] = key;
+      event["image"] = buffer;
+    } catch (error) {
+      console.error(`[S3] Error uploading image: ${error}`);
+      res.status(500).send({ valid: false, community: undefined });
+    }
+  }
+  if (req.body.name) {
+    params["name"] = req.body.name;
+    event["name"] = req.body.name;
+  }
+  if (req.body.description) {
+    params["description"] = req.body.description;
+    event["description"] = req.body.description;
+  }
+
+  if (Object.keys(params).length > 0) {
+    Community.findByIdAndUpdate(req.body.communityId, params).then((community) => {
+      socketManager.getIo().emit("updated community", event);
+      res.send({ valid: true, community: community });
+    });
+  } else res.send({ valid: true, community: undefined });
 });
 
 router.get("/community/loadphoto", async (req, res) => {
@@ -257,9 +304,21 @@ router.get("/community/join", async (req, res) => {
  * SEARCH
  */
 
-router.post("/search/profiles", async (req, res) => {
-  console.log(`[BACKEND] Profile search query: ${req.body.query}`); // main search, filtered by user profiles
-  res.send({});
+router.post("/search/users", async (req, res) => {
+  const regex = new RegExp(req.body.query, "i");
+  User.find({ name: { $regex: regex } }).then((users) => {
+    console.log(users);
+  });
+  User.find({ username: { $regex: regex } }).then((users) => {
+    console.log(users);
+  });
+});
+
+router.post("/search/communities", async (req, res) => {
+  const regex = new RegExp(req.body.query, "i");
+  Community.find({ name: { $regex: regex } }).then((communities) => {
+    console.log(communities);
+  });
 });
 
 // anything else falls to this "not found" case

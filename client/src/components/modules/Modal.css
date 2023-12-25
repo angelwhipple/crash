@@ -27,5 +27,6 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  row-gap: 10px;
   padding: 20px; /* Adjust padding according to your needs */
 }
