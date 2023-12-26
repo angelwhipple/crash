@@ -154,8 +154,18 @@ const CommunityDetails = (props: Props) => {
           <p className={`${showMedia ? `gradient-text-sel` : `gradient-text`}`}>media</p>
         </button>
       </div>
+
       {showRules ? (
-        <></>
+        <div className="rules-view">
+          <h4>Community Rules</h4>
+          <div className="rules-container">
+            <p>1. Treat other Crash users with kindness.</p>
+            <p>2. No bullying, harassment, or hate speech is allowed.</p>
+            <p>
+              3. Only use your real identity. Catfishing and impersonation will be not be tolerated.
+            </p>
+          </div>
+        </div>
       ) : showMembers ? (
         <>
           {members.length > 0 ? (
@@ -181,7 +191,12 @@ const CommunityDetails = (props: Props) => {
         <></>
       )}
       {editing ? (
-        <EditModal setEditing={setEditing} communityId={props.activeCommunity._id}></EditModal>
+        <EditModal
+          name={name}
+          decription={description}
+          setEditing={setEditing}
+          communityId={props.activeCommunity._id}
+        ></EditModal>
       ) : (
         <></>
       )}

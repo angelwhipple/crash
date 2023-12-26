@@ -29,8 +29,8 @@ const Housing = (props) => {
       <button
         className="default-button u-pointer"
         onClick={(event) => {
+          socket.emit("nav toggle all", {});
           route("/");
-          socket.emit("toggleAll", {});
         }}
       >
         Take me back

@@ -165,10 +165,10 @@ const Communities = (props: Props) => {
           <div className="centered default-container">
             <h3>Login to see this page</h3>
             <button
-              className="login-button u-pointer"
+              className="default-button u-pointer"
               onClick={(event) => {
+                socket.emit("nav toggle all", {});
                 route("/");
-                // socket.emit("toggleAll", {});
               }}
             >
               Take me back

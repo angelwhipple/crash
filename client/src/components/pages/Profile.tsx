@@ -9,6 +9,7 @@ import blank from "../../assets/blank.jpg";
 import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
 import { FaGear } from "react-icons/fa6";
+import RequirementModal from "../modules/profile/Requirements";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -16,10 +17,12 @@ type Props = RouteComponentProps & {
 
 const Profile = (props: Props) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [name, setName] = useState(`Crash User`);
   const [username, setUsername] = useState(`default_user420`);
   const [pfp, setPfp] = useState<any>(blank);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState(`Add a bio`);
+  const [requirements, setRequirements] = useState(false);
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -39,6 +42,7 @@ const Profile = (props: Props) => {
       const buffer = event.image;
       updatePhoto(buffer);
     }
+    if (event.name) setName(event.name);
     if (event.username) setUsername(event.username);
     if (event.bio) setBio(event.bio);
   });
@@ -48,6 +52,7 @@ const Profile = (props: Props) => {
       get("/api/user/fetch", { id: props.userId }).then((res) => {
         if (res.valid) {
           setUser(res.user);
+          setName(res.user.name);
           setUsername(res.user.username);
           if (res.user.bio) setBio(res.user.bio);
           get("/api/user/loadphoto", { userId: res.user._id }).then((res) => {
@@ -65,7 +70,29 @@ const Profile = (props: Props) => {
     <>
       {props.userId ? (
         <>
-          {editing ? <EditModal userId={props.userId} setEditing={setEditing}></EditModal> : <></>}
+          {editing ? (
+            <>
+              <EditModal
+                name={name}
+                bio={bio}
+                username={username}
+                userId={props.userId}
+                setEditing={setEditing}
+                setRequirements={setRequirements}
+              ></EditModal>
+            </>
+          ) : (
+            <>
+              {requirements ? (
+                <RequirementModal
+                  setEditing={setEditing}
+                  setRequirements={setRequirements}
+                ></RequirementModal>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
           <div className="profile-split">
             <div className="card-container">
               <FaGear
@@ -77,7 +104,7 @@ const Profile = (props: Props) => {
               <div className="profile-info-container">
                 <h3>@{username}</h3>
                 <img src={pfp} className="profile-pic"></img>
-                <h4>{user?.name}</h4>
+                <h4>{name}</h4>
                 <p>{bio}</p>
                 <div className="follow-cts">
                   <p>0 followers</p>
@@ -99,8 +126,8 @@ const Profile = (props: Props) => {
           <button
             className="default-button u-pointer"
             onClick={(event) => {
+              socket.emit("nav toggle all", {});
               route("/");
-              socket.emit("toggleAll", {});
             }}
           >
             Take me back

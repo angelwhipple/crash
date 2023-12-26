@@ -1,7 +1,44 @@
-.edit-label {
+.img-label {
   -webkit-text-fill-color: black;
 }
 
-.edit-label:hover {
+.img-label:hover {
   -webkit-text-fill-color: var(--primary-dim);
+}
+
+.edit-input {
+  padding: 1%;
+  text-align: center;
+}
+
+.edit-label {
+  white-space: nowrap;
+}
+
+.info-icon {
+  fill: black;
+  opacity: 0.5;
+}
+
+.info-icon:hover {
+  fill: red;
+  opacity: 1;
+}
+
+.multiline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: small;
+  width: 80%;
+}
+
+.multiline-input {
+  width: 100%;
+  height: 75px;
+  padding: 1%;
+  resize: none; /* Prevent the user from resizing the textarea */
+  overflow-y: auto; /* Show scrollbar if content overflows vertically */
+  word-wrap: break-word;
+  text-align: center;
 }

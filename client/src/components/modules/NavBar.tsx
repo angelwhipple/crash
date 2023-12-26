@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./NavBar.css";
 import "./LoginPanel.css";
 import "../../utilities.css";
-import { socket } from "../../client-socket";
-import { io } from "socket.io-client";
+import { onSocketConnect, socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import { HiHome } from "react-icons/hi";
@@ -27,6 +26,7 @@ const NavBar = (props: Props) => {
   const [filtering, setFiltering] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(SearchFilters.ALL);
+  const [socketConnected, setSocketConnected] = useState(socket.connected);
 
   /**
    * TODO
@@ -35,16 +35,16 @@ const NavBar = (props: Props) => {
    * @param filter
    */
   const toggleTabs = (
-    selectedFunc: (val: boolean) => void,
     all: boolean = false,
-    filter: boolean = false
+    filter: boolean = false,
+    selectedFunc?: (val: boolean) => void
   ) => {
     const funcOptions = [setProfile, setCommunities, setHousing, setQuerying, setFiltering];
     for (const toggleFunc of funcOptions) toggleFunc(false);
     if (filter) {
       setQuerying(true);
       setFiltering(!filtering);
-    } else if (!all) selectedFunc(true);
+    } else if (!all && selectedFunc) selectedFunc(true);
   };
 
   const handleQuery = (event) => {
@@ -70,8 +70,23 @@ const NavBar = (props: Props) => {
   };
 
   useEffect(() => {
-    console.log(`Search filter: ${filter}`);
-  }, [filter]);
+    setSocketConnected(socket.connected);
+    const handleConnect = () => {
+      setSocketConnected(true);
+    };
+    onSocketConnect(handleConnect);
+  }, []);
+
+  useEffect(() => {
+    if (socketConnected) {
+      console.log(`Socket is connected!`);
+      console.log("Socket ID:", socket.id);
+    }
+  }, [socketConnected]);
+
+  socket.on("nav toggle all", (event) => {
+    toggleTabs(true, false);
+  });
 
   return (
     <>
@@ -86,24 +101,27 @@ const NavBar = (props: Props) => {
         <></>
       )}
       <nav className="nav-bar-container">
-        {/* {props.userId !== undefined ? (
+        {props.userId !== undefined ? (
           <ImExit
             title="Logout"
             className={`u-pointer nav-icon`}
             onClick={(event) => {
               props.setUserId(undefined);
-              post("/api/logout").then((res) => route("/"));
+              post("/api/logout").then((res) => {
+                socket.emit("nav toggle all", {});
+                route("/");
+              });
             }}
           ></ImExit>
         ) : (
           <></>
-        )} */}
+        )}
         <BsPersonFill
           title="Profile"
           className={`u-pointer ${profile ? "nav-icon-selected" : "nav-icon"}`}
           onClick={(event) => {
             route("/profile");
-            toggleTabs(setProfile);
+            toggleTabs(false, false, setProfile);
           }}
         ></BsPersonFill>
         <HiHome
@@ -111,25 +129,26 @@ const NavBar = (props: Props) => {
           className={`u-pointer ${housing ? "nav-icon-selected" : "nav-icon"}`}
           onClick={(event) => {
             route("/housing");
-            toggleTabs(setHousing);
+            toggleTabs(false, false, setHousing);
           }}
         ></HiHome>
         <IoIosPeople
           title="Communities"
           className={`u-pointer ${communities ? "nav-icon-selected" : "nav-icon"}`}
           onClick={(event) => {
+            // socket.emit("nav toggle", "toggled communities");
             route("/communities");
-            toggleTabs(setCommunities);
+            toggleTabs(false, false, setCommunities);
           }}
         ></IoIosPeople>
         <BsSearch
           className={`u-pointer ${querying ? "nav-icon-selected" : "nav-icon"}`}
           onClick={(event) => {
             if (querying) {
-              if (!query) toggleTabs(setQuerying, true); // no search query, close & de-highlight all navbar tabs
+              if (!query) toggleTabs(true, false, setQuerying); // no search query, close & de-highlight all navbar tabs
               // else handleSearch()
             } else {
-              toggleTabs(setQuerying);
+              toggleTabs(false, false, setQuerying);
             }
           }}
         ></BsSearch>

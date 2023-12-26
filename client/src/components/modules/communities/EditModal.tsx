@@ -8,6 +8,8 @@ import "../profile/EditModal.css";
 type Props = RouteComponentProps & {
   setEditing: any;
   communityId: string;
+  name: string;
+  decription: string;
 };
 
 const EditModal = (props: Props) => {
@@ -50,16 +52,20 @@ const EditModal = (props: Props) => {
                 }
               }}
             ></input>
-            <p className="edit-label u-pointer">{file ? file.name : "Upload a new photo"}</p>
+            <p className="img-label u-pointer">{file ? file.name : "Upload a new photo"}</p>
           </label>
-          <label>
-            New community name
-            <input id="name" type="text"></input>
+          <label className="edit-label">
+            Name
+            <input id="name" type="text" className="edit-input" placeholder={props.name}></input>
           </label>
-          <label>
-            New description
-            <input id="description" type="text"></input>
-          </label>
+          <div className="multiline-container">
+            <p>Description</p>
+            <textarea
+              id="description"
+              className="multiline-input"
+              defaultValue={props.decription}
+            ></textarea>
+          </div>
 
           <div className="action-container">
             <button

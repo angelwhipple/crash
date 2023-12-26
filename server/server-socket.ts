@@ -40,6 +40,12 @@ export const init = (server: http.Server): void => {
       const user = getUserFromSocketID(socket.id);
       if (user !== undefined) removeUser(user, socket);
     });
+    socket.on("nav toggle all", () => {
+      console.log(`socket has toggled nav bar ${socket.id}`);
+      io.emit("nav toggle all", {});
+    });
+
+    // ADD socket.on EVENTS AS NEEDED
   });
 };
 

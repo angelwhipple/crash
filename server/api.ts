@@ -123,6 +123,10 @@ router.post("/user/update", upload.any(), async (req: CustomRequest, res) => {
       res.status(500).send({ valid: false });
     }
   }
+  if (req.body.name) {
+    params["name"] = req.body.name;
+    event["name"] = req.body.name;
+  }
   if (req.body.username) {
     params["username"] = req.body.username;
     event["username"] = req.body.username;

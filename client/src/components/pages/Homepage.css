@@ -1,8 +1,7 @@
 .background {
-  position: absolute;
+  position: fixed;
   display: block;
   background-color: var(--primary);
-  /* background-image: url("../../assets/background4.jpg"); */
   /* opacity: 0.5; */
   background-repeat: no-repeat;
   background-size: cover;

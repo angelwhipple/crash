@@ -38,14 +38,14 @@
 }
 
 .profile-pic {
-  width: 100%;
+  width: 30%;
   height: auto;
   border-radius: 50%;
 }
 
 .profile-info-container {
   position: absolute;
-  width: 30%;
+  width: 100%;
   height: auto;
   top: 10%;
   text-align: center;
