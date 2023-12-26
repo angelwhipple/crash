@@ -15,16 +15,6 @@
   white-space: nowrap;
 }
 
-.info-icon {
-  fill: black;
-  opacity: 0.5;
-}
-
-.info-icon:hover {
-  fill: red;
-  opacity: 1;
-}
-
 .multiline-container {
   display: flex;
   flex-direction: column;
@@ -41,4 +31,17 @@
   overflow-y: auto; /* Show scrollbar if content overflows vertically */
   word-wrap: break-word;
   text-align: center;
+}
+
+.info-icon-profile {
+  fill: black;
+  font-size: 24px;
+  opacity: 0.5;
+  transition-duration: 0.5s;
+}
+
+.info-icon-profile:hover {
+  opacity: 1;
+  fill: red;
+  transition-duration: 0.5s;
 }

@@ -6,7 +6,6 @@ import "../Modal.css";
 import "./EditModal.css";
 import helpers from "../helpers";
 import { MdInfoOutline } from "react-icons/md";
-import RequirementModal from "./Requirements";
 
 type Props = RouteComponentProps & {
   name: string;
@@ -65,7 +64,7 @@ const EditModal = (props: Props) => {
             </label>
             <label className="edit-label">
               <MdInfoOutline
-                className="info-icon u-pointer"
+                className="info-icon-profile u-pointer"
                 onClick={(event) => {
                   props.setEditing(false);
                   props.setRequirements(true);

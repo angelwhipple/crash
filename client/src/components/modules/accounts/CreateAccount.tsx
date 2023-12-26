@@ -6,8 +6,8 @@ import "./CreateAccount.css";
 import "../NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { MdInfoOutline } from "react-icons/md";
-import RequirementModal from "./Requirements";
 import helpers from "../helpers";
+import InfoModal from "../InfoModal";
 
 type Props = RouteComponentProps & {
   setCreate: (bool: boolean) => void;
@@ -27,7 +27,14 @@ const CreateAccount = (props: Props) => {
   const [password, setPassword] = useState("");
   const [invalid, setInvalid] = useState({ ind: false, message: "" });
   const [showReq, setShowReq] = useState(false);
-  //   const [picture, setPicture] = useState(true);
+
+  const passwordInfo = (
+    <div>
+      <p>1. Your password must be atleast 8 characters long.</p>
+      <p>2. Must include a mix of letters, numbers, and special characters.</p>
+      <p>3. Avoid common passwords and consider using passphrases for added security.</p>
+    </div>
+  );
 
   const handleDob = (event, dobInput) => {
     event.preventDefault();
@@ -134,7 +141,15 @@ const CreateAccount = (props: Props) => {
   // IF create, use existing logic
   return (
     <>
-      {showReq ? <RequirementModal setShowReq={setShowReq}></RequirementModal> : <></>}
+      {showReq ? (
+        <InfoModal
+          header="Password requirements"
+          info={passwordInfo}
+          setRequirements={setShowReq}
+        ></InfoModal>
+      ) : (
+        <></>
+      )}
       <div className="centered default-container create-container">
         {exists === true ? <h3>Sign in</h3> : <h3>Create an account</h3>}
         {email === "" ? (
@@ -227,7 +242,7 @@ const CreateAccount = (props: Props) => {
             </label>
             <label className="create-label">
               <MdInfoOutline
-                className="info-icon u-pointer"
+                className="info-icon-create u-pointer"
                 onClick={(event) => {
                   setShowReq(true);
                 }}

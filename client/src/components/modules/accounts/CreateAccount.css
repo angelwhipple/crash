@@ -38,19 +38,15 @@
   }
 }
 
-.info-icon {
-  color: white;
+.info-icon-create {
+  fill: white;
   font-size: 24px;
   opacity: 0.5;
   transition-duration: 0.5s;
 }
 
-.info-icon:hover {
+.info-icon-create:hover {
   opacity: 1;
+  fill: red;
   transition-duration: 0.5s;
-}
-
-.req-text {
-  text-align: start;
-  font-size: small;
 }

@@ -163,3 +163,8 @@ form {
   word-wrap: break-word;
   font-size: small;
 }
+
+.info-text {
+  text-align: start;
+  font-size: small;
+}

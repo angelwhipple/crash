@@ -136,7 +136,7 @@ const CommunityDetails = (props: Props) => {
         ></FaGear>
         <img className="community-img" src={img}></img>
         <div className="community-details">
-          <h3>{name}</h3>
+          <h2>{name}</h2>
           <p>{members.length} members</p>
           <p className="opaque-text">{description}</p>
         </div>
@@ -185,7 +185,7 @@ const CommunityDetails = (props: Props) => {
           )}
         </>
       ) : showMedia ? (
-        <></>
+        <div className="u-flex u-justifyCenter">No media to show</div>
       ) : (
         <></>
       )}

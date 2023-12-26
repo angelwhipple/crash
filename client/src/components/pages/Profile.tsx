@@ -9,7 +9,7 @@ import blank from "../../assets/blank.jpg";
 import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
 import { FaGear } from "react-icons/fa6";
-import RequirementModal from "../modules/profile/Requirements";
+import InfoModal from "../modules/InfoModal";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -23,6 +23,15 @@ const Profile = (props: Props) => {
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState(`Add a bio`);
   const [requirements, setRequirements] = useState(false);
+
+  const usernameInfo = (
+    <div>
+      <p>1. New username must be atleast 3 characters long.</p>
+      <p>2. Can include a mix of letters, numbers, and underscores.</p>
+      <p>3. Usernames may only be changed twice every 30 days.</p>
+      <p>4. Your old username will be reserved for up to 5 days after the change.</p>
+    </div>
+  );
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -84,10 +93,12 @@ const Profile = (props: Props) => {
           ) : (
             <>
               {requirements ? (
-                <RequirementModal
-                  setEditing={setEditing}
+                <InfoModal
+                  header="Username requirements"
+                  info={usernameInfo}
                   setRequirements={setRequirements}
-                ></RequirementModal>
+                  setEditing={setEditing}
+                ></InfoModal>
               ) : (
                 <></>
               )}
@@ -112,7 +123,6 @@ const Profile = (props: Props) => {
                 </div>
               </div>
               <div className="connected-view">
-                <p>CONNECTED ACCOUNTS</p>
                 <div className="account-pill">TEST</div>
               </div>
             </div>
