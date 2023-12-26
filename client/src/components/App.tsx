@@ -7,7 +7,6 @@ import { get, post } from "../utilities";
 import NotFound from "./pages/NotFound";
 import { socket } from "../client-socket";
 import User from "../../../shared/User";
-import Community from "../../../shared/Community";
 import "../utilities.css";
 import "./pages/Homepage.css";
 import Homepage from "./pages/Homepage";
@@ -33,6 +32,7 @@ const App = () => {
   const [extraProfiles, setExtraProfiles]: any[] = useState([]);
   const [chosenProfiles, setChosenProfiles]: any[] = useState([]);
   const [joinCode, setJoinCode] = useState("");
+  const [invited, setInvited] = useState(false);
 
   const generatePills = (profiles: Array<JSON>) => {
     const pills = profiles.map((profile, index) => (
@@ -46,34 +46,41 @@ const App = () => {
     return pills;
   };
 
-  socket.on("linkedin", async (event) => {
-    console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
-    setUserId(event.user._id);
-    post("/api/initsocket", { socketid: socket.id });
+  const loginJoinCommunity = () => {
+    if (invited) {
+      const body = {
+        code: joinCode,
+        userId: userId,
+      };
+      console.log(`Join community body: ${JSON.stringify(body)}`);
+      post("/api/community/join", body).then((res) => {});
+    }
+  };
 
+  const handleConsolidate = (event) => {
     if (event.consolidate.eligible) {
       setExtraProfiles(generatePills(event.consolidate.profiles));
       setConsolidate(true);
     }
+  };
+
+  useEffect(() => {
+    loginJoinCommunity();
+  }, [userId]);
+
+  socket.on("linkedin", async (event) => {
+    console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
+    setUserId(event.user._id);
+    post("/api/initsocket", { socketid: socket.id });
+    handleConsolidate(event);
   });
 
   socket.on("origin", async (event) => {
     console.log(`Origin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
     post("/api/initsocket", { socketid: socket.id });
-    if (event.consolidate.eligible) {
-      setExtraProfiles(generatePills(event.consolidate.profiles));
-      setConsolidate(true);
-    }
+    handleConsolidate(event);
   });
-
-  socket.on("join link", (event) => setJoinCode(event.communityCode));
-
-  useEffect(() => {
-    if (joinCode !== "" && userId !== undefined) {
-      post("/api/community/join", { code: joinCode, userId: userId });
-    }
-  }, [userId]);
 
   useEffect(() => {
     get("/api/whoami")
@@ -100,15 +107,11 @@ const App = () => {
     console.log(`Email address: ${decodedCredential.email}`);
     post("/api/login", {
       token: userToken,
-    }).then((response) => {
+    }).then(async (response) => {
+      console.log(`Google login response: ${JSON.stringify(response)}`);
       setUserId(response.user._id);
       post("/api/initsocket", { socketid: socket.id });
-
-      console.log(`Google login response: ${JSON.stringify(response)}`);
-      if (response.consolidate.eligible) {
-        setExtraProfiles(generatePills(response.consolidate.profiles));
-        setConsolidate(true);
-      }
+      handleConsolidate(response);
     });
   };
 
@@ -135,6 +138,8 @@ const App = () => {
           userId={userId}
           setUserId={setUserId}
           setConsolidate={setConsolidate}
+          setInvited={setInvited}
+          setJoinCode={setJoinCode}
         />
         <Profile path="/profile" userId={userId!}></Profile>
         <Communities path="/communities" userId={userId!} setUserId={setUserId}></Communities>

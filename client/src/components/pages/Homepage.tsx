@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   GoogleOAuthProvider,
   GoogleLogin,
@@ -21,9 +21,24 @@ type Props = RouteComponentProps & {
   setConsolidate: (consolidate: boolean) => void;
   setChosenProfiles: (profiles: string[]) => void;
   setUserId: (newUserId: string) => void;
+  setInvited: any;
+  setJoinCode: any;
 };
 const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
+
+  useEffect(() => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    const invited = urlParams.get("joined_community");
+    const communityCode = urlParams.get("community_code");
+    console.log(`From invitation link: ${invited}`);
+    if (invited) {
+      props.setInvited(true);
+      props.setJoinCode(communityCode);
+    }
+  }, []);
 
   return (
     <div className="u-flexColumn u-alignCenter">

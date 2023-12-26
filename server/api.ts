@@ -300,8 +300,7 @@ router.post("/community/join", async (req, res) => {
 });
 
 router.get("/community/join", async (req, res) => {
-  socketManager.getIo().emit("join link", { communityCode: req.body.code }); // emit that someone used an invite link (while logged out)
-  res.redirect("/");
+  res.redirect(`/?joined_community=true&community_code=${req.query.code}`);
 });
 
 /**

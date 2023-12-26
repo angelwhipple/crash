@@ -14,7 +14,7 @@ type Props = RouteComponentProps & {
 
 const Invite = (props: Props) => {
   const newest: Community = props.newCommunity;
-  const joinLink = `http://localhost:5050/api/joincommunity?code=${newest.code}`;
+  const joinLink = `http://localhost:5050/api/community/join?code=${newest.code}`;
   const subject = `Join ${newest.name} on Crash!`;
   const message = `I just launched a new community called ${newest.name} on Crash! Create an account and join with community code ${newest.code}, or follow this link: ${joinLink}`;
 
