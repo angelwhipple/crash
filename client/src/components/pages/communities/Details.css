@@ -13,21 +13,24 @@
   padding: 2%;
   background-color: black;
   -webkit-text-fill-color: white;
-  justify-content: center;
   position: relative;
 }
 
 .community-img {
+  position: relative;
+  left: 30%;
   width: auto;
   height: 150px;
   border-radius: var(--s);
-  border: medium solid black;
   align-self: center;
-  text-align: center;
 }
 
 .community-details {
+  flex: 1;
+  position: relative;
+  left: 30%;
   padding: 1%;
+  word-wrap: break-word;
 }
 
 .gear-icon {

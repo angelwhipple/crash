@@ -17,7 +17,6 @@ import Housing from "./pages/Housing";
 import ProfilePill from "./modules/accounts/ProfilePill";
 import Verified from "./pages/throwaway/Verified";
 import Joined from "./pages/throwaway/Joined";
-import { GoPaperAirplane } from "react-icons/go";
 
 const PLATFORMS = {
   linkedin: "linkedinid",
@@ -34,40 +33,6 @@ const App = () => {
   const [joinCode, setJoinCode] = useState("");
   const [invited, setInvited] = useState(false);
 
-  const generatePills = (profiles: Array<JSON>) => {
-    const pills = profiles.map((profile, index) => (
-      <ProfilePill
-        profile={profile}
-        key={index}
-        chosenProfiles={chosenProfiles}
-        setChosenProfiles={setChosenProfiles}
-      ></ProfilePill>
-    ));
-    return pills;
-  };
-
-  const loginJoinCommunity = () => {
-    if (invited) {
-      const body = {
-        code: joinCode,
-        userId: userId,
-      };
-      console.log(`Join community body: ${JSON.stringify(body)}`);
-      post("/api/community/join", body).then((res) => {});
-    }
-  };
-
-  const handleConsolidate = (event) => {
-    if (event.consolidate.eligible) {
-      setExtraProfiles(generatePills(event.consolidate.profiles));
-      setConsolidate(true);
-    }
-  };
-
-  useEffect(() => {
-    loginJoinCommunity();
-  }, [userId]);
-
   socket.on("linkedin", async (event) => {
     console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
     setUserId(event.user._id);
@@ -81,21 +46,6 @@ const App = () => {
     post("/api/initsocket", { socketid: socket.id });
     handleConsolidate(event);
   });
-
-  useEffect(() => {
-    get("/api/whoami")
-      .then((user: User) => {
-        if (user._id) {
-          // They are registed in the database and currently logged in.
-          setUserId(user._id);
-        }
-      })
-      .then(() =>
-        socket.on("connect", () => {
-          post("/api/initsocket", { socketid: socket.id });
-        })
-      );
-  }, []);
 
   const handleLogin = (credentialResponse: CredentialResponse) => {
     const userToken = credentialResponse.credential;
@@ -119,6 +69,56 @@ const App = () => {
     setUserId(undefined);
     post("/api/logout");
   };
+
+  const loginJoinCommunity = () => {
+    if (invited) {
+      const body = {
+        code: joinCode,
+        userId: userId,
+      };
+      console.log(`Join community body: ${JSON.stringify(body)}`);
+      post("/api/community/join", body).then((res) => {});
+    }
+  };
+
+  const generatePills = (profiles: Array<JSON>) => {
+    const pills = profiles.map((profile, index) => (
+      <ProfilePill
+        profile={profile}
+        key={index}
+        chosenProfiles={chosenProfiles}
+        setChosenProfiles={setChosenProfiles}
+      ></ProfilePill>
+    ));
+    return pills;
+  };
+
+  const handleConsolidate = (event) => {
+    if (event.consolidate.eligible) {
+      setExtraProfiles(generatePills(event.consolidate.profiles));
+      setConsolidate(true);
+    }
+  };
+
+  useEffect(() => {
+    loginJoinCommunity();
+  }, [userId]);
+
+  useEffect(() => {
+    get("/api/whoami")
+      .then((user: User) => {
+        if (user._id) {
+          // They are registed in the database and currently logged in.
+          setUserId(user._id);
+        }
+      })
+      .then(() =>
+        socket.on("connect", () => {
+          post("/api/initsocket", { socketid: socket.id });
+        })
+      );
+  }, []);
+
   // NOTE:
   // All the pages need to have the props extended via RouteComponentProps for @reach/router to work properly. Please use the Homepage as an example.
   return (

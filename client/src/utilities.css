@@ -158,4 +158,8 @@ form {
 
 .opaque-text {
   opacity: 0.5;
+  max-width: 60%;
+  overflow: hidden;
+  word-wrap: break-word;
+  font-size: small;
 }

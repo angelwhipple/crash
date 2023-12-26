@@ -9,6 +9,7 @@ import { FaEdit } from "react-icons/fa";
 import Member from "../../modules/communities/MemberEntry";
 import EditModal from "../../modules/communities/EditModal";
 import { FaGear } from "react-icons/fa6";
+import defaultImg from "../../../assets/default-placeholder.png";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -20,7 +21,7 @@ const CommunityDetails = (props: Props) => {
   const [showMembers, setShowMembers] = useState(true);
   const [showMedia, setShowMedia] = useState(false);
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
-  const [img, setImg] = useState("");
+  const [img, setImg] = useState(defaultImg);
   const [name, setName] = useState(props.activeCommunity.name);
   const [description, setDescription] = useState(`Describe this community`);
   const [editing, setEditing] = useState(false);
@@ -93,8 +94,6 @@ const CommunityDetails = (props: Props) => {
       if (res.valid) {
         const buffer = res.buffer.Body.data;
         updatePhoto(buffer);
-      } else {
-        // default community photo
       }
     });
   }, []);
