@@ -105,7 +105,7 @@ const Profile = (props: Props) => {
                 <h3>@{username}</h3>
                 <img src={pfp} className="profile-pic"></img>
                 <h4>{name}</h4>
-                <p>{bio}</p>
+                <p className="opaque-text">{bio}</p>
                 <div className="follow-cts">
                   <p>0 followers</p>
                   <p>0 following</p>

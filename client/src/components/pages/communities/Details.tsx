@@ -22,7 +22,7 @@ const CommunityDetails = (props: Props) => {
   const [members, setMembers] = useState<Array<JSX.Element>>([]);
   const [img, setImg] = useState("");
   const [name, setName] = useState(props.activeCommunity.name);
-  const [description, setDescription] = useState(`Add a description`);
+  const [description, setDescription] = useState(`Describe this community`);
   const [editing, setEditing] = useState(false);
 
   const toggle = (selectorFn: any) => {
@@ -139,7 +139,7 @@ const CommunityDetails = (props: Props) => {
         <div className="community-details">
           <h3>{name}</h3>
           <p>{members.length} members</p>
-          <p>{description}</p>
+          <p className="opaque-text">{description}</p>
         </div>
       </div>
 

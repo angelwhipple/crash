@@ -1,12 +1,14 @@
 .page-container {
   background-color: white;
-  height: inherit;
+  /* height: inherit; */
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .community-header {
   display: flex;
-  /* column-gap: 10%; */
   align-items: center;
   padding: 2%;
   background-color: black;
@@ -102,23 +104,11 @@ input[type="file"] {
 }
 
 .member-view {
+  flex: 1;
   display: flex;
   flex-direction: column;
   row-gap: var(--s);
-  overflow-y: scroll;
-}
-
-.member-view::-webkit-scrollbar {
-  display: none;
-}
-
-.members-header {
-  width: inherit;
-  display: flex;
-  column-gap: 15%;
-  justify-content: center;
-  background-color: black;
-  -webkit-text-fill-color: white;
+  overflow-y: auto;
 }
 
 /* loading animation */

@@ -155,3 +155,7 @@ form {
   display: flex;
   column-gap: 10%;
 }
+
+.opaque-text {
+  opacity: 0.5;
+}
