@@ -52,6 +52,10 @@ form {
   flex-grow: 1;
 }
 
+input:focus {
+  outline: none;
+}
+
 .u-flex {
   display: flex;
 }

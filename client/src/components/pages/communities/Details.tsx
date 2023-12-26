@@ -128,12 +128,16 @@ const CommunityDetails = (props: Props) => {
   return (
     <div className="page-container">
       <div className="community-header">
-        <FaGear
-          className="gear-icon u-pointer"
-          onClick={(event) => {
-            setEditing(true);
-          }}
-        ></FaGear>
+        {props.userId === props.activeCommunity.owner ? (
+          <FaGear
+            className="gear-icon u-pointer"
+            onClick={(event) => {
+              setEditing(true);
+            }}
+          ></FaGear>
+        ) : (
+          <></>
+        )}
         <img className="community-img" src={img}></img>
         <div className="community-details">
           <h2>{name}</h2>

@@ -165,6 +165,8 @@ const NavBar = (props: Props) => {
           <input
             id="navSearch"
             type="search"
+            placeholder="search"
+            className="search-bar"
             onKeyDown={(event) => {
               if (event.key == "Enter") {
                 handleSearch(event);

@@ -47,6 +47,12 @@ body {
   color: var(--primary-dim);
 }
 
+.search-bar {
+  padding: 1%;
+  flex: 1;
+  border-radius: var(--s);
+}
+
 .search-bar-open {
   animation: fadeIn 0.5s;
 }
@@ -102,4 +108,5 @@ body {
   flex-direction: row;
   align-content: center;
   column-gap: 5px;
+  width: 40%;
 }

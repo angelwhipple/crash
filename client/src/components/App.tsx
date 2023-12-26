@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement } from "react";
-import { Router, useNavigate } from "@reach/router";
+import { navigate, Router } from "@reach/router";
 import jwt_decode from "jwt-decode";
 import { CredentialResponse } from "@react-oauth/google";
 
@@ -47,6 +47,8 @@ const App = () => {
     handleConsolidate(event);
   });
 
+  const redirect = (path) => navigate(path);
+
   const handleLogin = (credentialResponse: CredentialResponse) => {
     const userToken = credentialResponse.credential;
     const decodedCredential = jwt_decode(userToken as string) as {
@@ -77,7 +79,9 @@ const App = () => {
         userId: userId,
       };
       console.log(`Join community body: ${JSON.stringify(body)}`);
-      post("/api/community/join", body).then((res) => {});
+      post("/api/community/join", body).then((res) => {
+        redirect("/communities");
+      });
     }
   };
 

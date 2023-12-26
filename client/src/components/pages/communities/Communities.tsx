@@ -59,9 +59,7 @@ const Communities = (props: Props) => {
     setVerified(true);
   });
 
-  socket.on("new community", (event) => {
-    // console.log(event);
-  });
+  socket.on("new community", (event) => {});
 
   socket.on("joined community", async (event) => {
     if (event.communityId === activeCommunity?._id) {
