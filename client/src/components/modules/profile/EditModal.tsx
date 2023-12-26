@@ -6,6 +6,7 @@ import "../Modal.css";
 import "./EditModal.css";
 import helpers from "../helpers";
 import { MdInfoOutline } from "react-icons/md";
+import { USERNAME_INFO } from "../types";
 
 type Props = RouteComponentProps & {
   name: string;
@@ -67,7 +68,11 @@ const EditModal = (props: Props) => {
                 className="info-icon-profile u-pointer"
                 onClick={(event) => {
                   props.setEditing(false);
-                  props.setRequirements(true);
+                  props.setRequirements({
+                    show: true,
+                    header: "Username requirements",
+                    info: USERNAME_INFO,
+                  });
                 }}
               ></MdInfoOutline>
               Username

@@ -10,6 +10,7 @@ import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
 import { FaGear } from "react-icons/fa6";
 import InfoModal from "../modules/InfoModal";
+import { Requirements } from "../modules/types";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -22,16 +23,7 @@ const Profile = (props: Props) => {
   const [pfp, setPfp] = useState<any>(blank);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState(`Add a bio`);
-  const [requirements, setRequirements] = useState(false);
-
-  const usernameInfo = (
-    <div>
-      <p>1. New username must be atleast 3 characters long.</p>
-      <p>2. Can include a mix of letters, numbers, and underscores.</p>
-      <p>3. Usernames may only be changed twice every 30 days.</p>
-      <p>4. Your old username will be reserved for up to 5 days after the change.</p>
-    </div>
-  );
+  const [requirements, setRequirements] = useState<Requirements>({ show: false });
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -92,10 +84,10 @@ const Profile = (props: Props) => {
             </>
           ) : (
             <>
-              {requirements ? (
+              {requirements.show ? (
                 <InfoModal
-                  header="Username requirements"
-                  info={usernameInfo}
+                  header={requirements.header!}
+                  info={requirements.info}
                   setRequirements={setRequirements}
                   setEditing={setEditing}
                 ></InfoModal>

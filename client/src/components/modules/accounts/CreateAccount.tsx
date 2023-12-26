@@ -8,15 +8,16 @@ import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { MdInfoOutline } from "react-icons/md";
 import helpers from "../helpers";
 import InfoModal from "../InfoModal";
-
-type Props = RouteComponentProps & {
-  setCreate: (bool: boolean) => void;
-  setUserId: (newUserId: string) => void;
-};
+import { USERNAME_INFO, PASSWORD_INFO, Requirements } from "../types";
 
 type Invalid = {
   ind: boolean;
   message: string;
+};
+
+type Props = RouteComponentProps & {
+  setCreate: (bool: boolean) => void;
+  setUserId: (newUserId: string) => void;
 };
 
 const CreateAccount = (props: Props) => {
@@ -26,15 +27,7 @@ const CreateAccount = (props: Props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [invalid, setInvalid] = useState({ ind: false, message: "" });
-  const [showReq, setShowReq] = useState(false);
-
-  const passwordInfo = (
-    <div>
-      <p>1. Your password must be atleast 8 characters long.</p>
-      <p>2. Must include a mix of letters, numbers, and special characters.</p>
-      <p>3. Avoid common passwords and consider using passphrases for added security.</p>
-    </div>
-  );
+  const [requirements, setRequirements] = useState<Requirements>({ show: false });
 
   const handleDob = (event, dobInput) => {
     event.preventDefault();
@@ -136,16 +129,13 @@ const CreateAccount = (props: Props) => {
     return () => {};
   });
 
-  // TODO: login OR create account
-  // IF login, POST to "/api/login": include originid, email, & password in request body
-  // IF create, use existing logic
   return (
     <>
-      {showReq ? (
+      {requirements.show ? (
         <InfoModal
-          header="Password requirements"
-          info={passwordInfo}
-          setRequirements={setShowReq}
+          header={requirements.header!}
+          info={requirements.info}
+          setRequirements={setRequirements}
         ></InfoModal>
       ) : (
         <></>
@@ -238,16 +228,30 @@ const CreateAccount = (props: Props) => {
         ) : username === "" || password === "" ? (
           <>
             <label className="create-label" title="username">
+              <MdInfoOutline
+                className="info-icon-create u-pointer"
+                onClick={(event) => {
+                  setRequirements({
+                    show: true,
+                    header: "Username requirements",
+                    info: USERNAME_INFO,
+                  });
+                }}
+              ></MdInfoOutline>
               Select a username <input id="username" className="create-input" type="text"></input>
             </label>
             <label className="create-label">
               <MdInfoOutline
                 className="info-icon-create u-pointer"
                 onClick={(event) => {
-                  setShowReq(true);
+                  setRequirements({
+                    show: true,
+                    header: "Password requirements",
+                    info: PASSWORD_INFO,
+                  });
                 }}
               ></MdInfoOutline>
-              Enter a password{" "}
+              Enter a password
               <input
                 id="password"
                 className="create-input"
@@ -280,11 +284,7 @@ const CreateAccount = (props: Props) => {
             ></TbPlayerTrackNextFilled>
           </>
         ) : (
-          <>
-            {/* <label className="create-label">
-          Upload a profile picture <input className="create-input" type="file"></input>
-        </label> */}
-          </>
+          <></>
         )}
         {invalid.ind ? (
           <p className="invalid-msg">{invalid.message}</p>

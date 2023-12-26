@@ -109,6 +109,14 @@ form {
   float: left;
 }
 
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
 .centered {
   position: fixed;
   top: 50%;
@@ -117,12 +125,11 @@ form {
   text-align: center;
 }
 
-.left {
-  left: 0;
-}
-
-.right {
-  right: 0;
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .default-container {
@@ -151,6 +158,7 @@ form {
   /* transition-duration: 0.5s; */
   -webkit-text-fill-color: var(--primary-dim);
 }
+
 .action-container {
   display: flex;
   column-gap: 10%;

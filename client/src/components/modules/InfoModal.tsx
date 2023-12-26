@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
+import { Requirements } from "./types";
 
 type Props = RouteComponentProps & {
   header: string;
@@ -20,7 +21,7 @@ const InfoModal = (props: Props) => {
           <button
             className="default-button u-pointer"
             onClick={(event) => {
-              props.setRequirements(false);
+              props.setRequirements({ show: false });
               if (props.setEditing) props.setEditing(true);
             }}
           >

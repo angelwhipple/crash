@@ -185,7 +185,7 @@ const CommunityDetails = (props: Props) => {
           )}
         </>
       ) : showMedia ? (
-        <div className="u-flex u-justifyCenter">No media to show</div>
+        <div className="centered-container">No media to display</div>
       ) : (
         <></>
       )}
