@@ -1,4 +1,5 @@
 import { THIS_YEAR, VALID_DOMAINS } from "./types";
+import { type Crop } from "react-image-crop";
 
 /**
  * HELPERS
@@ -46,9 +47,68 @@ const validateEmail = (emailAddress: string): Boolean => {
   return valid.length !== 0;
 };
 
+/**
+ * IMAGE CROP
+ */
+
+const drawCropCanvas = (image: HTMLImageElement, canvas: HTMLCanvasElement, crop: Crop) => {
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    const pixelRatio = window.devicePixelRatio;
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+
+    canvas.width = Math.floor(crop.width * scaleX * pixelRatio);
+    canvas.height = Math.floor(crop.height * scaleY * pixelRatio);
+
+    ctx.scale(pixelRatio, pixelRatio);
+    ctx!.imageSmoothingQuality = "high";
+    ctx.save();
+
+    const cropX = crop.x * scaleX;
+    const cropY = crop.y * scaleY;
+
+    // Move crop origin to canvas origin (0, 0)
+    ctx.translate(-cropX, -cropY);
+    ctx.drawImage(
+      image,
+      0,
+      0,
+      image.naturalWidth,
+      image.naturalHeight,
+      0,
+      0,
+      image.naturalWidth,
+      image.naturalHeight
+    );
+
+    ctx.restore();
+  } else console.log("No 2d context");
+};
+
+const fileFromURL = async (url: string, filename: string) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const file = new File([blob], filename, { type: blob.type });
+  return file;
+};
+
+const URLFromFile = (file: File): string => {
+  const reader = new FileReader();
+  let url = "";
+  reader.onload = (event) => {
+    url = event.target?.result as string;
+  };
+  reader.readAsDataURL(file);
+  return url;
+};
+
 export default {
   validateUsername,
   validatePassword,
   validateAge,
   validateEmail,
+  drawCropCanvas,
+  fileFromURL,
+  URLFromFile,
 };

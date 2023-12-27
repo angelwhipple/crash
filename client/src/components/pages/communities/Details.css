@@ -10,7 +10,7 @@
 .community-header {
   display: flex;
   align-items: center;
-  padding: 2%;
+  padding: 1%;
   background-color: black;
   -webkit-text-fill-color: white;
   position: relative;
@@ -19,8 +19,8 @@
 .community-img {
   position: relative;
   left: 30%;
-  width: auto;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: var(--s);
   align-self: center;
 }

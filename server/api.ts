@@ -236,23 +236,6 @@ router.get("/community/loadphoto", async (req, res) => {
   });
 });
 
-router.post("/community/updatephoto", upload.any(), async (req: CustomRequest, res) => {
-  if (req.files) {
-    const key = `communityPhotos/${req.body.communityId}_${uuidv4()}`;
-    const file = req.files[0];
-    try {
-      const { url, buffer } = await helpers.uploadImageToS3(file, key);
-      Community.findByIdAndUpdate(req.body.communityId, { aws_img_key: key }).then((community) => {
-        socketManager.getIo().emit("community photo", { image: buffer });
-        res.send({ valid: true, url: url });
-      });
-    } catch (error) {
-      console.error(`[S3] Error uploading image: ${error}`);
-      res.status(500).send({ valid: false, url: "" });
-    }
-  } else res.send({});
-});
-
 router.get("/community/fetch", async (req, res) => {
   Community.findById(req.query.communityId).then((community) => {
     if (community !== undefined) res.send({ valid: true, community: community });

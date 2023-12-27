@@ -17,6 +17,12 @@ export type Requirements = {
   info?: any;
 };
 
+export type Crop = {
+  show: boolean;
+  input?: File;
+  previewSrc?: string;
+};
+
 export const THIS_YEAR = new Date().getFullYear();
 export const VALID_DOMAINS = [".edu", ".com", ".gov"];
 export const FILTERS_TO_IDS = {

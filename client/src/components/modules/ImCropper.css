@@ -1,0 +1,11 @@
+.cropper-photo {
+  max-height: 70vh;
+}
+
+.cropper-preview {
+  border: 1px solid black;
+  border-radius: var(--s);
+  object-fit: contain;
+  width: 150px;
+  height: 150px;
+}

@@ -4,6 +4,10 @@ import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "../Modal.css";
 import "../profile/EditModal.css";
+import ImCropper from "../ImCropper";
+import "../ImCropper.css";
+import helpers from "../helpers";
+import { Crop } from "../types";
 
 type Props = RouteComponentProps & {
   setEditing: any;
@@ -14,13 +18,13 @@ type Props = RouteComponentProps & {
 
 const EditModal = (props: Props) => {
   const [file, setFile] = useState<File | undefined>(undefined);
+  const [crop, setCrop] = useState<Crop>({ show: false });
 
   const update = async (nameInput?: HTMLInputElement, descriptionInput?: HTMLInputElement) => {
     const formData = new FormData();
     formData.append("communityId", props.communityId);
-    if (file) {
-      formData.append("image", file);
-    }
+    if (file) formData.append("image", file);
+
     if (nameInput && nameInput.value) {
       formData.append("name", nameInput.value);
       nameInput.value = "";
@@ -36,61 +40,77 @@ const EditModal = (props: Props) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-content">
-          <h3>Edit community details</h3>
-          <label>
-            <input
-              type="file"
-              name="photo"
-              onChange={async (event) => {
-                if (event.target.files && event.target.files[0]) {
-                  const file = event.target.files[0];
-                  event.target.value = "";
-                  setFile(file);
-                }
-              }}
-            ></input>
-            <p className="img-label u-pointer">{file ? file.name : "Upload a new photo"}</p>
-          </label>
-          <label className="edit-label">
-            Name
-            <input id="name" type="text" className="edit-input" placeholder={props.name}></input>
-          </label>
-          <div className="multiline-container">
-            <p>Description</p>
-            <textarea
-              id="description"
-              className="multiline-input"
-              defaultValue={props.decription}
-            ></textarea>
-          </div>
+    <>
+      {crop.show ? (
+        <ImCropper inputImg={crop.input!} setCrop={setCrop} setFile={setFile}></ImCropper>
+      ) : (
+        <div className="modal-overlay">
+          <div id="reg-container" className="modal-container">
+            <div id="reg-content" className="modal-content">
+              <h3>Edit community details</h3>
+              {crop.previewSrc ? (
+                <img className="cropper-preview" src={crop.previewSrc}></img>
+              ) : (
+                <></>
+              )}
+              <label>
+                <input
+                  type="file"
+                  name="photo"
+                  onChange={async (event) => {
+                    if (event.target.files && event.target.files[0]) {
+                      setCrop({ show: true, input: event.target.files[0] });
+                    }
+                  }}
+                ></input>
+                <p className="img-label u-pointer">{file ? file.name : "Upload a new photo"}</p>
+              </label>
+              <label className="edit-label">
+                Name
+                <input
+                  id="name"
+                  type="text"
+                  className="edit-input"
+                  placeholder={props.name}
+                ></input>
+              </label>
+              <div className="multiline-container">
+                <p>Description</p>
+                <textarea
+                  id="description"
+                  className="multiline-input"
+                  defaultValue={props.decription}
+                ></textarea>
+              </div>
 
-          <div className="action-container">
-            <button
-              className="default-button u-pointer"
-              onClick={async (event) => {
-                const nameInput = document.getElementById("name") as HTMLInputElement;
-                const descriptionInput = document.getElementById("description") as HTMLInputElement;
-                await update(nameInput, descriptionInput);
-                props.setEditing(false);
-              }}
-            >
-              submit
-            </button>
-            <button
-              className="default-button u-pointer"
-              onClick={(event) => {
-                props.setEditing(false);
-              }}
-            >
-              exit
-            </button>
+              <div className="action-container">
+                <button
+                  className="default-button u-pointer"
+                  onClick={async (event) => {
+                    const nameInput = document.getElementById("name") as HTMLInputElement;
+                    const descriptionInput = document.getElementById(
+                      "description"
+                    ) as HTMLInputElement;
+                    await update(nameInput, descriptionInput);
+                    props.setEditing(false);
+                  }}
+                >
+                  submit
+                </button>
+                <button
+                  className="default-button u-pointer"
+                  onClick={(event) => {
+                    props.setEditing(false);
+                  }}
+                >
+                  exit
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
