@@ -1,25 +1,13 @@
-.confirm-container {
+.profiles-container {
   display: flex;
-  column-gap: 8px;
+  column-gap: 2px;
+  overflow-x: visible;
+  width: auto;
 }
 
-.confirm-button {
-  border: solid;
-  border-color: white;
-  border-radius: var(--m);
-  background-color: black;
-  -webkit-text-fill-color: white;
-  padding: 2%;
-  transition-duration: 1s;
+.profiles-container::-webkit-scrollbar {
+  display: none;
 }
-
-.confirm-button:hover,
-.confirm-button:visited {
-  border-color: var(--primary-dim);
-  -webkit-text-fill-color: var(--primary-dim);
-  transition-duration: 1s;
-}
-
 .merge-modal {
   align-self: center;
   background: var(--black);
@@ -64,19 +52,8 @@
 }
 
 .merge-modal-container {
-  animation: slideUp 2.2s;
+  animation: slideUp 1.5s;
   align-self: center;
-}
-
-.profiles-container {
-  display: flex;
-  column-gap: 2px;
-  overflow-x: visible;
-  width: auto;
-}
-
-.profiles-container::-webkit-scrollbar {
-  display: none;
 }
 
 @keyframes slideUp {

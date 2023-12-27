@@ -63,7 +63,7 @@ const LoginPanel = (props: Props) => {
           <div className="centered default-container">
             <p>You are logged in.</p>
             <button
-              className="login-button u-pointer"
+              className="default-button u-pointer"
               onClick={() => {
                 props.googleLogout();
                 props.handleLogout();

@@ -12,6 +12,8 @@ import { GoFilter } from "react-icons/go";
 import { ImExit } from "react-icons/im";
 import Filters from "./FiltersModal";
 import { SearchFilters, FILTERS_TO_IDS } from "./types";
+import Logout from "./LogoutModal";
+import helpers from "../helpers";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -24,9 +26,15 @@ const NavBar = (props: Props) => {
   const [housing, setHousing] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [filtering, setFiltering] = useState(false);
+  const [logout, setLogout] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(SearchFilters.ALL);
   const [socketConnected, setSocketConnected] = useState(socket.connected);
+
+  const navigate = useNavigate();
+  const route = (path) => {
+    navigate(path);
+  };
 
   /**
    * TODO
@@ -64,11 +72,6 @@ const NavBar = (props: Props) => {
     });
   };
 
-  const navigate = useNavigate();
-  const route = (path) => {
-    navigate(path);
-  };
-
   useEffect(() => {
     setSocketConnected(socket.connected);
     const handleConnect = () => {
@@ -97,6 +100,8 @@ const NavBar = (props: Props) => {
           setFiltering={setFiltering}
           setQuerying={setQuerying}
         />
+      ) : logout ? (
+        <Logout setUserId={props.setUserId} setLogout={setLogout}></Logout>
       ) : (
         <></>
       )}
@@ -105,13 +110,7 @@ const NavBar = (props: Props) => {
           <ImExit
             title="Logout"
             className={`u-pointer nav-icon`}
-            onClick={(event) => {
-              props.setUserId(undefined);
-              post("/api/logout").then((res) => {
-                socket.emit("nav toggle all", {});
-                route("/");
-              });
-            }}
+            onClick={() => setLogout(true)}
           ></ImExit>
         ) : (
           <></>
@@ -136,7 +135,6 @@ const NavBar = (props: Props) => {
           title="Communities"
           className={`u-pointer ${communities ? "nav-icon-selected" : "nav-icon"}`}
           onClick={(event) => {
-            // socket.emit("nav toggle", "toggled communities");
             route("/communities");
             toggleTabs(false, false, setCommunities);
           }}

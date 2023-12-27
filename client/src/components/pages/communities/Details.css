@@ -36,10 +36,9 @@
 .gear-icon {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   padding: 2%;
-  width: var(--l);
-  height: var(--l);
+  size: 24px;
   fill: white;
   transition-duration: 0.5s;
 }

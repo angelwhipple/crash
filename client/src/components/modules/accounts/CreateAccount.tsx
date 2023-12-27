@@ -6,14 +6,9 @@ import "./CreateAccount.css";
 import "../NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { MdInfoOutline } from "react-icons/md";
-import helpers from "../helpers";
+import helpers from "../../helpers";
 import InfoModal from "../InfoModal";
-import { USERNAME_INFO, PASSWORD_INFO, Requirements } from "../types";
-
-type Invalid = {
-  ind: boolean;
-  message: string;
-};
+import { USERNAME_INFO, PASSWORD_INFO, Requirements, CustomError } from "../types";
 
 type Props = RouteComponentProps & {
   setCreate: (bool: boolean) => void;
@@ -26,19 +21,19 @@ const CreateAccount = (props: Props) => {
   const [dob, setDob] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [invalid, setInvalid] = useState({ ind: false, message: "" });
+  const [error, setError] = useState<CustomError>({ valid: false });
   const [requirements, setRequirements] = useState<Requirements>({ show: false });
 
   const handleDob = (event, dobInput) => {
     event.preventDefault();
     console.log(`Date of birth: ${dobInput.value}`);
     if (!dobInput.value) {
-      setInvalid({ ind: true, message: "Please enter a valid date of birth" });
+      setError({ valid: true, message: "Please enter a valid date of birth" });
     } else if (helpers.validateAge(dobInput.value)) {
       setDob(dobInput.value);
-      setInvalid({ ind: false, message: "" });
+      setError({ valid: false });
     } else {
-      setInvalid({ ind: true, message: "Must be atleast 16 years of age" });
+      setError({ valid: true, message: "Must be atleast 16 years of age" });
     }
     dobInput.value = "";
   };
@@ -51,17 +46,17 @@ const CreateAccount = (props: Props) => {
         // if existing account is returned, skip to password step for login
         if (res.exists) {
           setExists(true);
-          setInvalid({
-            ind: true,
-            message: "An existing account was found with that email address. Please login",
-          });
-          setInvalid({ ind: false, message: "" });
+          // setInvalid({
+          //   ind: true,
+          //   message: "An existing account was found with that email address. Please login",
+          // });
+          setError({ valid: false });
         }
       });
       setEmail(emailInput.value);
     } else {
       emailInput.value = "";
-      setInvalid({ ind: true, message: "Invalid email address" });
+      setError({ valid: true, message: "Invalid email address" });
     }
   };
 
@@ -73,16 +68,16 @@ const CreateAccount = (props: Props) => {
       password: passwordInput.value,
     }).then((res) => {
       if (res.valid) {
-        setInvalid({ ind: false, message: "" });
+        setError({ valid: false });
         props.setCreate(false);
       } else {
         passwordInput.value = "";
-        setInvalid({ ind: true, message: res.message });
+        setError({ valid: true, message: res.message });
       }
     });
   };
 
-  const handleUserPass = (event) => {
+  const handleUserPass = async (event) => {
     event.preventDefault();
     const usernameInput = document.getElementById("username")! as HTMLInputElement;
     const passwordInput = document.getElementById("password")! as HTMLInputElement;
@@ -91,15 +86,15 @@ const CreateAccount = (props: Props) => {
     if (passwordInput.value !== confirmInput.value) {
       passwordInput.value = "";
       confirmInput.value = "";
-      setInvalid({ ind: true, message: "Passwords must match" });
+      setError({ valid: true, message: "Passwords must match" });
     } else {
       console.log(`Password: ${passwordInput.value}`);
-      const validUsername = helpers.validateUsername(usernameInput.value);
-      const invalidPassword = helpers.validatePassword(passwordInput.value);
-      if (!invalidPassword.ind && validUsername) {
+      const usernameError = await helpers.validateUsername(usernameInput.value);
+      const passwordError = helpers.validatePassword(passwordInput.value);
+      if (!usernameError.valid && !passwordError.valid) {
         setUsername(usernameInput.value);
         setPassword(passwordInput.value);
-        setInvalid({ ind: false, message: "" });
+        setError({ valid: false });
         const body = {
           username: usernameInput.value,
           password: passwordInput.value,
@@ -110,15 +105,16 @@ const CreateAccount = (props: Props) => {
           console.log(user);
           props.setUserId(user._id);
           props.setCreate(false);
+          helpers.route("/profile");
           // switch to profile page for setup here
         });
-      } else if (!validUsername) {
-        setInvalid({ ind: true, message: "Invalid username" });
+      } else if (usernameError.valid) {
+        setError(usernameError);
         usernameInput.value = "";
         passwordInput.value = "";
         confirmInput.value = "";
-      } else if (invalidPassword.ind) {
-        setInvalid({ ind: true, message: invalidPassword.message });
+      } else if (passwordError.valid) {
+        setError(passwordError);
         passwordInput.value = "";
         confirmInput.value = "";
       }
@@ -126,8 +122,8 @@ const CreateAccount = (props: Props) => {
   };
 
   useEffect(() => {
-    return () => {};
-  });
+    setError({ valid: false }); // clear error
+  }, [email, dob, username, password]);
 
   return (
     <>
@@ -255,9 +251,9 @@ const CreateAccount = (props: Props) => {
               <input
                 id="password"
                 className="create-input"
-                onKeyDown={(event) => {
+                onKeyDown={async (event) => {
                   if (event.key === "Enter") {
-                    handleUserPass(event);
+                    await handleUserPass(event);
                   }
                 }}
                 type="password"
@@ -268,9 +264,9 @@ const CreateAccount = (props: Props) => {
               <input
                 id="confirm"
                 className="create-input"
-                onKeyDown={(event) => {
+                onKeyDown={async (event) => {
                   if (event.key === "Enter") {
-                    handleUserPass(event);
+                    await handleUserPass(event);
                   }
                 }}
                 type="password"
@@ -278,18 +274,18 @@ const CreateAccount = (props: Props) => {
             </label>
             <TbPlayerTrackNextFilled
               className="nav-icon u-pointer"
-              onClick={(event) => {
-                handleUserPass(event);
+              onClick={async (event) => {
+                await handleUserPass(event);
               }}
             ></TbPlayerTrackNextFilled>
           </>
         ) : (
           <></>
         )}
-        {invalid.ind ? (
-          <p className="invalid-msg">{invalid.message}</p>
+        {error.valid ? (
+          <p className="error-text">{error.message}</p>
         ) : (
-          <p className="invalid-msg-hidden">Default</p>
+          <p className="error-text-hidden">Default</p>
         )}
       </div>
     </>

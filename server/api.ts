@@ -76,6 +76,13 @@ router.post("/user/consolidate", auth.consolidateProfiles);
 router.get("/user/exists", auth.existingUser);
 router.get("/user/linkedin", auth.linkedin);
 
+router.get("/user/unique", async (req, res) => {
+  User.findOne({ username: req.query.username as string }).then((user) => {
+    if (user) res.send({ unique: false });
+    else res.send({ unique: true });
+  });
+});
+
 router.get("/user/fetch", async (req, res) => {
   console.log(`[MONGODB] Requesting user: ${req.query.id}`);
   await User.findById(req.query.id).then((user) => {

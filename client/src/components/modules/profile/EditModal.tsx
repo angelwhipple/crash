@@ -4,9 +4,9 @@ import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "../Modal.css";
 import "./EditModal.css";
-import helpers from "../helpers";
+import helpers from "../../helpers";
 import { MdInfoOutline } from "react-icons/md";
-import { USERNAME_INFO, Crop } from "../types";
+import { USERNAME_INFO, Crop, CustomError } from "../types";
 import ImCropper from "../ImCropper";
 
 type Props = RouteComponentProps & {
@@ -21,6 +21,7 @@ type Props = RouteComponentProps & {
 const EditModal = (props: Props) => {
   const [file, setFile] = useState<File | undefined>(undefined);
   const [crop, setCrop] = useState<Crop>({ show: false });
+  const [error, setError] = useState<CustomError>({ valid: false });
 
   const updateProfile = async (
     nameInput: HTMLInputElement,
@@ -28,10 +29,15 @@ const EditModal = (props: Props) => {
     bioInput: HTMLInputElement,
     file?: File
   ) => {
+    const usernameError = await helpers.validateUsername(usernameInput.value);
+
     const formData = new FormData();
     formData.append("userId", props.userId);
     if (nameInput.value) formData.append("name", nameInput.value);
-    if (usernameInput.value) formData.append("username", usernameInput.value); // TODO: validate username
+    if (usernameInput.value && !usernameError.valid) {
+      formData.append("username", usernameInput.value);
+    } else setError(usernameError);
+
     if (bioInput.value) formData.append("bio", bioInput.value);
     if (file) formData.append("image", file);
 
@@ -41,15 +47,29 @@ const EditModal = (props: Props) => {
     });
   };
 
+  useEffect(() => {
+    setError({ valid: false });
+  }, [file, props.username]);
+
   return (
     <>
       {crop.show ? (
-        <ImCropper inputImg={crop.input!} setCrop={setCrop} setFile={setFile}></ImCropper>
+        <ImCropper
+          inputImg={crop.input!}
+          setCrop={setCrop}
+          setFile={setFile}
+          setError={setError}
+        ></ImCropper>
       ) : (
         <div className="modal-overlay">
           <div className="modal-container">
             <div className="modal-content">
               <h3>Edit profile</h3>
+              {error.valid ? (
+                <p className="error-text">{error.message}</p>
+              ) : (
+                <p className="error-text-hidden">Default</p>
+              )}
               {crop.previewSrc ? (
                 <img src={crop.previewSrc} className="cropper-preview"></img>
               ) : (

@@ -16,13 +16,13 @@ const Merge = (props) => {
     <div className="modal-overlay">
       <div className="merge-modal-container">
         <div className="merge-modal">
-          <h1>Is this you?</h1>
+          <h3>Is this you?</h3>
           <p>
-            We found another profile under the same email address. Would you like to connect your
+            We found another profile registered with your email address. Do you want to link these
             accounts?
           </p>
           <div className="profiles-container">{props.extraProfiles}</div>
-          <div className="confirm-container">
+          <div className="action-container">
             <button
               onClick={(event) => {
                 console.log(`Selected profiles: ${props.chosenProfiles}`);
@@ -39,18 +39,18 @@ const Merge = (props) => {
                 }
                 props.setConsolidate(false);
               }}
-              className="confirm-button u-pointer"
+              className="default-button u-pointer"
             >
-              Yes, please
+              <p>Yes, please</p>
             </button>
-            <button
+            <div
               onClick={(event) => {
                 props.setConsolidate(false);
               }}
-              className="confirm-button u-pointer"
+              className="default-button u-pointer"
             >
-              No, thank you
-            </button>
+              <p> Not me</p>
+            </div>
           </div>
         </div>
       </div>

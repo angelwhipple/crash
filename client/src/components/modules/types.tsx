@@ -23,6 +23,11 @@ export type Crop = {
   previewSrc?: string;
 };
 
+export type CustomError = {
+  valid: boolean;
+  message?: string;
+};
+
 export const THIS_YEAR = new Date().getFullYear();
 export const VALID_DOMAINS = [".edu", ".com", ".gov"];
 export const FILTERS_TO_IDS = {

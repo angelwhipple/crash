@@ -7,7 +7,6 @@ import { MdOutlineAnnouncement } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
 import { MdExplore } from "react-icons/md";
 import "./CommunityMenu.css";
-import { response } from "express";
 
 enum MenuAction {
   "DETAILS", // view/edit community details
@@ -29,11 +28,6 @@ const CommunityMenu = (props: Props) => {
   const [hoverManage, setHoverManage] = useState(false);
   const [hoverAnnounce, setHoverAnnounce] = useState(false);
   const [hoverDetails, setHoverDetails] = useState(false);
-
-  const navigate = useNavigate();
-  const route = (path) => {
-    navigate(path);
-  };
 
   return (
     <div className="menu-options-container">

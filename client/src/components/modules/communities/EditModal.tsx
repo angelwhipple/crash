@@ -6,8 +6,8 @@ import "../Modal.css";
 import "../profile/EditModal.css";
 import ImCropper from "../ImCropper";
 import "../ImCropper.css";
-import helpers from "../helpers";
-import { Crop } from "../types";
+import helpers from "../../helpers";
+import { Crop, CustomError } from "../types";
 
 type Props = RouteComponentProps & {
   setEditing: any;
@@ -19,6 +19,7 @@ type Props = RouteComponentProps & {
 const EditModal = (props: Props) => {
   const [file, setFile] = useState<File | undefined>(undefined);
   const [crop, setCrop] = useState<Crop>({ show: false });
+  const [error, setError] = useState<CustomError>({ valid: false });
 
   const update = async (nameInput?: HTMLInputElement, descriptionInput?: HTMLInputElement) => {
     const formData = new FormData();
@@ -39,15 +40,29 @@ const EditModal = (props: Props) => {
     });
   };
 
+  useEffect(() => {
+    setError({ valid: false });
+  }, [file]);
+
   return (
     <>
       {crop.show ? (
-        <ImCropper inputImg={crop.input!} setCrop={setCrop} setFile={setFile}></ImCropper>
+        <ImCropper
+          setError={setError}
+          inputImg={crop.input!}
+          setCrop={setCrop}
+          setFile={setFile}
+        ></ImCropper>
       ) : (
         <div className="modal-overlay">
           <div id="reg-container" className="modal-container">
             <div id="reg-content" className="modal-content">
               <h3>Edit community details</h3>
+              {error.valid ? (
+                <p className="error-text">{error.message}</p>
+              ) : (
+                <p className="error-text-hidden">Default</p>
+              )}
               {crop.previewSrc ? (
                 <img className="cropper-preview" src={crop.previewSrc}></img>
               ) : (
@@ -82,7 +97,6 @@ const EditModal = (props: Props) => {
                   defaultValue={props.decription}
                 ></textarea>
               </div>
-
               <div className="action-container">
                 <button
                   className="default-button u-pointer"

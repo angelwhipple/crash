@@ -16,6 +16,7 @@ import CommunityDetails from "./Details";
 import ManageCommunity from "./Manage";
 import Explore from "./Explore";
 import Annoucements from "./Annoucements";
+import helpers from "../../helpers";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -47,11 +48,6 @@ const Communities = (props: Props) => {
   const [showInvite, setShowInvite] = useState(false);
   const [joining, setJoining] = useState(false);
   const [menuAction, setMenuAction] = useState<MenuAction | undefined>(undefined);
-
-  const navigate = useNavigate();
-  const route = (path) => {
-    navigate(path);
-  };
 
   socket.on("verified", (event) => {
     console.log(event);
@@ -166,7 +162,7 @@ const Communities = (props: Props) => {
               className="default-button u-pointer"
               onClick={(event) => {
                 socket.emit("nav toggle all", {});
-                route("/");
+                helpers.route("/");
               }}
             >
               Take me back

@@ -18,17 +18,6 @@
   padding: 2%;
 }
 
-.invalid-msg {
-  font-size: medium;
-  -webkit-text-fill-color: darkred;
-  animation: msgFade 0.5s;
-}
-
-.invalid-msg-hidden {
-  font-size: medium;
-  opacity: 0;
-}
-
 @keyframes msgFade {
   from {
     opacity: 0;

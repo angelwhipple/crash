@@ -11,12 +11,13 @@ import {
   type Crop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import helpers from "./helpers";
+import helpers from "../helpers";
 
 type Props = RouteComponentProps & {
   inputImg: File;
   setCrop: any;
   setFile: any;
+  setError: any;
 };
 
 const MIN_DIMENSION = 200;
@@ -53,8 +54,10 @@ const ImCropper = (props: Props) => {
       const elem = document.getElementById("cropper-photo") as HTMLImageElement;
       elem.onload = (event) => {
         if (elem.naturalWidth < MIN_DIMENSION || elem.naturalHeight < MIN_DIMENSION) {
-          console.log(`Image must be atleast ${MIN_DIMENSION} x ${MIN_DIMENSION} pixels`); // error handle
           setSrc("");
+          const msg = `Image must be atleast ${MIN_DIMENSION} x ${MIN_DIMENSION} pixels`;
+          props.setError({ valid: true, message: msg });
+          props.setCrop({ show: false });
         } else {
           const cropObj = makeAspectCrop(
             { unit: "%", width: 25 },

@@ -33,21 +33,6 @@ const CommunityDetails = (props: Props) => {
     selectorFn(true);
   };
 
-  const displayImage = (src: string) => {
-    const imageWindow = window.open("", "_blank", "width=400,height=400");
-    imageWindow!.document.write(`
-      <html>
-      <head>
-          <title>Image Window</title>
-      </head>
-      <body style="margin: 0; display: flex; justify-content: center; align-items: center;">
-          <img src=${src} alt="Image">
-      </body>
-      </html>
-    `);
-    imageWindow!.document.close();
-  };
-
   const updatePhoto = async (imageBuffer: ArrayBuffer) => {
     const base64Image = btoa(
       new Uint8Array(imageBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
@@ -60,7 +45,6 @@ const CommunityDetails = (props: Props) => {
     if (event.image) {
       const buffer = event.image;
       updatePhoto(buffer);
-      // displayImage(src);
     }
     if (event.name) setName(event.name);
     if (event.description) setDescription(event.description);
