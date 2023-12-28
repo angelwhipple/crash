@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import gapi from "@react-oauth/google";
 import { get, post } from "../../utilities";
-import { set } from "mongoose";
 import { socket } from "../../client-socket";
 import {
   GoogleOAuthProvider,
