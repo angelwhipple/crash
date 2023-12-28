@@ -49,6 +49,11 @@ const Communities = (props: Props) => {
   const [joining, setJoining] = useState(false);
   const [menuAction, setMenuAction] = useState<MenuAction | undefined>(undefined);
 
+  const navigate = useNavigate();
+  const route = (path) => {
+    navigate(path);
+  };
+
   socket.on("verified", (event) => {
     console.log(event);
     setVerifying(false);
@@ -162,7 +167,7 @@ const Communities = (props: Props) => {
               className="default-button u-pointer"
               onClick={(event) => {
                 socket.emit("nav toggle all", {});
-                helpers.route("/");
+                route("/");
               }}
             >
               Take me back
