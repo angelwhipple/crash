@@ -10,7 +10,7 @@ import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
 import { FaGear } from "react-icons/fa6";
 import InfoModal from "../modules/InfoModal";
-import { Requirements } from "../modules/types";
+import { Policy } from "../types";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -23,7 +23,7 @@ const Profile = (props: Props) => {
   const [pfp, setPfp] = useState<any>(blank);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState(`Add a bio`);
-  const [requirements, setRequirements] = useState<Requirements>({ show: false });
+  const [requirements, setRequirements] = useState<Policy>({ show: false });
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -87,9 +87,9 @@ const Profile = (props: Props) => {
               {requirements.show ? (
                 <InfoModal
                   header={requirements.header!}
-                  info={requirements.info}
-                  setRequirements={setRequirements}
-                  setEditing={setEditing}
+                  info={requirements.text}
+                  setDisplay={setRequirements}
+                  setAltDisplay={setEditing}
                 ></InfoModal>
               ) : (
                 <></>

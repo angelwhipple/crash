@@ -8,11 +8,16 @@ import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { MdInfoOutline } from "react-icons/md";
 import helpers from "../../helpers";
 import InfoModal from "../InfoModal";
-import { USERNAME_INFO, PASSWORD_INFO, Requirements, CustomError } from "../types";
+import { USERNAME_INFO, PASSWORD_INFO, Policy, CustomError } from "../../types";
 
 type Props = RouteComponentProps & {
   setCreate: (bool: boolean) => void;
   setUserId: (newUserId: string) => void;
+};
+
+type Acknowledgements = {
+  privacy: boolean;
+  terms: boolean;
 };
 
 const CreateAccount = (props: Props) => {
@@ -22,7 +27,11 @@ const CreateAccount = (props: Props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<CustomError>({ valid: false });
-  const [requirements, setRequirements] = useState<Requirements>({ show: false });
+  const [policy, setPolicy] = useState<Policy>({ show: false });
+  const [acknowledgements, setAcknowledgements] = useState<Acknowledgements>({
+    privacy: false,
+    terms: false,
+  });
 
   const handleDob = (event, dobInput) => {
     event.preventDefault();
@@ -91,7 +100,8 @@ const CreateAccount = (props: Props) => {
       console.log(`Password: ${passwordInput.value}`);
       const usernameError = await helpers.validateUsername(usernameInput.value);
       const passwordError = helpers.validatePassword(passwordInput.value);
-      if (!usernameError.valid && !passwordError.valid) {
+      const acknowledged = acknowledgements.privacy && acknowledgements.terms;
+      if (!usernameError.valid && !passwordError.valid && acknowledged) {
         setUsername(usernameInput.value);
         setPassword(passwordInput.value);
         setError({ valid: false });
@@ -117,6 +127,11 @@ const CreateAccount = (props: Props) => {
         setError(passwordError);
         passwordInput.value = "";
         confirmInput.value = "";
+      } else if (!acknowledged) {
+        setError({
+          valid: true,
+          message: "Please read and accept our Privacy Policy and Terms of Service",
+        });
       }
     }
   };
@@ -125,17 +140,22 @@ const CreateAccount = (props: Props) => {
     setError({ valid: false }); // clear error
   }, [email, dob, username, password]);
 
+  socket.on("privacy policy", () =>
+    setAcknowledgements({ privacy: true, terms: acknowledgements.terms })
+  );
+
+  socket.on("terms of service", () =>
+    setAcknowledgements({ privacy: acknowledgements.privacy, terms: true })
+  );
+
   return (
     <>
-      {requirements.show ? (
-        <InfoModal
-          header={requirements.header!}
-          info={requirements.info}
-          setRequirements={setRequirements}
-        ></InfoModal>
+      {policy.show ? (
+        <InfoModal header={policy.header!} info={policy.text} setDisplay={setPolicy}></InfoModal>
       ) : (
         <></>
       )}
+
       <div className="centered default-container create-container">
         {exists === true ? <h3>Sign in</h3> : <h3>Create an account</h3>}
         {email === "" ? (
@@ -227,10 +247,10 @@ const CreateAccount = (props: Props) => {
               <MdInfoOutline
                 className="info-icon-create u-pointer"
                 onClick={(event) => {
-                  setRequirements({
+                  setPolicy({
                     show: true,
                     header: "Username requirements",
-                    info: USERNAME_INFO,
+                    text: USERNAME_INFO,
                   });
                 }}
               ></MdInfoOutline>
@@ -240,10 +260,10 @@ const CreateAccount = (props: Props) => {
               <MdInfoOutline
                 className="info-icon-create u-pointer"
                 onClick={(event) => {
-                  setRequirements({
+                  setPolicy({
                     show: true,
                     header: "Password requirements",
-                    info: PASSWORD_INFO,
+                    text: PASSWORD_INFO,
                   });
                 }}
               ></MdInfoOutline>
@@ -271,6 +291,30 @@ const CreateAccount = (props: Props) => {
                 }}
                 type="password"
               ></input>
+            </label>
+            <label className="create-label">
+              I have read and accept the{" "}
+              <a
+                className="u-pointer default-button"
+                onClick={async () => {
+                  await get("/api/privacy").then((res) => {
+                    setPolicy({ show: true, header: "Crash Privacy Policy", text: res.text });
+                  });
+                }}
+              >
+                Privacy Policy{" "}
+              </a>
+              and{" "}
+              <a
+                className="u-pointer default-button"
+                onClick={async () => {
+                  await get("/api/terms").then((res) => {
+                    setPolicy({ show: true, header: "Crash Terms of Service", text: res.text });
+                  });
+                }}
+              >
+                Terms of Service
+              </a>
             </label>
             <TbPlayerTrackNextFilled
               className="nav-icon u-pointer"

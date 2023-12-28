@@ -7,7 +7,7 @@ import "../profile/EditModal.css";
 import ImCropper from "../ImCropper";
 import "../ImCropper.css";
 import helpers from "../../helpers";
-import { Crop, CustomError } from "../types";
+import { Crop, CustomError } from "../../types";
 
 type Props = RouteComponentProps & {
   setEditing: any;

@@ -1,4 +1,4 @@
-import { THIS_YEAR, VALID_DOMAINS, CustomError } from "./modules/types";
+import { THIS_YEAR, VALID_DOMAINS, CustomError } from "./types";
 import { type Crop } from "react-image-crop";
 import { useNavigate } from "@reach/router";
 import { get, post } from "../utilities";
@@ -91,6 +91,10 @@ const drawCropCanvas = (image: HTMLImageElement, canvas: HTMLCanvasElement, crop
   } else console.log("No 2d context");
 };
 
+/**
+ * FILE MANIPULATION
+ */
+
 const fileFromURL = async (url: string, filename: string) => {
   const response = await fetch(url);
   const blob = await response.blob();
@@ -109,6 +113,7 @@ const URLFromFile = (file: File): string => {
 };
 
 export default {
+  route,
   validateUsername,
   validatePassword,
   validateAge,
@@ -116,5 +121,4 @@ export default {
   drawCropCanvas,
   fileFromURL,
   URLFromFile,
-  route,
 };

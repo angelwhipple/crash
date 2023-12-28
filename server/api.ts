@@ -9,7 +9,8 @@ const router = express.Router();
 const AWS = require("aws-sdk");
 import mailjet from "node-mailjet";
 import helpers from "./helpers";
-import { CustomRequest, TokenResponse } from "./types";
+import { CustomRequest, TokenResponse, PRIVACY_POLICY, SERVICE_TERMS } from "./types";
+import path from "path";
 
 /**
  * CONFIG
@@ -312,6 +313,18 @@ router.post("/search/communities", async (req, res) => {
   Community.find({ name: { $regex: regex } }).then((communities) => {
     console.log(communities);
   });
+});
+
+router.get("/privacy", async (req, res) => {
+  const filepath = path.join(process.cwd(), PRIVACY_POLICY);
+  const text = await helpers.readFile(filepath);
+  res.send({ text: text });
+});
+
+router.get("/terms", async (req, res) => {
+  const filepath = path.join(process.cwd(), SERVICE_TERMS);
+  const text = await helpers.readFile(filepath);
+  res.send({ text: text });
 });
 
 // anything else falls to this "not found" case

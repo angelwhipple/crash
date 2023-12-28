@@ -1,0 +1,46 @@
+<hr></hr>
+<p class="u-textCenter pad-light"><strong>Effective Date:</strong> Dec 27, 2023</p>
+
+    <p><strong>1. Introduction</strong></p>
+    <p>Welcome to Crash. This Privacy Policy explains how we collect, use, disclose, and protect your information when you visit our website and use our services.</p>
+
+   
+    <p><strong>2. Information We Collect</strong></p>
+    <ul>
+        <li><strong>Personal Information:</strong> We may collect personal information such as your name, email address, and other contact details when you voluntarily provide them to us.</li>
+        <li><strong>Non-Personal Information:</strong> We may automatically collect non-personal information, such as browser type, IP address, and device information, when you visit our website.</li>
+    </ul>
+   
+
+    <p><strong>3. How We Use Your Information</strong></p>
+    <ul>
+        <li>To provide and maintain our website and services.</li>
+        <li>To communicate with you, respond to your inquiries, and send you updates.</li>
+        <li>To analyze and improve our website, user experience, and services.</li>
+        <li>To comply with legal obligations.</li>
+    </ul>
+
+    <p><strong>4. Cookies and Tracking Technologies</strong></p>
+    <p>We use cookies and similar tracking technologies to enhance your experience on our website. You can manage your cookie preferences through your browser settings.</p>
+
+    <p><strong>5. Third-Party Links and Services</strong></p>
+    <p>Our website may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. Please review their privacy policies.</p>
+
+    <p><strong>6. Information Sharing</strong></p>
+    <ul>
+        <li>With your consent.</li>
+        <li>To comply with legal obligations.</li>
+        <li>To protect our rights, privacy, safety, or property.</li>
+        <li>In connection with a business transaction (e.g., merger, acquisition).</li>
+    </ul>
+
+    <p><strong>7. Security</strong></p>
+    <p>We take reasonable measures to protect your information from unauthorized access and disclosure. However, no method of transmission over the internet or electronic storage is 100% secure.</p>
+
+    <p><strong>8. Your Choices</strong></p>
+    <p>You can opt-out of receiving promotional emails from us by following the instructions in the emails. You may also contact us to update or delete your information.</p>
+
+    <p><strong>9. Changes to this Privacy Policy</strong></p>
+    <p>We may update this Privacy Policy from time to time. Please review the changes carefully. Your continued use of our website after the changes indicates your acceptance.</p>
+
+    <p class="u-textCenter pad-light">If you have any questions or concerns about this Privacy Policy, please contact us at <a href="mailto:awhipp@mit.edu">awhipp@mit.edu</a>.</p>

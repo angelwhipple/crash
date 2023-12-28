@@ -1,0 +1,39 @@
+<hr></hr>
+<p class="u-textCenter pad-light"><strong>Effective Date:</strong> Dec 27, 2023</p>
+
+    <p><strong>1. Acceptance of Terms</strong></p>
+    <p>By accessing or using Crash, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our website.</p>
+
+    <p><strong>2. Changes to Terms</strong></p>
+    <p>We reserve the right to modify or revise these Terms of Service at any time. Your continued use of our website after any changes indicates your acceptance of the revised terms. It is your responsibility to review these terms periodically.</p>
+
+    <p><strong>3. Use of the Website</strong></p>
+    <p>You must be at least 16 years old to use this website. You agree to provide accurate, current, and complete information when using our services. You are responsible for maintaining the confidentiality of your account information and password.</p>
+
+    <p><strong>4. User Content</strong></p>
+    <p>You may contribute content to our website, including text, images, and other materials ("User Content"). By submitting User Content, you grant us a non-exclusive, royalty-free, perpetual, and worldwide license to use, modify, and distribute the User Content.</p>
+
+    <p><strong>5. Prohibited Conduct</strong></p>
+    <p>You agree not to engage in the following prohibited conduct:</p>
+    <ul>
+        <li>Violating any applicable laws or regulations.</li>
+        <li>Using our website for any illegal or unauthorized purpose.</li>
+        <li>Interfering with the security or integrity of our website.</li>
+        <li>Engaging in any activity that could harm, disable, or overburden our infrastructure.</li>
+    </ul>
+
+    <p><strong>6. Intellectual Property</strong></p>
+    <p>All content and materials on our website, including but not limited to text, graphics, logos, and images, are the property of Crash MIT or its licensors and are protected by intellectual property laws.</p>
+
+    <p><strong>7. Limitation of Liability</strong></p>
+    <p>To the extent permitted by law, we shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use our website.</p>
+
+    <p><strong>8. Termination</strong></p>
+    <p>We reserve the right to terminate or suspend your access to our website without prior notice for any reason, including violation of these Terms of Service.</p>
+
+    <p><strong>9. Governing Law</strong></p>
+    <p>These Terms of Service are governed by and construed in accordance with the laws of Massachusetts. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in Massachusetts.</p>
+    
+    <p class="u-textCenter pad-light">If you have any questions or concerns about these Terms of Service, please contact us at <a href="mailto:awhipp@mit.edu">awhipp@mit.edu</a>.</p>
+
+

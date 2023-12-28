@@ -40,12 +40,21 @@ export const init = (server: http.Server): void => {
       const user = getUserFromSocketID(socket.id);
       if (user !== undefined) removeUser(user, socket);
     });
+
+    // ADD socket.on EVENTS AS NEEDED
+
     socket.on("nav toggle all", () => {
       console.log(`socket has toggled nav bar ${socket.id}`);
       io.emit("nav toggle all", {});
     });
-
-    // ADD socket.on EVENTS AS NEEDED
+    socket.on("privacy policy", () => {
+      console.log(`socket has acknowledged privacy policy ${socket.id}`);
+      io.emit("privacy policy", {});
+    });
+    socket.on("terms of service", () => {
+      console.log(`socket has acknowledged terms of service ${socket.id}`);
+      io.emit("terms of service", {});
+    });
   });
 };
 

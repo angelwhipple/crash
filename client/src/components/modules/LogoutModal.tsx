@@ -3,7 +3,6 @@ import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Modal.css";
-import helpers from "../helpers";
 
 type Props = RouteComponentProps & {
   setLogout: any;
@@ -11,6 +10,11 @@ type Props = RouteComponentProps & {
 };
 
 const Logout = (props: Props) => {
+  const navigate = useNavigate();
+  const route = (path) => {
+    navigate(path);
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal-container">
@@ -24,7 +28,7 @@ const Logout = (props: Props) => {
                 post("/api/logout").then((res) => {
                   socket.emit("nav toggle all", {});
                   props.setLogout(false);
-                  helpers.route("/");
+                  route("/");
                 });
               }}
             >

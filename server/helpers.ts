@@ -10,6 +10,7 @@ import {
   LETTERS,
   MulterFile,
 } from "./types";
+import fs from "fs";
 
 /**
  * AWS S3 CONFIG
@@ -166,7 +167,21 @@ const createCommunity = async (req: Request): Promise<CommunityInfo> => {
   });
 };
 
+const readFile = (path: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, "utf-8", (err, data) => {
+      if (err) {
+        console.log(`Error reading file ${path}: ${err}`);
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
+
 export default {
+  readFile,
   createCommunity,
   callExternalAPI,
   uploadImageToS3,

@@ -48,3 +48,5 @@ export type CommunityInfo = {
 };
 
 export const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+export const PRIVACY_POLICY = "client/src/assets/privacy-policy.txt";
+export const SERVICE_TERMS = "client/src/assets/terms-of-service.txt";

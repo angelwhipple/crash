@@ -6,7 +6,7 @@ import "../Modal.css";
 import "./EditModal.css";
 import helpers from "../../helpers";
 import { MdInfoOutline } from "react-icons/md";
-import { USERNAME_INFO, Crop, CustomError } from "../types";
+import { USERNAME_INFO, Crop, CustomError } from "../../types";
 import ImCropper from "../ImCropper";
 
 type Props = RouteComponentProps & {
@@ -104,7 +104,7 @@ const EditModal = (props: Props) => {
                     props.setRequirements({
                       show: true,
                       header: "Username requirements",
-                      info: USERNAME_INFO,
+                      text: USERNAME_INFO,
                     });
                   }}
                 ></MdInfoOutline>

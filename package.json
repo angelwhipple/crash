@@ -58,6 +58,7 @@
     "multer": "^1.4.5-lts.1",
     "node-mailjet": "^6.0.4",
     "pako": "^2.1.0",
+    "path": "^0.12.7",
     "react": "^16.x",
     "react-dom": "^16.x",
     "react-icons": "^4.10.1",

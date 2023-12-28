@@ -57,6 +57,11 @@ textarea:focus {
   outline: none;
 }
 
+ul {
+  list-style-type: circle;
+  margin-left: 5%;
+}
+
 .u-flex {
   display: flex;
 }
@@ -74,6 +79,9 @@ textarea:focus {
   align-items: center;
 }
 
+.u-textCenter {
+  text-align: center;
+}
 .u-inlineBlock {
   display: inline-block;
 }
@@ -180,9 +188,12 @@ textarea:focus {
   font-size: small;
 }
 
-.info-text {
+.info-textbox {
   text-align: start;
   font-size: small;
+  max-height: 70vh;
+  width: auto;
+  overflow-y: auto;
 }
 
 .error-text {
@@ -194,4 +205,8 @@ textarea:focus {
 .error-text-hidden {
   font-size: small;
   opacity: 0;
+}
+
+.pad-light {
+  padding: 2%;
 }

@@ -11,7 +11,7 @@ import { IoIosPeople } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
 import { ImExit } from "react-icons/im";
 import Filters from "./FiltersModal";
-import { SearchFilters, FILTERS_TO_IDS } from "./types";
+import { SearchFilters, FILTERS_TO_IDS } from "../types";
 import Logout from "./LogoutModal";
 import helpers from "../helpers";
 
@@ -110,7 +110,9 @@ const NavBar = (props: Props) => {
           <ImExit
             title="Logout"
             className={`u-pointer nav-icon`}
-            onClick={() => setLogout(true)}
+            onClick={() => {
+              setLogout(true);
+            }}
           ></ImExit>
         ) : (
           <></>
