@@ -6,14 +6,14 @@ import socketManager from "./server-socket";
 import axios from "axios";
 import dotenv from "dotenv";
 import url from "url";
-import { TokenResponse } from "./types";
+import { TokenResponse, DOMAIN } from "./types";
 import helpers from "./helpers";
 
 dotenv.config({});
 
 // create a new OAuth client used to verify google sign-in
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
-const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID;
+const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
 const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
 const SALT_ROUNDS = 10;

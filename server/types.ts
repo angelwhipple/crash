@@ -50,3 +50,4 @@ export type CommunityInfo = {
 export const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const PRIVACY_POLICY = "client/src/assets/privacy-policy.txt";
 export const SERVICE_TERMS = "client/src/assets/terms-of-service.txt";
+export const DOMAIN = "https://crashmit-6571970b206b.herokuapp.com/";
