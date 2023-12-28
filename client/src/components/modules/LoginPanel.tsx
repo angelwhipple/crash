@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import gapi from "@react-oauth/google";
 import { get, post } from "../../utilities";
+import { set } from "mongoose";
 import { socket } from "../../client-socket";
 import {
   GoogleOAuthProvider,
@@ -12,6 +13,7 @@ import {
 import "./Modal.css";
 import "./LoginPanel.css";
 import CreateAccount from "./accounts/CreateAccount";
+import { DOMAIN } from "../../../../server/types";
 
 type Props = RouteComponentProps & {
   handleLogin: any;
@@ -30,7 +32,8 @@ const PLATFORMS = {
 };
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
-const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
+// const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
+const LINKEDIN_REDIRECT_URI = `${DOMAIN}/api/user/linkedin`;
 const LINKEDIN_AUTH_URL = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${LINKEDIN_CLIENT_ID}&redirect_uri=${LINKEDIN_REDIRECT_URI}&scope=r_liteprofile,r_emailaddress`;
 
 const LoginPanel = (props: Props) => {
@@ -62,7 +65,7 @@ const LoginPanel = (props: Props) => {
           <div className="centered default-container">
             <p>You are logged in.</p>
             <button
-              className="default-button u-pointer"
+              className="login-button u-pointer"
               onClick={() => {
                 props.googleLogout();
                 props.handleLogout();
