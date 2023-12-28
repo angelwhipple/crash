@@ -270,7 +270,8 @@ const linkedin = async (req: Request, res: Response) => {
                 "identifier"
               ];
             console.log(`[LINKEDIN] Profile picture url: ${profilePictureUrl}`);
-            const loginUrl = `http://localhost:5050/api/login`;
+            // const loginUrl = `http://localhost:5050/api/login`;
+            const loginUrl = `https://crashmit-6571970b206b.herokuapp.com/api/login`;
             const loginBody = {
               name: `${firstName} ${lastName}`,
               linkedinid: linkedinId,

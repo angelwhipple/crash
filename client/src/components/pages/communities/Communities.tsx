@@ -16,7 +16,6 @@ import CommunityDetails from "./Details";
 import ManageCommunity from "./Manage";
 import Explore from "./Explore";
 import Annoucements from "./Annoucements";
-import helpers from "../../helpers";
 
 type Props = RouteComponentProps & {
   userId: string;

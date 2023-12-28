@@ -17,11 +17,6 @@ import path from "path";
  */
 
 dotenv.config({});
-// AWS.config.update({
-//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//   region: "us-east-2",
-// });
 const { v4: uuidv4 } = require("uuid"); // generates unique keys
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() }); // Store files in memory as Buffers
