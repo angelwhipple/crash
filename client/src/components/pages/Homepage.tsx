@@ -87,6 +87,7 @@ const Homepage = (props: Props) => {
         ></LoginPanel>
       ) : (
         <>
+          <h1 className="header u-">CRASH</h1>
           <div className="animation-container">
             <script
               src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"

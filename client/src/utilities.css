@@ -15,7 +15,7 @@
 */
 
 /* TODO: REPLACE WITH YOUR OWN FONT! */
-@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo&display=swap");
 
 :root {
   --orange: #ff8400;
@@ -172,6 +172,7 @@ ul {
   -webkit-text-fill-color: inherit;
   background-color: inherit;
   font-size: small;
+  font-weight: 200;
   white-space: nowrap;
   transition-duration: 1s;
   padding: 2%;
@@ -196,6 +197,7 @@ ul {
   overflow: hidden;
   word-wrap: break-word;
   font-size: small;
+  font-weight: 300;
 }
 
 .info-textbox {

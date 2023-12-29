@@ -3,7 +3,7 @@
 }
 
 .img-label:hover {
-  -webkit-text-fill-color: var(--primary-dim);
+  -webkit-text-fill-color: var(--orange);
 }
 
 .edit-input {
