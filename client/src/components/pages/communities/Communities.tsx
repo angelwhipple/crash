@@ -69,6 +69,7 @@ const Communities = (props: Props) => {
     setMenuAction(undefined);
     setJoining(false);
     setLanding(false);
+    setType(undefined);
     setActiveCommunity(undefined);
   });
 

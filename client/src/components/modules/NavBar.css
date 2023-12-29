@@ -99,7 +99,7 @@ body {
   border-radius: var(--s);
   border: solid var(--orange);
   box-shadow: inset 0px -1px 11px 5px rgba(0, 0, 0, 0.2);
-  -webkit-text-fill-color: var(--hot-orange);
+  -webkit-text-fill-color: var(--black);
 }
 
 .search-filters-container {

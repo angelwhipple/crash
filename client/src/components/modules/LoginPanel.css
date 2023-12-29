@@ -1,35 +1,31 @@
 .login-button {
   border: none;
-  /* border-color: white; */
-  border-radius: var(--m);
   background-color: inherit;
   -webkit-text-fill-color: inherit;
-  padding: 5%;
+  padding: 1%;
   transition-duration: 1s;
-  font-weight: bolder;
 }
 
 .login-button:hover,
 .login-button:visited {
-  /* border-color: var(--primary-dim); */
   -webkit-text-fill-color: var(--hot-orange);
   transition-duration: 1s;
 }
 
 .login-container {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  row-gap: var(--l);
-  height: 100vh;
+  align-items: center;
   justify-content: center;
+  row-gap: var(--s);
 }
 
 .floating-button {
-  animation-name: buttonFade;
-  animation-duration: 2.6s;
+  animation: scaleIn 1.5s;
 }
 
-@keyframes buttonFade {
+@keyframes scaleIn {
   from {
     opacity: 0;
     transform: scale(0);

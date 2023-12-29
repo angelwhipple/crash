@@ -97,36 +97,42 @@ const NavBar = (props: Props) => {
     });
   };
 
+  const refreshCommunities = () => {
+    const btns: JSX.Element[] = [];
+    get("/api/user/communities", { id: props.userId }).then((res) => {
+      console.log(res);
+      for (const community of res.communities) {
+        btns.push(
+          <button
+            key={community._id}
+            className="default-button u-pointer"
+            onClick={() => {
+              socket.emit("switched communities", { community: community });
+              toggleDropdown("community-dropdown");
+            }}
+            // onMouseOver={() => {
+            //   toggleDropdown("community-dropdown");
+            // }}
+          >
+            {community.name}
+          </button>
+        );
+      }
+      setCommunityBtns(btns);
+    });
+  };
+
   useEffect(() => {
-    if (props.userId) updateIdentity();
-    else setSrc(blank);
+    if (props.userId) {
+      updateIdentity();
+      refreshCommunities();
+    } else setSrc(blank);
   }, []);
 
   useEffect(() => {
     if (props.userId) {
       updateIdentity();
-      const btns: JSX.Element[] = [];
-      get("/api/user/communities", { id: props.userId }).then((res) => {
-        console.log(res);
-        for (const community of res.communities) {
-          btns.push(
-            <button
-              key={community._id}
-              className="default-button u-pointer"
-              onClick={() => {
-                socket.emit("switched communities", { community: community });
-                toggleDropdown("community-dropdown");
-              }}
-              // onMouseOver={() => {
-              //   toggleDropdown("community-dropdown");
-              // }}
-            >
-              {community.name}
-            </button>
-          );
-        }
-        setCommunityBtns(btns);
-      });
+      refreshCommunities();
     }
   }, [props.userId]);
 
@@ -136,6 +142,10 @@ const NavBar = (props: Props) => {
 
   socket.on("updated user", () => {
     if (props.userId) updateIdentity();
+  });
+
+  socket.on("new community", (event) => {
+    if (event.owner === props.userId) refreshCommunities();
   });
 
   return (

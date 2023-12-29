@@ -16,6 +16,9 @@
   height: auto;
   -webkit-text-fill-color: var(--black);
   padding: 2%;
+  border-radius: var(--s);
+  border-color: inherit;
+  box-shadow: inset 0px -1px 11px 5px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes msgFade {
@@ -36,6 +39,6 @@
 
 .info-icon-create:hover {
   opacity: 1;
-  fill: var(--orange);
+  fill: var(--white);
   transition-duration: 0.5s;
 }
