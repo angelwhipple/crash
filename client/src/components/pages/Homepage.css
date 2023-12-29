@@ -69,6 +69,16 @@
   position: relative;
   text-align: center;
   top: 15%;
-  font-weight: 400;
-  animation: fadeIn 2s;
+  font-weight: 700;
+  animation: headerFadeIn 1s;
+  opacity: 0.5;
+}
+
+@keyframes headerFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
 }
