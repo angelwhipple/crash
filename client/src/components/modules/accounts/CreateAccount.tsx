@@ -55,12 +55,12 @@ const CreateAccount = (props: Props) => {
     if (helpers.validateEmail(emailInput.value)) {
       get("/api/user/exists", { email: emailInput.value }).then((res) => {
         if (res.exists) {
-          props.setError({
-            valid: true,
-            message: "An existing account was found with that email address. Please login",
-          });
-          props.setCreate(false);
+          // props.setError({
+          //   valid: true,
+          //   message: "An existing account was found with that email address. Please login",
+          // });
           props.setLogin(true);
+          props.setCreate(false);
         } else setEmail(emailInput.value);
       });
     } else {
@@ -156,14 +156,21 @@ const CreateAccount = (props: Props) => {
                 }}
                 type="email"
               ></input>
+              <TbPlayerTrackNextFilled
+                className="nav-icon u-pointer"
+                onClick={(event) => {
+                  const emailInput = document.getElementById("email")! as HTMLInputElement;
+                  handleEmail(event, emailInput);
+                }}
+              ></TbPlayerTrackNextFilled>
             </label>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const emailInput = document.getElementById("email")! as HTMLInputElement;
-                handleEmail(event, emailInput);
-              }}
-            ></TbPlayerTrackNextFilled>
+
+            <button
+              className="default-button u-pointer"
+              onClick={(event) => props.setCreate(false)}
+            >
+              Go back
+            </button>
           </>
         ) : dob === "" ? (
           <>
@@ -180,14 +187,14 @@ const CreateAccount = (props: Props) => {
                 }}
                 type="date"
               ></input>
+              <TbPlayerTrackNextFilled
+                className="nav-icon u-pointer"
+                onClick={(event) => {
+                  const dobInput = document.getElementById("dob")! as HTMLInputElement;
+                  handleDob(event, dobInput);
+                }}
+              ></TbPlayerTrackNextFilled>
             </label>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const dobInput = document.getElementById("dob")! as HTMLInputElement;
-                handleDob(event, dobInput);
-              }}
-            ></TbPlayerTrackNextFilled>
           </>
         ) : username === "" || password === "" ? (
           <>

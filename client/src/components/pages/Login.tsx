@@ -44,6 +44,7 @@ const LINKEDIN_AUTH_URL = `https://www.linkedin.com/oauth/v2/authorization?respo
 const LoginPage = (props: Props) => {
   const [localAccount, setLocalAccount] = useState(false);
   const [error, setError] = useState<CustomError>(props.error);
+  const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -58,21 +59,21 @@ const LoginPage = (props: Props) => {
     if (helpers.validateEmail(emailInput.value)) {
       await get("/api/user/exists", { email: emailInput.value }).then((res) => {
         if (!res.exists) {
-          props.setError({
-            valid: true,
-            message: "No account was found with that email address. Please create an account",
-          });
+          // props.setError({
+          //   valid: true,
+          //   message: "No account was found with that email address. Please create an account",
+          // });
           props.setCreate(true);
           props.setLogin(false);
           return;
-        }
+        } else setEmail(emailInput.value);
       });
     } else {
       emailInput.value = "";
       setError({ valid: true, message: "Invalid email address" });
       return;
     }
-    if (passwordInput.value) {
+    if (passwordInput.value !== "") {
       await post("/api/login", {
         originid: "originid",
         email: emailInput.value,
@@ -93,13 +94,14 @@ const LoginPage = (props: Props) => {
   };
 
   // useEffect order matters!
-  useEffect(() => {
-    setError({ valid: false });
-  }, [props.userId, localAccount]);
+  // useEffect(() => {
+  //   setError({ valid: false });
+  // }, [email, props.userId]);
 
-  useEffect(() => {
-    setError(props.error);
-  }, []);
+  // useEffect(() => {
+  //   setError(props.error);
+  //   if (props.error.valid) setLocalAccount(true);
+  // }, []);
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
@@ -128,7 +130,10 @@ const LoginPage = (props: Props) => {
               <div className="action-container">
                 <TbPlayerTrackPrevFilled
                   className="login-icon u-pointer"
-                  onClick={(event) => setLocalAccount(false)}
+                  onClick={(event) => {
+                    setError({ valid: false });
+                    setLocalAccount(false);
+                  }}
                 ></TbPlayerTrackPrevFilled>
                 <TbPlayerTrackNextFilled
                   className="login-icon u-pointer"
@@ -176,6 +181,9 @@ const LoginPage = (props: Props) => {
                 }}
               >
                 Sign in with Facebook
+              </button>
+              <button className="login-button u-pointer" onClick={(event) => props.setLogin(false)}>
+                Go back
               </button>
             </>
           )}
