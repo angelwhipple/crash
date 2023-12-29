@@ -1,11 +1,11 @@
 .profile-split {
   position: fixed;
-  top: 0;
+  top: inherit;
+  left: 70%;
   height: 100%;
   width: 30%;
   align-items: center;
   display: flex;
-  padding: 1%;
 }
 
 .details-split {
@@ -13,7 +13,7 @@
   top: inherit;
   height: 100%;
   width: 50%;
-  left: 30%;
+  left: 20%;
   padding: 1%;
 }
 
@@ -22,19 +22,19 @@
   top: inherit;
   height: 100%;
   width: 20%;
-  left: 80%;
   padding: 1%;
 }
 
 .card-container {
   position: relative;
-  background-color: white;
-  -webkit-text-fill-color: black;
+  background-color: var(--orange);
+  -webkit-text-fill-color: white;
   width: 100%;
-  height: 65%;
-  border-radius: 4%;
   justify-content: center;
   display: flex;
+  border: 2px solid var(--orange);
+  animation: fadeInLeft 0.7s;
+  height: inherit;
 }
 
 .profile-pic {
@@ -82,14 +82,15 @@
 .edit-icon {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   padding: 5%;
   font-size: 24px;
   transition-duration: 0.3s;
+  fill: white;
 }
 
 .edit-icon:hover {
-  color: var(--primary-dim);
+  fill: var(--hot-orange);
   transition-duration: 0.3s;
 }
 
@@ -102,9 +103,9 @@
 
 .account-pill {
   align-self: center;
-  background: var(--black);
+  background: var(--white);
   border-radius: 25%;
-  -webkit-text-fill-color: var(--white);
+  -webkit-text-fill-color: var(--black);
   text-align: center;
   display: flex;
   align-items: center;

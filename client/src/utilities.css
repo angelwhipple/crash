@@ -19,6 +19,7 @@
 
 :root {
   --orange: #ff8400;
+  --hot-orange: #bd1209;
   --primary: #0a12ff;
   --primary-dim: #4249ff;
   --primary-light: #575dfb;
@@ -28,12 +29,16 @@
   --white: #fff;
   --black: #020006;
   --red: #bd1209;
-  --glow-1: #8185fa;
+  /* --glow-1: #8185fa;
   --glow-2: #666bfd;
   --glow-3: #4249ff;
   --glow-4: #0a12ff;
-  --glow-5: #090fc5;
-
+  --glow-5: #090fc5; */
+  --glow-1: #ff932e;
+  --glow-2: #ed7429;
+  --glow-3: #ed6111;
+  --glow-4: #d74a13;
+  --glow-5: #d71313;
   --xs: 4px;
   --s: 8px;
   --m: 16px;
@@ -148,7 +153,7 @@ ul {
 .default-container {
   display: flex;
   flex-direction: column;
-  background-color: black;
+  background-color: var(--orange);
   width: fit-content;
   height: fit-content;
   padding: 5%;
@@ -165,10 +170,11 @@ ul {
   font-size: small;
   white-space: nowrap;
   transition-duration: 1s;
+  padding: 2%;
 }
 
 .default-button:hover {
-  -webkit-text-fill-color: var(--primary-dim);
+  -webkit-text-fill-color: var(--hot-orange);
   transition-duration: 1s;
 }
 
@@ -181,7 +187,7 @@ ul {
 }
 
 .opaque-text {
-  opacity: 0.5;
+  opacity: 0.7;
   max-width: 60%;
   overflow: hidden;
   word-wrap: break-word;
@@ -209,4 +215,43 @@ ul {
 
 .pad-light {
   padding: 2%;
+}
+
+.font-medium {
+  font-size: medium;
+}
+.font-small {
+  font-size: small;
+}
+.font-large {
+  font-size: large;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0%);
+  }
 }

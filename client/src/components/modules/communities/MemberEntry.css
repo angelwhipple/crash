@@ -9,13 +9,13 @@
 }
 
 .entry-container:hover {
-  border: solid var(--primary);
+  border: solid var(--orange);
   transition-duration: 0.6s;
-  -webkit-text-fill-color: var(--primary);
+  -webkit-text-fill-color: var(--orange);
 }
 
 .icon-sel {
-  color: var(--primary-dim);
+  color: var(--orange);
 }
 
 .x-icon {

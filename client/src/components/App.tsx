@@ -5,7 +5,7 @@ import { CredentialResponse } from "@react-oauth/google";
 
 import { get, post } from "../utilities";
 import NotFound from "./pages/NotFound";
-import { socket } from "../client-socket";
+import { socket, onSocketConnect } from "../client-socket";
 import User from "../../../shared/User";
 import "../utilities.css";
 import "./pages/Homepage.css";
@@ -26,6 +26,7 @@ const PLATFORMS = {
 };
 
 const App = () => {
+  const [socketConnected, setSocketConnected] = useState(socket.connected);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [consolidate, setConsolidate] = useState(false);
   const [extraProfiles, setExtraProfiles]: any[] = useState([]);
@@ -34,14 +35,14 @@ const App = () => {
   const [invited, setInvited] = useState(false);
 
   socket.on("linkedin", async (event) => {
-    console.log(`Linkedin login socket emission: ${JSON.stringify(event)}`);
+    console.log(`Linkedin login success`);
     setUserId(event.user._id);
     post("/api/initsocket", { socketid: socket.id });
     handleConsolidate(event);
   });
 
   socket.on("origin", async (event) => {
-    console.log(`Origin login socket emission: ${JSON.stringify(event)}`);
+    console.log(`Crash login success`);
     setUserId(event.user._id);
     post("/api/initsocket", { socketid: socket.id });
     handleConsolidate(event);
@@ -60,9 +61,11 @@ const App = () => {
     post("/api/login", {
       token: userToken,
     }).then(async (response) => {
-      console.log(`Google login response: ${JSON.stringify(response)}`);
+      console.log(`Google login success`);
       setUserId(response.user._id);
-      post("/api/initsocket", { socketid: socket.id });
+      post("/api/initsocket", { socketid: socket.id }).then(() => {
+        socket.emit("login success");
+      });
       handleConsolidate(response);
     });
   };
@@ -105,10 +108,23 @@ const App = () => {
   };
 
   useEffect(() => {
+    if (socketConnected) {
+      console.log(`Socket is connected!`);
+      console.log("Socket ID:", socket.id);
+    }
+  }, [socketConnected]);
+
+  useEffect(() => {
     loginJoinCommunity();
   }, [userId]);
 
   useEffect(() => {
+    setSocketConnected(socket.connected);
+    const handleConnect = () => {
+      setSocketConnected(true);
+    };
+    onSocketConnect(handleConnect);
+
     get("/api/whoami")
       .then((user: User) => {
         if (user._id) {

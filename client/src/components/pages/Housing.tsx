@@ -15,7 +15,6 @@ const Housing = (props) => {
 
   return (
     <div className="centered default-container">
-      <p>Find Housing</p>
       <p>Coming soon...</p>
       <button
         className="default-button u-pointer"

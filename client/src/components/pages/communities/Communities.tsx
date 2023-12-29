@@ -8,7 +8,6 @@ import "../../modules/accounts/CreateAccount.css";
 import "../../modules/LoginPanel.css";
 import "../../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
-import { FaBackward } from "react-icons/fa";
 import Invite from "../../modules/communities/Invite";
 import Community from "../../../../../shared/Community";
 import CommunityMenu from "../../modules/communities/CommunityMenu";
@@ -60,6 +59,18 @@ const Communities = (props: Props) => {
   });
 
   socket.on("new community", (event) => {});
+
+  socket.on("switched communities", (event) => {
+    setActiveCommunity(event.community);
+    setMenuAction(MenuAction.DETAILS);
+  });
+
+  socket.on("create new community", () => {
+    setMenuAction(undefined);
+    setJoining(false);
+    setLanding(false);
+    setActiveCommunity(undefined);
+  });
 
   socket.on("joined community", async (event) => {
     if (event.communityId === activeCommunity?._id) {
@@ -210,7 +221,7 @@ const Communities = (props: Props) => {
           <div className="centered default-container">
             <div className="u-flex">
               <label className="create-label">
-                Invitation code
+                <p>Please provide an invite code</p>
                 <input
                   id="inv_code"
                   type="text"
@@ -231,13 +242,15 @@ const Communities = (props: Props) => {
                 }}
               ></TbPlayerTrackNextFilled>
             </div>
-            <FaBackward
-              className="nav-icon back-button u-pointer"
+            <button
+              className="default-button u-pointer"
               onClick={(event) => {
                 setJoining(false);
                 setLanding(true);
               }}
-            ></FaBackward>
+            >
+              Go back
+            </button>
           </div>
         ) : communityType === undefined && props.userId ? (
           <div className="centered default-container">
@@ -276,10 +289,13 @@ const Communities = (props: Props) => {
             >
               Locality
             </button>
-            <FaBackward
-              className="nav-icon back-button u-pointer"
-              onClick={(event) => setLanding(true)}
-            ></FaBackward>
+            {communities.length > 0 ? (
+              <></>
+            ) : (
+              <button className="default-button u-pointer" onClick={(event) => setLanding(true)}>
+                Go back
+              </button>
+            )}
           </div>
         ) : communityType !== undefined && props.userId && verifying === true ? (
           <div className="centered default-container">
@@ -307,10 +323,9 @@ const Communities = (props: Props) => {
                 }}
               ></TbPlayerTrackNextFilled>
             </div>
-            <FaBackward
-              className="nav-icon back-button u-pointer"
-              onClick={(event) => setType(undefined)}
-            ></FaBackward>
+            <button className="default-button u-pointer" onClick={(event) => setType(undefined)}>
+              Go back
+            </button>
           </div>
         ) : (props.userId &&
             (communityType == CommunityType.UNIVERSITY ||
@@ -343,10 +358,9 @@ const Communities = (props: Props) => {
                 }}
               ></TbPlayerTrackNextFilled>
             </div>
-            <FaBackward
-              className="nav-icon back-button u-pointer"
-              onClick={(event) => setType(undefined)}
-            ></FaBackward>
+            <button className="default-button u-pointer" onClick={(event) => setType(undefined)}>
+              Go back
+            </button>
           </div>
         ) : (
           <></>

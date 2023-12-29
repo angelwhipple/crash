@@ -8,7 +8,6 @@ import { SearchFilters, FILTERS_TO_IDS } from "../types";
 
 type Props = RouteComponentProps & {
   setFiltering: any;
-  setQuerying: any;
   filter: SearchFilters;
   setFilter: any;
 };
@@ -80,10 +79,7 @@ const Filters = (props: Props) => {
               apply filter
             </button>
             <button
-              onClick={(event) => {
-                props.setFiltering(false);
-                props.setQuerying(true);
-              }}
+              onClick={(event) => props.setFiltering(false)}
               className="default-button u-pointer"
             >
               close

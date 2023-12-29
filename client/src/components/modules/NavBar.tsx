@@ -2,23 +2,26 @@ import React, { useState, useEffect } from "react";
 import "./NavBar.css";
 import "./LoginPanel.css";
 import "../../utilities.css";
-import { onSocketConnect, socket } from "../../client-socket";
+import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import { HiHome } from "react-icons/hi";
-import { BsSearch, BsPersonFill } from "react-icons/bs";
 import { IoIosPeople } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
-import { ImExit } from "react-icons/im";
+import { FaGear } from "react-icons/fa6";
 import Filters from "./FiltersModal";
 import { SearchFilters, FILTERS_TO_IDS } from "../types";
 import Logout from "./LogoutModal";
+import blank from "../../assets/blank.jpg";
 import helpers from "../helpers";
+import "./Modal.css";
 
 type Props = RouteComponentProps & {
   userId: string;
   setUserId: any;
 };
+
+const DROPDOWN_IDS = ["profile-dropdown", "community-dropdown"];
 
 const NavBar = (props: Props) => {
   const [profile, setProfile] = useState(false);
@@ -29,7 +32,9 @@ const NavBar = (props: Props) => {
   const [logout, setLogout] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(SearchFilters.ALL);
-  const [socketConnected, setSocketConnected] = useState(socket.connected);
+  const [src, setSrc] = useState("");
+  const [communityBtns, setCommunityBtns] = useState<JSX.Element[]>();
+  const [name, setName] = useState("Crash User");
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -47,12 +52,20 @@ const NavBar = (props: Props) => {
     filter: boolean = false,
     selectedFunc?: (val: boolean) => void
   ) => {
+    DROPDOWN_IDS.map((dropdown) => {
+      const elem = document.getElementById(dropdown);
+      if (elem) elem.style.display = "none"; // always disable dropdowns
+    });
+
     const funcOptions = [setProfile, setCommunities, setHousing, setQuerying, setFiltering];
     for (const toggleFunc of funcOptions) toggleFunc(false);
-    if (filter) {
-      setQuerying(true);
-      setFiltering(!filtering);
-    } else if (!all && selectedFunc) selectedFunc(true);
+    if (filter) setFiltering(!filtering);
+    else if (!all && selectedFunc) selectedFunc(true);
+  };
+
+  const toggleDropdown = (dropdownId: string) => {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown!.style.display = dropdown?.style.display === "none" ? "flex" : "none";
   };
 
   const handleQuery = (event) => {
@@ -72,34 +85,64 @@ const NavBar = (props: Props) => {
     });
   };
 
+  const updateIdentity = async () => {
+    await get("/api/user/fetch", { id: props.userId }).then((res) => {
+      setName(res.user.name);
+    });
+    await get("/api/user/loadphoto", { userId: props.userId }).then((res) => {
+      if (res.valid) {
+        const buffer = res.buffer.Body.data;
+        setSrc(helpers.URLFromBuffer(buffer));
+      }
+    });
+  };
+
   useEffect(() => {
-    setSocketConnected(socket.connected);
-    const handleConnect = () => {
-      setSocketConnected(true);
-    };
-    onSocketConnect(handleConnect);
+    if (props.userId) updateIdentity();
+    else setSrc(blank);
   }, []);
 
   useEffect(() => {
-    if (socketConnected) {
-      console.log(`Socket is connected!`);
-      console.log("Socket ID:", socket.id);
+    if (props.userId) {
+      updateIdentity();
+      const btns: JSX.Element[] = [];
+      get("/api/user/communities", { id: props.userId }).then((res) => {
+        console.log(res);
+        for (const community of res.communities) {
+          btns.push(
+            <button
+              key={community._id}
+              className="default-button u-pointer"
+              onClick={() => {
+                socket.emit("switched communities", { community: community });
+                toggleDropdown("community-dropdown");
+              }}
+              // onMouseOver={() => {
+              //   toggleDropdown("community-dropdown");
+              // }}
+            >
+              {community.name}
+            </button>
+          );
+        }
+        setCommunityBtns(btns);
+      });
     }
-  }, [socketConnected]);
+  }, [props.userId]);
 
   socket.on("nav toggle all", (event) => {
     toggleTabs(true, false);
   });
 
+  socket.on("updated user", () => {
+    if (props.userId) updateIdentity();
+  });
+
   return (
     <>
+      <script></script>
       {filtering ? (
-        <Filters
-          filter={filter}
-          setFilter={setFilter}
-          setFiltering={setFiltering}
-          setQuerying={setQuerying}
-        />
+        <Filters filter={filter} setFilter={setFilter} setFiltering={setFiltering} />
       ) : logout ? (
         <Logout setUserId={props.setUserId} setLogout={setLogout}></Logout>
       ) : (
@@ -107,24 +150,59 @@ const NavBar = (props: Props) => {
       )}
       <nav className="nav-bar-container">
         {props.userId !== undefined ? (
-          <ImExit
-            title="Logout"
-            className={`u-pointer nav-icon`}
-            onClick={() => {
-              setLogout(true);
-            }}
-          ></ImExit>
+          <>
+            <div className="nav-dropdown-container">
+              <div
+                className="u-flex u-alignCenter"
+                onClick={() => {
+                  toggleDropdown("profile-dropdown");
+                }}
+              >
+                <img
+                  className={`u-pointer ${profile ? "nav-img-selected" : "nav-img"}`}
+                  src={src}
+                ></img>
+                <p className="u-pointer font-small pad-light">{name}</p>
+              </div>
+
+              <div
+                id="profile-dropdown"
+                className="nav-dropdown-content"
+                // onMouseOut={() => {
+                //   toggleDropdown("profile-dropdown");
+                // }}
+              >
+                <button
+                  className="default-button font-medium u-pointer"
+                  onClick={(event) => {
+                    route("/profile");
+                    toggleDropdown("profile-dropdown");
+                    toggleTabs(false, false, setProfile);
+                  }}
+                  // onMouseOver={() => {
+                  //   toggleDropdown("profile-dropdown");
+                  // }}
+                >
+                  Profile
+                </button>
+                <button
+                  className="default-button font-medium u-pointer"
+                  onClick={() => {
+                    setLogout(true);
+                    toggleDropdown("profile-dropdown");
+                  }}
+                  // onMouseOver={() => {
+                  //   toggleDropdown("profile-dropdown");
+                  // }}
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </>
         ) : (
           <></>
         )}
-        <BsPersonFill
-          title="Profile"
-          className={`u-pointer ${profile ? "nav-icon-selected" : "nav-icon"}`}
-          onClick={(event) => {
-            route("/profile");
-            toggleTabs(false, false, setProfile);
-          }}
-        ></BsPersonFill>
         <HiHome
           title="Housing"
           className={`u-pointer ${housing ? "nav-icon-selected" : "nav-icon"}`}
@@ -141,39 +219,64 @@ const NavBar = (props: Props) => {
             toggleTabs(false, false, setCommunities);
           }}
         ></IoIosPeople>
-        <BsSearch
-          className={`u-pointer ${querying ? "nav-icon-selected" : "nav-icon"}`}
-          onClick={(event) => {
-            if (querying) {
-              if (!query) toggleTabs(true, false, setQuerying); // no search query, close & de-highlight all navbar tabs
-              // else handleSearch()
-            } else {
-              toggleTabs(false, false, setQuerying);
-            }
-          }}
-        ></BsSearch>
-        <div
-          className={`search-bar-container ${querying ? "search-bar-open" : "search-bar-close"}`}
-        >
-          <GoFilter
-            className={`u-pointer ${filtering ? "nav-icon-selected" : "nav-icon"}`}
-            onClick={(event) => {
-              setFiltering(!filtering);
-              setQuerying(true);
-            }}
-          ></GoFilter>
-          <input
-            id="navSearch"
-            type="search"
-            placeholder="search"
-            className="search-bar"
-            onKeyDown={(event) => {
-              if (event.key == "Enter") {
-                handleSearch(event);
-              }
-            }}
-            onChange={handleQuery}
-          ></input>
+        <div className="alt-container">
+          {" "}
+          {communities && props.userId ? (
+            <>
+              <div className="nav-dropdown-container community-dropdown">
+                <FaGear
+                  id="gear"
+                  className="nav-icon u-pointer"
+                  onClick={() => {
+                    toggleDropdown("community-dropdown");
+                  }}
+                ></FaGear>
+                <div
+                  id="community-dropdown"
+                  className="nav-dropdown-content"
+                  // onMouseOut={() => {
+                  //   toggleDropdown("community-dropdown");
+                  // }}
+                >
+                  {communityBtns}
+                  <button
+                    className="default-button u-pointer"
+                    onClick={() => {
+                      socket.emit("create new community");
+                      toggleDropdown("community-dropdown");
+                    }}
+                    // onMouseOver={() => {
+                    //   toggleDropdown("community-dropdown");
+                    // }}
+                  >
+                    Create new
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+          <div className="search-bar-container">
+            <GoFilter
+              className={`u-pointer ${filtering ? "nav-icon-selected" : "nav-icon"}`}
+              onClick={(event) => {
+                setFiltering(!filtering);
+              }}
+            ></GoFilter>
+            <input
+              id="navSearch"
+              type="search"
+              placeholder="search"
+              className="search-bar"
+              onKeyDown={(event) => {
+                if (event.key == "Enter") {
+                  handleSearch(event);
+                }
+              }}
+              onChange={handleQuery}
+            ></input>
+          </div>
         </div>
       </nav>
     </>

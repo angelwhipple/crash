@@ -5,24 +5,24 @@
 }
 
 .menu-option {
-  background-color: black;
+  background-color: inherit;
   border: var(--s) solid transparent;
   padding: 5%;
   width: 100%;
   transition-duration: 0.7s;
 }
 .menu-option:hover {
-  border: var(--s) solid var(--primary-light);
+  border: var(--s) solid var(--orange);
   transition-duration: 0.9s;
 }
 
 .menu-option-sel {
-  background-color: black;
+  background-color: inherit;
   border: var(--s) solid transparent;
   padding: 5%;
   width: 100%;
   transition-duration: 0.7s;
-  border: var(--s) solid var(--primary-light);
+  border: var(--s) solid var(--orange);
   transition-duration: 0.9s;
 }
 
@@ -30,14 +30,14 @@
 }
 .reg:hover,
 .reg-sel {
-  border-image: linear-gradient(var(--primary-light), var(--primary)) 10;
+  border-image: linear-gradient(var(--orange), var(--hot-orange)) 10;
 }
 
 .inv {
 }
 .inv:hover,
 .inv-sel {
-  border-image: linear-gradient(var(--primary), var(--primary-light)) 10;
+  border-image: linear-gradient(var(--hot-orange), var(--orange)) 10;
 }
 
 .menu-icon {
@@ -53,15 +53,15 @@
 }
 
 .icon-reg {
-  color: var(--white);
+  color: var(--orange);
 }
 .icon-reg-sel {
-  color: var(--primary-light);
+  color: var(--hot-orange);
 }
 
 .icon-inv {
-  color: var(--white);
+  color: var(--orange);
 }
 .icon-inv-sel {
-  color: var(--primary);
+  color: var(--hot-orange);
 }

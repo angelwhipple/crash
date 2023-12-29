@@ -1,6 +1,6 @@
 .profiles-container {
   display: flex;
-  column-gap: 2px;
+  column-gap: 2%;
   overflow-x: visible;
   width: auto;
 }
@@ -10,10 +10,10 @@
 }
 .merge-modal {
   align-self: center;
-  background: var(--black);
+  background: var(--white);
   width: fit-content;
   border-radius: 12px;
-  -webkit-text-fill-color: var(--white);
+  -webkit-text-fill-color: var(--black);
   text-align: center;
   display: flex;
   flex-direction: column;

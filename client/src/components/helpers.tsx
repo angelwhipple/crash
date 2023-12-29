@@ -112,6 +112,12 @@ const URLFromFile = (file: File): string => {
   return url;
 };
 
+const URLFromBuffer = (buffer: Buffer): string => {
+  const arrayBuffer = Uint8Array.from(buffer).buffer;
+  const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
+  return URL.createObjectURL(blob);
+};
+
 export default {
   route,
   validateUsername,
@@ -121,4 +127,5 @@ export default {
   drawCropCanvas,
   fileFromURL,
   URLFromFile,
+  URLFromBuffer,
 };

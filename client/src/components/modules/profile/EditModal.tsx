@@ -43,7 +43,6 @@ const EditModal = (props: Props) => {
 
     fetch("/api/user/update", { method: "POST", body: formData }).then(async (res) => {
       const data = await res.json();
-      if (data.valid) console.log(data);
     });
   };
 

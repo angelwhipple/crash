@@ -33,7 +33,7 @@ const CommunityDetails = (props: Props) => {
     selectorFn(true);
   };
 
-  const updatePhoto = async (imageBuffer: ArrayBuffer) => {
+  const updatePhoto = (imageBuffer: ArrayBuffer) => {
     const base64Image = btoa(
       new Uint8Array(imageBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
     );
@@ -69,21 +69,28 @@ const CommunityDetails = (props: Props) => {
     }
   });
 
-  useEffect(() => {
+  const refreshDetails = async () => {
+    setMembers([]);
     populateUsers();
-    if (props.activeCommunity.description !== undefined) {
-      setDescription(props.activeCommunity.description.toString());
-    }
+    setImg(defaultImg);
     get("/api/community/loadphoto", { communityId: props.activeCommunity._id }).then((res) => {
       if (res.valid) {
         const buffer = res.buffer.Body.data;
         updatePhoto(buffer);
       }
     });
+    setName(props.activeCommunity.name);
+    if (props.activeCommunity.description) {
+      setDescription(props.activeCommunity.description.toString());
+    } else setDescription(`Describe this community`);
+  };
+
+  useEffect(() => {
+    refreshDetails();
   }, []);
 
   useEffect(() => {
-    populateUsers();
+    refreshDetails();
   }, [props.activeCommunity]);
 
   const populateUsers = async () => {

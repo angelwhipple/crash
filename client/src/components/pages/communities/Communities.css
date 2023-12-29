@@ -1,5 +1,5 @@
 .sidebar-split {
-  background-color: var(--black);
+  background-color: var(--white);
   height: 100%;
   width: 20%;
   position: fixed;
@@ -9,7 +9,7 @@
 }
 
 .mainpage-split {
-  background-color: var(--primary);
+  background-color: var(--white);
   height: 100%;
   width: 80%;
   position: fixed;
@@ -32,8 +32,4 @@
 
 .code-chars {
   width: 10%;
-}
-
-.back-button {
-  align-self: center;
 }

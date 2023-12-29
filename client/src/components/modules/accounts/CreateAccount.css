@@ -36,6 +36,6 @@
 
 .info-icon-create:hover {
   opacity: 1;
-  fill: red;
+  fill: var(--orange);
   transition-duration: 0.5s;
 }

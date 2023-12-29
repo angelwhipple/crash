@@ -23,7 +23,6 @@ const PROFILE_ICONS = {
 };
 
 const ProfilePill = (props) => {
-  console.log(`Profile info: ${JSON.stringify(props.profile)}`);
   const [platform, setPlatform] = useState("");
   const [icon, setIcon] = useState("");
 

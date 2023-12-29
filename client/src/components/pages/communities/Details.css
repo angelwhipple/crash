@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   padding: 1%;
-  background-color: black;
+  background-color: var(--orange);
   -webkit-text-fill-color: white;
   position: relative;
 }
@@ -39,26 +39,26 @@
   right: 0;
   padding: 2%;
   size: 24px;
-  fill: white;
+  fill: var(--white);
   transition-duration: 0.5s;
 }
 
 .gear-icon:hover {
   transition-duration: 0.5s;
-  fill: var(--primary-dim);
+  fill: var(--hot-orange);
 }
 
 .toggle-container {
   display: flex;
   column-gap: 20%;
-  background-color: black;
+  background-color: var(--orange);
   padding: 2%;
   justify-content: center;
   align-items: center;
 }
 
 .toggle-link {
-  background-color: black;
+  background-color: inherit;
   border: none;
 }
 
@@ -71,7 +71,8 @@
 .gradient-text:hover,
 .gradient-text-sel {
   font-size: large;
-  background: -webkit-linear-gradient(var(--primary), var(--primary-light));
+  /* background: -webkit-linear-gradient(var(--primary), var(--primary-light)); */
+  background: -webkit-linear-gradient(var(--hot-orange), var(--hot-orange));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition-duration: 0.7s;

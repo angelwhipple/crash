@@ -1,8 +1,7 @@
 .pill-container {
   background-color: black;
-  border: solid thin;
+  border: 2px solid var(--white);
   border-radius: 12px;
-  border-color: var(--white);
   padding: 6%;
   display: flex;
   align-items: center;
@@ -13,8 +12,8 @@
 }
 
 .pill-container:hover {
-  border-color: var(--primary-dim);
-  -webkit-text-fill-color: var(--primary-dim);
+  border-color: var(--hot-orange);
+  -webkit-text-fill-color: var(--hot-orange);
   transition-duration: 0.4s;
 }
 

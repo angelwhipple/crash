@@ -43,6 +43,10 @@ export const init = (server: http.Server): void => {
 
     // ADD socket.on EVENTS AS NEEDED
 
+    socket.on("login success", () => {
+      console.log(`socket has logged in successfully ${socket.id}`);
+      io.emit("login success", {});
+    });
     socket.on("nav toggle all", () => {
       console.log(`socket has toggled nav bar ${socket.id}`);
       io.emit("nav toggle all", {});
@@ -54,6 +58,14 @@ export const init = (server: http.Server): void => {
     socket.on("terms of service", () => {
       console.log(`socket has acknowledged terms of service ${socket.id}`);
       io.emit("terms of service", {});
+    });
+    socket.on("switched communities", (event) => {
+      console.log(`socket has switched communities ${socket.id}`);
+      io.emit("switched communities", { community: event.community });
+    });
+    socket.on("create new community", (event) => {
+      console.log(`socket has elected to start a new community ${socket.id}`);
+      io.emit("create new community");
     });
   });
 };
