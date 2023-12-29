@@ -1,5 +1,5 @@
 import React from "react";
-import "../modules/LoginPanel.css";
+import "../pages/Login.css";
 
 import { RouteComponentProps, useNavigate } from "@reach/router";
 

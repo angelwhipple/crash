@@ -12,7 +12,10 @@ import { USERNAME_INFO, PASSWORD_INFO, Policy, CustomError } from "../../types";
 
 type Props = RouteComponentProps & {
   setCreate: (bool: boolean) => void;
+  setLogin: (bool: boolean) => void;
   setUserId: (newUserId: string) => void;
+  error: CustomError;
+  setError: (err: CustomError) => void;
 };
 
 type Acknowledgements = {
@@ -21,21 +24,20 @@ type Acknowledgements = {
 };
 
 const CreateAccount = (props: Props) => {
-  const [exists, setExists] = useState(false);
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<CustomError>({ valid: false });
   const [policy, setPolicy] = useState<Policy>({ show: false });
   const [acknowledgements, setAcknowledgements] = useState<Acknowledgements>({
     privacy: false,
     terms: false,
   });
+  const [error, setError] = useState<CustomError>(props.error);
 
   const handleDob = (event, dobInput) => {
     event.preventDefault();
-    console.log(`Date of birth: ${dobInput.value}`);
+    // console.log(`Date of birth: ${dobInput.value}`);
     if (!dobInput.value) {
       setError({ valid: true, message: "Please enter a valid date of birth" });
     } else if (helpers.validateAge(dobInput.value)) {
@@ -49,41 +51,22 @@ const CreateAccount = (props: Props) => {
 
   const handleEmail = (event, emailInput) => {
     event.preventDefault();
-    console.log(`Email: ${emailInput.value}`);
+    // console.log(`Email: ${emailInput.value}`);
     if (helpers.validateEmail(emailInput.value)) {
       get("/api/user/exists", { email: emailInput.value }).then((res) => {
-        // if existing account is returned, skip to password step for login
         if (res.exists) {
-          setExists(true);
-          // setInvalid({
-          //   ind: true,
-          //   message: "An existing account was found with that email address. Please login",
-          // });
-          setError({ valid: false });
-        }
+          props.setError({
+            valid: true,
+            message: "An existing account was found with that email address. Please login",
+          });
+          props.setCreate(false);
+          props.setLogin(true);
+        } else setEmail(emailInput.value);
       });
-      setEmail(emailInput.value);
     } else {
       emailInput.value = "";
       setError({ valid: true, message: "Invalid email address" });
     }
-  };
-
-  const handleLogin = (event, emailInput, passwordInput) => {
-    event.preventDefault();
-    post("/api/login", {
-      originid: "originid",
-      email: emailInput.value,
-      password: passwordInput.value,
-    }).then((res) => {
-      if (res.valid) {
-        setError({ valid: false });
-        props.setCreate(false);
-      } else {
-        passwordInput.value = "";
-        setError({ valid: true, message: res.message });
-      }
-    });
   };
 
   const handleUserPass = async (event) => {
@@ -91,20 +74,20 @@ const CreateAccount = (props: Props) => {
     const usernameInput = document.getElementById("username")! as HTMLInputElement;
     const passwordInput = document.getElementById("password")! as HTMLInputElement;
     const confirmInput = document.getElementById("confirm")! as HTMLInputElement;
-    console.log(`Username: ${usernameInput.value}`);
+    // console.log(`Username: ${usernameInput.value}`);
     if (passwordInput.value !== confirmInput.value) {
       passwordInput.value = "";
       confirmInput.value = "";
       setError({ valid: true, message: "Passwords must match" });
     } else {
-      console.log(`Password: ${passwordInput.value}`);
+      // console.log(`Password: ${passwordInput.value}`);
       const usernameError = await helpers.validateUsername(usernameInput.value);
       const passwordError = helpers.validatePassword(passwordInput.value);
       const acknowledged = acknowledgements.privacy && acknowledgements.terms;
       if (!usernameError.valid && !passwordError.valid && acknowledged) {
         setUsername(usernameInput.value);
         setPassword(passwordInput.value);
-        setError({ valid: false });
+        props.setError({ valid: false });
         const body = {
           username: usernameInput.value,
           password: passwordInput.value,
@@ -116,7 +99,6 @@ const CreateAccount = (props: Props) => {
           props.setUserId(user._id);
           props.setCreate(false);
           helpers.route("/profile");
-          // switch to profile page for setup here
         });
       } else if (usernameError.valid) {
         setError(usernameError);
@@ -140,10 +122,13 @@ const CreateAccount = (props: Props) => {
     setError({ valid: false }); // clear error
   }, [email, dob, username, password]);
 
+  useEffect(() => {
+    setError(props.error);
+  }, []);
+
   socket.on("privacy policy", () =>
     setAcknowledgements({ privacy: true, terms: acknowledgements.terms })
   );
-
   socket.on("terms of service", () =>
     setAcknowledgements({ privacy: acknowledgements.privacy, terms: true })
   );
@@ -157,7 +142,7 @@ const CreateAccount = (props: Props) => {
       )}
 
       <div className="centered default-container create-container">
-        {exists === true ? <h3>Sign in</h3> : <h3>Create an account</h3>}
+        <h3>Create an account</h3>
         {email === "" ? (
           <>
             <label className="create-label">
@@ -177,43 +162,6 @@ const CreateAccount = (props: Props) => {
               onClick={(event) => {
                 const emailInput = document.getElementById("email")! as HTMLInputElement;
                 handleEmail(event, emailInput);
-              }}
-            ></TbPlayerTrackNextFilled>
-          </>
-        ) : exists === true ? (
-          <>
-            <label className="create-label">
-              Enter your email address
-              <input
-                id="email2"
-                className="create-input"
-                onKeyDown={(event) => {
-                  const emailInput = document.getElementById("email2")! as HTMLInputElement;
-                  if (event.key === "Enter") handleEmail(event, emailInput);
-                }}
-                type="email"
-                value={email}
-              ></input>
-            </label>
-            <label className="create-label">
-              Enter your password{" "}
-              <input
-                id="password"
-                className="create-input"
-                type="password"
-                onKeyDown={(event) => {
-                  const emailInput = document.getElementById("email2")! as HTMLInputElement;
-                  const passwordInput = document.getElementById("password")! as HTMLInputElement;
-                  if (event.key === "Enter") handleLogin(event, emailInput, passwordInput);
-                }}
-              ></input>
-            </label>
-            <TbPlayerTrackNextFilled
-              className="nav-icon u-pointer"
-              onClick={(event) => {
-                const emailInput = document.getElementById("email")! as HTMLInputElement;
-                const passwordInput = document.getElementById("password")! as HTMLInputElement;
-                handleLogin(event, emailInput, passwordInput);
               }}
             ></TbPlayerTrackNextFilled>
           </>

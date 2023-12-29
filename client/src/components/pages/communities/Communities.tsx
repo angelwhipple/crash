@@ -5,7 +5,7 @@ import { get, post } from "../../../utilities";
 import { Link, RouteComponentProps, useNavigate } from "@reach/router";
 import "./Communities.css";
 import "../../modules/accounts/CreateAccount.css";
-import "../../modules/LoginPanel.css";
+import "../../pages/Login.css";
 import "../../modules/NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import Invite from "../../modules/communities/Invite";

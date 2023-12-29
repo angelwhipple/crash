@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  GoogleOAuthProvider,
-  GoogleLogin,
-  googleLogout,
-  CredentialResponse,
-} from "@react-oauth/google";
+import { CredentialResponse } from "@react-oauth/google";
 import { socket } from "../../client-socket";
 import "./Homepage.css";
 import { RouteComponentProps } from "@reach/router";
-import LoginPanel from "../modules/LoginPanel";
+import LoginPage from "./Login";
+import CreateAccount from "../modules/accounts/CreateAccount";
 import Merge from "../modules/accounts/Merge";
-
 import { Player, Controls } from "@lottiefiles/react-lottie-player";
+import { CustomError } from "../types";
+import Logout from "../modules/LogoutModal";
 
 type Props = RouteComponentProps & {
   userId?: any;
@@ -30,6 +27,8 @@ const Homepage = (props: Props) => {
   const { handleLogin, handleLogout } = props;
   const [create, setCreate] = useState(false);
   const [login, setLogin] = useState(false);
+  const [error, setError] = useState<CustomError>({ valid: false });
+  const [logout, setLogout] = useState(false);
 
   useEffect(() => {
     const queryString = window.location.search;
@@ -55,6 +54,8 @@ const Homepage = (props: Props) => {
               chosenProfiles={props.chosenProfiles}
               setConsolidate={props.setConsolidate}
             ></Merge>
+          ) : logout ? (
+            <Logout setUserId={props.setUserId} setLogout={setLogout}></Logout>
           ) : (
             <></>
           )}
@@ -63,8 +64,9 @@ const Homepage = (props: Props) => {
             <button
               className="default-button u-pointer"
               onClick={() => {
-                googleLogout();
-                props.handleLogout();
+                setLogin(false);
+                setCreate(false);
+                setLogout(true);
               }}
             >
               Logout
@@ -72,19 +74,23 @@ const Homepage = (props: Props) => {
           </div>
         </>
       ) : create ? (
-        <LoginPanel
-          handleLogin={handleLogin}
-          setChosenProfiles={props.setChosenProfiles}
-          userId={props.userId}
+        <CreateAccount
+          setCreate={setCreate}
+          setLogin={setLogin}
           setUserId={props.setUserId}
-        ></LoginPanel>
+          error={error}
+          setError={setError}
+        ></CreateAccount>
       ) : login ? (
-        <LoginPanel
+        <LoginPage
           handleLogin={handleLogin}
-          setChosenProfiles={props.setChosenProfiles}
+          setLogin={setLogin}
+          setCreate={setCreate}
           userId={props.userId}
           setUserId={props.setUserId}
-        ></LoginPanel>
+          error={error}
+          setError={setError}
+        ></LoginPage>
       ) : (
         <>
           <h1 className="header u-">Welcome to Crash</h1>

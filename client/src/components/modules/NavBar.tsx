@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./NavBar.css";
-import "./LoginPanel.css";
+import "../pages/Login.css";
 import "../../utilities.css";
 import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";

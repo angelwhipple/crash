@@ -3,7 +3,7 @@ import { socket } from "../../../client-socket";
 import { get, post } from "../../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import Community from "../../../../../shared/Community";
-import "../../modules/LoginPanel.css";
+import "../../pages/Login.css";
 import "./Invite.css";
 import "../Modal.css";
 

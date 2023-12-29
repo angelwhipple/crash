@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { socket } from "../../client-socket";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
+import { googleLogout } from "@react-oauth/google";
 import "./Modal.css";
 
 type Props = RouteComponentProps & {
@@ -25,6 +26,7 @@ const Logout = (props: Props) => {
               className="default-button u-pointer"
               onClick={(event) => {
                 props.setUserId(undefined);
+                googleLogout();
                 post("/api/logout").then((res) => {
                   socket.emit("nav toggle all", {});
                   props.setLogout(false);

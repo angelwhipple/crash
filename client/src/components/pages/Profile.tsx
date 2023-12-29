@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import { get, post } from "../../utilities";
 import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Profile.css";
-import "../modules/LoginPanel.css";
+import "../pages/Login.css";
 import blank from "../../assets/blank.jpg";
 import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
