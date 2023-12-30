@@ -16,6 +16,7 @@ import ManageCommunity from "./Manage";
 import Explore from "./Explore";
 import Annoucements from "./Annoucements";
 import { CustomError } from "../../types";
+import { SendEmailV3_1 } from "node-mailjet";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -101,6 +102,8 @@ const Communities = (props: Props) => {
     setMenuAction(MenuAction.EXPLORE);
   }, []);
 
+  useEffect(() => setError({ valid: false }), [verified]);
+
   const createCommunity = async (nameInput) => {
     const body = {
       userId: props.userId,
@@ -143,20 +146,20 @@ const Communities = (props: Props) => {
       emailInput.value = "";
       console.log(`From: ${sender.email}, To: ${sendee.email}`);
 
-      const messages = {
+      const messages: SendEmailV3_1.Body = {
         Messages: [
           {
             From: { Email: sender.email, Name: sender.name }, // single sender object
             To: [{ Email: sendee.email, Name: sendee.name }], // list of sendee objects
             Subject: "Verify your e-mail with Crash",
-            HtmlPart: `<a href="http://localhost:5050/api/user/verified?id=${props.userId}">Click here to confirm your email address</a>`,
+            HTMLPart: `<a href="http://localhost:5050/api/user/verified?id=${props.userId}">Click here to confirm your email address</a>`,
           },
         ],
       };
 
       post("/api/user/verification", { messages: messages }).then((res) => {
         if (res.sent) {
-          setError({ valid: true, message: "Check your email for a verification link" });
+          setError({ valid: true, message: "Please check your email for a verification link" });
         } else {
           console.log(`Mailjet error: ${res.error}`);
           setError({

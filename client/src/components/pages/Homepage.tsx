@@ -119,8 +119,8 @@ const Homepage = (props: Props) => {
             <Player
               src="https://lottie.host/08687337-9aa4-42d9-8a3d-f855b2350a2f/j7lwbUynui.json"
               background="transparent"
-              speed={0.75}
-              style={{ width: "100%", height: "100%" }}
+              speed={0.9}
+              style={{ width: "175%", height: "175%" }}
               loop
               controls
               autoplay

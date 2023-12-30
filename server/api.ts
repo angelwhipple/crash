@@ -7,7 +7,7 @@ import Community from "./models/Community";
 import CommunityInterface from "../shared/Community";
 const router = express.Router();
 const AWS = require("aws-sdk");
-import mailjet from "node-mailjet";
+import mailjet, { SendEmailV3_1 } from "node-mailjet";
 import helpers from "./helpers";
 import { CustomRequest, TokenResponse, PRIVACY_POLICY, SERVICE_TERMS } from "./types";
 import path from "path";
@@ -22,7 +22,8 @@ const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() }); // Store files in memory as Buffers
 const mailjet_api = mailjet.apiConnect(
   process.env.MAILJET_API_KEY!,
-  process.env.MAILJET_SECRET_KEY!
+  process.env.MAILJET_SECRET_KEY!,
+  { options: { timeout: 300000 } } // 5 min timeout (ms)
 );
 
 /**
@@ -92,10 +93,12 @@ router.get("/user/fetch", async (req, res) => {
 });
 
 router.post("/user/verification", async (req, res) => {
-  const request = mailjet_api.post("send", { version: "v3.1" }).request(req.body.messages);
+  const body: SendEmailV3_1.Body = req.body.messages;
+  console.log(body);
+  const request = mailjet_api.post("send", { version: "v3.1" }).request(body);
   await request
     .then((result) => {
-      console.log(`[MAILJET] API response: ${result.body}`);
+      console.log(`[MAILJET] Sent successfully: ${result}`);
       res.send({ sent: true });
     })
     .catch((err) => {
