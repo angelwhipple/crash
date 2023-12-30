@@ -93,12 +93,14 @@ router.get("/user/fetch", async (req, res) => {
 
 router.post("/user/verification", async (req, res) => {
   const request = mailjet_api.post("send", { version: "v3.1" }).request(req.body.messages);
-  request
+  await request
     .then((result) => {
       console.log(`[MAILJET] API response: ${result.body}`);
+      res.send({ sent: true });
     })
     .catch((err) => {
       console.log(`[MAILJET] API error: ${err}`);
+      res.send({ sent: false, error: err });
     });
 });
 

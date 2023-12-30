@@ -15,6 +15,7 @@ import CommunityDetails from "./Details";
 import ManageCommunity from "./Manage";
 import Explore from "./Explore";
 import Annoucements from "./Annoucements";
+import { CustomError } from "../../types";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -46,6 +47,7 @@ const Communities = (props: Props) => {
   const [showInvite, setShowInvite] = useState(false);
   const [joining, setJoining] = useState(false);
   const [menuAction, setMenuAction] = useState<MenuAction | undefined>(undefined);
+  const [error, setError] = useState<CustomError>({ valid: false });
 
   const navigate = useNavigate();
   const route = (path) => {
@@ -152,7 +154,17 @@ const Communities = (props: Props) => {
         ],
       };
 
-      post("/api/user/verification", { messages: messages });
+      post("/api/user/verification", { messages: messages }).then((res) => {
+        if (res.sent) {
+          setError({ valid: true, message: "Check your email for a verification link" });
+        } else {
+          console.log(`Mailjet error: ${res.error}`);
+          setError({
+            valid: true,
+            message: "Error sending verification link. Please try again later",
+          });
+        }
+      });
     });
   };
 
@@ -327,6 +339,11 @@ const Communities = (props: Props) => {
             <button className="default-button u-pointer" onClick={(event) => setType(undefined)}>
               Go back
             </button>
+            {error.valid ? (
+              <p className="error-text">{error.message}</p>
+            ) : (
+              <p className="error-text-hidden">Default</p>
+            )}
           </div>
         ) : (props.userId &&
             (communityType == CommunityType.UNIVERSITY ||
