@@ -15,7 +15,6 @@ dotenv.config({});
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
-// const LINKEDIN_REDIRECT_URI = "http://localhost:5050/api/user/linkedin";
 const LINKEDIN_REDIRECT_URI = `${DOMAIN}/api/user/linkedin`;
 const SALT_ROUNDS = 10;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -270,8 +269,7 @@ const linkedin = async (req: Request, res: Response) => {
                 "identifier"
               ];
             console.log(`[LINKEDIN] Profile picture url: ${profilePictureUrl}`);
-            // const loginUrl = `http://localhost:5050/api/login`;
-            const loginUrl = `https://crashmit-6571970b206b.herokuapp.com/api/login`;
+            const loginUrl = `${DOMAIN}/api/login`;
             const loginBody = {
               name: `${firstName} ${lastName}`,
               linkedinid: linkedinId,

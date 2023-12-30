@@ -51,3 +51,4 @@ export const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const PRIVACY_POLICY = "client/src/assets/privacy-policy.txt";
 export const SERVICE_TERMS = "client/src/assets/terms-of-service.txt";
 export const DOMAIN = "https://crashmit-6571970b206b.herokuapp.com";
+// export const DOMAIN = "http://localhost:5050/api/user/linkedin"

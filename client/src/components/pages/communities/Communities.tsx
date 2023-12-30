@@ -17,6 +17,7 @@ import Explore from "./Explore";
 import Annoucements from "./Annoucements";
 import { CustomError } from "../../types";
 import { SendEmailV3_1 } from "node-mailjet";
+import { DOMAIN } from "../../../../../server/types";
 
 type Props = RouteComponentProps & {
   userId: string;
@@ -152,7 +153,7 @@ const Communities = (props: Props) => {
             From: { Email: sender.email, Name: sender.name }, // single sender object
             To: [{ Email: sendee.email, Name: sendee.name }], // list of sendee objects
             Subject: "Verify your e-mail with Crash",
-            HTMLPart: `<a href="http://localhost:5050/api/user/verified?id=${props.userId}">Click here to confirm your email address</a>`,
+            HTMLPart: `<a href="${DOMAIN}/api/user/verified?id=${props.userId}">Click here to confirm your email address</a>`,
           },
         ],
       };

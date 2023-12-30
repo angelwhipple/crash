@@ -94,7 +94,6 @@ router.get("/user/fetch", async (req, res) => {
 
 router.post("/user/verification", async (req, res) => {
   const body: SendEmailV3_1.Body = req.body.messages;
-  // console.log(body);
   const request = mailjet_api.post("send", { version: "v3.1" }).request(body);
   await request
     .then((result) => {
