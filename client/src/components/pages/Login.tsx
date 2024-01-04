@@ -10,7 +10,7 @@ import {
   googleLogout,
   CredentialResponse,
 } from "@react-oauth/google";
-import "../modules/Modal.css";
+import "../modules/modals/Modal.css";
 import "./Login.css";
 import "../modules/accounts/CreateAccount.css";
 import { DOMAIN } from "../../../../server/types";

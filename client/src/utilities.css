@@ -69,6 +69,16 @@ iframe {
 ul {
   list-style-type: circle;
   margin-left: 5%;
+  text-align: start;
+}
+
+label {
+  white-space: nowrap;
+}
+
+input {
+  padding: 1%;
+  -webkit-text-fill-color: black;
 }
 
 .u-flex {
@@ -188,6 +198,7 @@ ul {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
   width: 100%;
   column-gap: 10%;
 }

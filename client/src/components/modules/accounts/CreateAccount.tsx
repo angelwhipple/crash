@@ -7,7 +7,7 @@ import "../NavBar.css";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { MdInfoOutline } from "react-icons/md";
 import helpers from "../../helpers";
-import InfoModal from "../InfoModal";
+import InfoModal from "../modals/InfoModal";
 import { USERNAME_INFO, PASSWORD_INFO, Policy, CustomError } from "../../types";
 
 type Props = RouteComponentProps & {

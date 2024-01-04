@@ -9,7 +9,7 @@ import blank from "../../assets/blank.jpg";
 import User from "../../../../shared/User";
 import EditModal from "../modules/profile/EditModal";
 import { FaGear } from "react-icons/fa6";
-import InfoModal from "../modules/InfoModal";
+import InfoModal from "../modules/modals/InfoModal";
 import { Policy } from "../types";
 
 type Props = RouteComponentProps & {

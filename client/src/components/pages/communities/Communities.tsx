@@ -160,12 +160,12 @@ const Communities = (props: Props) => {
 
       post("/api/user/verification", { messages: messages }).then((res) => {
         if (res.sent) {
-          setError({ valid: true, message: "Please check your email for a verification link" });
+          setError({ valid: true, message: "Please check your email for a verification link!" });
         } else {
           console.log(`Mailjet error: ${res.error}`);
           setError({
             valid: true,
-            message: "Error sending verification link. Please try again later",
+            message: "Error sending verification link, please try again later.",
           });
         }
       });
@@ -189,7 +189,7 @@ const Communities = (props: Props) => {
       <div className="mainpage-split">
         {props.userId === undefined ? (
           <div className="centered default-container">
-            <h3>Login to see this page</h3>
+            <p>Login to see this page</p>
             <button
               className="default-button u-pointer"
               onClick={(event) => {
@@ -340,7 +340,13 @@ const Communities = (props: Props) => {
                 }}
               ></TbPlayerTrackNextFilled>
             </div>
-            <button className="default-button u-pointer" onClick={(event) => setType(undefined)}>
+            <button
+              className="default-button u-pointer"
+              onClick={(event) => {
+                setType(undefined);
+                setVerifying(false);
+              }}
+            >
               Go back
             </button>
             {error.valid ? (

@@ -8,7 +8,7 @@ import CreateAccount from "../modules/accounts/CreateAccount";
 import Merge from "../modules/accounts/Merge";
 import { Player, Controls } from "@lottiefiles/react-lottie-player";
 import { CustomError } from "../types";
-import Logout from "../modules/LogoutModal";
+import Logout from "../modules/modals/LogoutModal";
 
 type Props = RouteComponentProps & {
   userId?: any;
@@ -29,8 +29,36 @@ const Homepage = (props: Props) => {
   const [login, setLogin] = useState(false);
   const [error, setError] = useState<CustomError>({ valid: false });
   const [logout, setLogout] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
+  const detectMobile = () => {
+    const devices = [
+      /Android/i,
+      /webOS/i,
+      /iPhone/i,
+      /iPad/i,
+      /iPod/i,
+      /BlackBerry/i,
+      /Windows Phone/i,
+    ];
+
+    return devices.some((device) => {
+      return navigator.userAgent.match(device);
+    });
+
+    // let isMobile = window.matchMedia;
+    // if (isMobile) {
+    //   let match_mobile = isMobile("(pointer:coarse)");
+    //   return match_mobile.matches;
+    // }
+    // return false;
+  };
 
   useEffect(() => {
+    const mobileDevice = detectMobile();
+    console.log(`Mobile: ${mobileDevice}`);
+    if (mobileDevice) setMobile(true);
+
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 

@@ -11,6 +11,7 @@ import helpers from "./helpers";
 
 dotenv.config({});
 
+export const GMAPS_API_KEY = process.env.GMAPS_API_KEY;
 // create a new OAuth client used to verify google sign-in
 const GOOGLE_CLIENT_ID = "281523827651-6p2ui3h699r3378i6emjqdm4o68hhnbi.apps.googleusercontent.com";
 const LINKEDIN_CLIENT_ID = "78kxc3fzhb4yju";

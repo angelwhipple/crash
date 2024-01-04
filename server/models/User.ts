@@ -11,11 +11,12 @@ const UserSchema = new Schema({
   pw_salt: { type: String, required: false },
   dob: { type: String, required: false },
   bio: { type: String, required: false },
-  verified: String,
+  verified: { type: Boolean, default: false },
   communities: [String], // array of community IDs
   followers: { type: [String], default: [] },
   following: { type: [String], default: [] },
   aws_img_key: { type: String, required: false },
+  subscription_tier: { type: String, default: "BASIC" },
 });
 
 export interface User extends Document {
@@ -30,11 +31,12 @@ export interface User extends Document {
   pw_salt?: string;
   dob?: string;
   bio?: string;
-  verified?: Boolean;
+  verified: Boolean;
   communities: string[];
   followers?: string[];
   following?: string[];
   aws_img_key?: String;
+  subscription_tier: string;
 }
 
 const UserModel = model<User>("User", UserSchema);

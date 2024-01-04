@@ -5,7 +5,7 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import Community from "../../../../../shared/Community";
 import "../../pages/Login.css";
 import "./Invite.css";
-import "../Modal.css";
+import "../modals/Modal.css";
 
 type Props = RouteComponentProps & {
   newCommunity: Community;

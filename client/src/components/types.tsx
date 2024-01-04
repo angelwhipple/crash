@@ -28,6 +28,13 @@ export type CustomError = {
   message?: string;
 };
 
+export type TravelQuery = {
+  location: string; // GMAP location later
+  startDate: string;
+  endDate: string;
+  groupSize: Number;
+};
+
 export const THIS_YEAR = new Date().getFullYear();
 export const VALID_DOMAINS = [".edu", ".com", ".gov"];
 export const FILTERS_TO_IDS = {

@@ -9,12 +9,12 @@ import { HiHome } from "react-icons/hi";
 import { IoIosPeople } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
 import { FaGear } from "react-icons/fa6";
-import Filters from "./FiltersModal";
+import Filters from "./modals/FiltersModal";
 import { SearchFilters, FILTERS_TO_IDS } from "../types";
-import Logout from "./LogoutModal";
+import Logout from "./modals/LogoutModal";
 import blank from "../../assets/blank.jpg";
 import helpers from "../helpers";
-import "./Modal.css";
+import "./modals/Modal.css";
 
 type Props = RouteComponentProps & {
   userId: string;
