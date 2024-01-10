@@ -6,8 +6,10 @@ import { RouteComponentProps, useNavigate } from "@reach/router";
 import "./Housing.css";
 import { CustomError, TravelQuery } from "../types";
 import Ad from "../modules/modals/AdModal";
-// import { Loader } from "@googlemaps/js-api-loader";
 import { GMAPS_API_KEY } from "../../../../server/auth";
+import { Loader } from "@googlemaps/js-api-loader";
+// import { google } from "googlemaps";
+// import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
 type Props = RouteComponentProps & {};
 
@@ -20,12 +22,38 @@ const Housing = (props: Props) => {
   const [error, setError] = useState<CustomError>({ valid: false });
   const [travelQuery, setTravelQuery] = useState<TravelQuery>();
   const [premiumAd, setPremiumAd] = useState(false);
+  const [map, setMap] = useState<google.maps.Map>()
 
+  // @ts-ignore google.maps.plugins
   // const loader = new Loader({
   //   apiKey: GMAPS_API_KEY!,
   //   version: "weekly",
-  //   libraries: ["places", "streetView"],
+  //   libraries: ["places", "maps", "streetView"],
   // });
+
+
+  const initGoogleMaps = () => {
+    const mapOptions = {
+      center: {
+        lat: 37.4708247,
+        lng: -121.927533,
+      },
+      zoom: 10,
+    };
+    // loader.load().then((google) => {
+    //   setMap(new google.maps.Map(document.getElementById("map") as HTMLElement, mapOptions));
+    // }).catch((e) => {});
+    // loader.importLibrary("maps").then(({ Map }) => {
+    //     setMap(new Map(document.getElementById("map")!, mapOptions));
+    //   });
+
+    const input = document.getElementById("location") as HTMLInputElement;
+    // const autocomplete = new google.maps.places.Autocomplete(input);
+    // autocomplete.addListener("place_changed", () => {
+    //   const place = autocomplete.getPlace();
+    //   console.log(place);
+    // });
+  };
 
   const handleDetails = async () => {
     const location = document.getElementById("location") as HTMLInputElement;
@@ -34,7 +62,7 @@ const Housing = (props: Props) => {
     const groupSize = document.getElementById("group_size") as HTMLInputElement;
     let tempError: CustomError = { valid: false };
 
-    // revise to use GMAPs API
+    // revise to use GMAPs Autocomplete
     if (!location.value) tempError = { valid: true, message: "Please select a valid location" };
     else if (!startDate.value)
       tempError = { valid: true, message: "Please enter a valid start date for travel" };
@@ -63,28 +91,21 @@ const Housing = (props: Props) => {
   };
 
   useEffect(() => {
-    const mapOptions = {
-      center: {
-        lat: 37.4708247, // TESLA: PAGE
-        lng: -121.927533,
-      },
-      zoom: 4,
-    };
-    // loader.load().then((google) => {
-    //   new google.maps.Map(document.getElementById("map") as HTMLElement, mapOptions);
-    // });
-    // loader.importLibrary("maps").then(({ Map }) => {
-    //   new Map(document.getElementById("map")!, mapOptions);
-    // });
-
     console.log(travelQuery);
     if (travelQuery !== undefined) setPremiumAd(true);
     setError({ valid: false });
   }, [travelQuery, view]);
 
+  useEffect(() => {
+    initGoogleMaps();
+  }, []);
+
   return (
     <>
-      <script src="https://unpkg.com/@googlemaps/js-api-loader@1.x/dist/index.min.js"></script>
+      {/* <script
+        src={`https://maps.googleapis.com/maps/api/js?key=${GMAPS_API_KEY}&libraries=places`}
+      ></script> */}
+      {/* <script src="https://unpkg.com/@googlemaps/js-api-loader@1.x/dist/index.min.js"></script> */}
       {premiumAd ? <Ad setDisplay={setPremiumAd}></Ad> : <></>}
       <div className="centered default-container">
         {travelQuery ? (
@@ -151,6 +172,16 @@ const Housing = (props: Props) => {
             <button className="default-button u-pointer" onClick={() => setView("TRAVELER")}>
               Traveler
             </button>
+            {/* {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={mapContainer}
+                center={center}
+                zoom={10}
+                onLoad={onLoad}
+              ></GoogleMap>
+            ) : (
+              <></>
+            )} */}
             <div id="map" className="map-container"></div>
           </>
         )}
