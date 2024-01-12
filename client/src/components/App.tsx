@@ -17,6 +17,7 @@ import Housing from "./pages/Housing";
 import ProfilePill from "./modules/accounts/ProfilePill";
 import Verified from "./pages/throwaway/Verified";
 import Joined from "./pages/throwaway/Joined";
+import Report from "./modules/modals/ReportIssue";
 
 const PLATFORMS = {
   linkedin: "linkedinid",
@@ -168,6 +169,7 @@ const App = () => {
         <Joined path="/joined"></Joined>
         <NotFound default={true} />
       </Router>
+      <Report></Report>
     </div>
   );
 };

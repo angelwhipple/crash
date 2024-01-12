@@ -8,8 +8,6 @@ import { CustomError, TravelQuery } from "../types";
 import Ad from "../modules/modals/AdModal";
 import { GMAPS_API_KEY } from "../../../../server/auth";
 import { Loader } from "@googlemaps/js-api-loader";
-// import { google } from "googlemaps";
-// import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
 type Props = RouteComponentProps & {};
 
@@ -22,15 +20,14 @@ const Housing = (props: Props) => {
   const [error, setError] = useState<CustomError>({ valid: false });
   const [travelQuery, setTravelQuery] = useState<TravelQuery>();
   const [premiumAd, setPremiumAd] = useState(false);
-  const [map, setMap] = useState<google.maps.Map>()
+  const [map, setMap] = useState<any>();
 
   // @ts-ignore google.maps.plugins
   // const loader = new Loader({
   //   apiKey: GMAPS_API_KEY!,
   //   version: "weekly",
-  //   libraries: ["places", "maps", "streetView"],
+  //   // libraries: ["places", "maps", "streetView"],
   // });
-
 
   const initGoogleMaps = () => {
     const mapOptions = {
@@ -40,18 +37,18 @@ const Housing = (props: Props) => {
       },
       zoom: 10,
     };
-    // loader.load().then((google) => {
-    //   setMap(new google.maps.Map(document.getElementById("map") as HTMLElement, mapOptions));
-    // }).catch((e) => {});
+    const gmap = document.getElementById("map") as HTMLElement;
     // loader.importLibrary("maps").then(({ Map }) => {
-    //     setMap(new Map(document.getElementById("map")!, mapOptions));
-    //   });
+    //   setMap(new Map(gmap, mapOptions));
+    // });
 
-    const input = document.getElementById("location") as HTMLInputElement;
-    // const autocomplete = new google.maps.places.Autocomplete(input);
-    // autocomplete.addListener("place_changed", () => {
-    //   const place = autocomplete.getPlace();
-    //   console.log(place);
+    const location = document.getElementById("location") as HTMLInputElement;
+    // loader.importLibrary("places").then(({ Autocomplete }) => {
+    //   const autocomplete = new Autocomplete(location);
+    //   autocomplete.addListener("place_changed", () => {
+    //     const place = autocomplete.getPlace();
+    //     console.log(place);
+    //   });
     // });
   };
 
@@ -102,10 +99,6 @@ const Housing = (props: Props) => {
 
   return (
     <>
-      {/* <script
-        src={`https://maps.googleapis.com/maps/api/js?key=${GMAPS_API_KEY}&libraries=places`}
-      ></script> */}
-      {/* <script src="https://unpkg.com/@googlemaps/js-api-loader@1.x/dist/index.min.js"></script> */}
       {premiumAd ? <Ad setDisplay={setPremiumAd}></Ad> : <></>}
       <div className="centered default-container">
         {travelQuery ? (
@@ -121,24 +114,24 @@ const Housing = (props: Props) => {
         ) : view === "TRAVELER" ? (
           <div className="inputs-container">
             <h4>Share a few details about your upcoming travel</h4>
-            <label>
-              Destination
-              <input id="location" type="text"></input>
-            </label>
-            <div className="dates-container">
+            <form>
+              <label>Destination</label>
+              <div className="dates-container">
+                <label>
+                  From
+                  <input id="date_start" type="date" min={TODAYS_DATE}></input>
+                </label>
+                <label>
+                  To
+                  <input id="date_end" type="date" min={TODAYS_DATE}></input>
+                </label>
+              </div>
               <label>
-                From
-                <input id="date_start" type="date" min={TODAYS_DATE}></input>
+                Number of Travelers
+                <input id="group_size" type="number" min="1"></input>
               </label>
-              <label>
-                To
-                <input id="date_end" type="date" min={TODAYS_DATE}></input>
-              </label>
-            </div>
-            <label>
-              Number of Travelers
-              <input id="group_size" type="number" min="1"></input>
-            </label>
+            </form>
+
             {error.valid ? (
               <p className="error-text">{error.message}</p>
             ) : (
@@ -172,16 +165,6 @@ const Housing = (props: Props) => {
             <button className="default-button u-pointer" onClick={() => setView("TRAVELER")}>
               Traveler
             </button>
-            {/* {isLoaded ? (
-              <GoogleMap
-                mapContainerStyle={mapContainer}
-                center={center}
-                zoom={10}
-                onLoad={onLoad}
-              ></GoogleMap>
-            ) : (
-              <></>
-            )} */}
             <div id="map" className="map-container"></div>
           </>
         )}

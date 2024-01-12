@@ -29,7 +29,7 @@ export type CustomError = {
 };
 
 export type TravelQuery = {
-  location: string; // GMAP location later
+  location: string; // GMAP/Mapbox locations
   startDate: string;
   endDate: string;
   groupSize: Number;

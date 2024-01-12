@@ -3,3 +3,12 @@
   width: auto;
   overflow-y: auto;
 }
+
+.info-textbox {
+  text-align: start;
+  font-size: small;
+  max-height: 70vh;
+  width: auto;
+  overflow-y: auto;
+  resize: none;
+}

@@ -31,3 +31,33 @@
   row-gap: 10px;
   padding: 20px; /* Adjust padding according to your needs */
 }
+
+.report-icon {
+  position: absolute;
+  padding: 2%;
+  bottom: 0;
+  right: 0;
+  color: inherit;
+  opacity: 0.5;
+  width: 25px;
+  height: 25px;
+  transition-duration: 0.5s;
+}
+
+.report-icon:hover {
+  color: var(--orange);
+  opacity: 1;
+  transition-duration: 0.5s;
+}
+
+.dropdown-container {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+}
+
+.dropdown-input {
+  width: 150px;
+  text-align: center;
+}

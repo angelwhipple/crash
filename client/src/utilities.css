@@ -194,6 +194,17 @@ input {
   transition-duration: 1s;
 }
 
+.default-icon {
+  font-size: small;
+  fill: inherit;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.default-icon:hover {
+  fill: var(--orange);
+}
+
 .action-container {
   display: flex;
   flex-direction: row;
@@ -210,14 +221,6 @@ input {
   word-wrap: break-word;
   font-size: small;
   font-weight: 300;
-}
-
-.info-textbox {
-  text-align: start;
-  font-size: small;
-  max-height: 70vh;
-  width: auto;
-  overflow-y: auto;
 }
 
 .error-text {
